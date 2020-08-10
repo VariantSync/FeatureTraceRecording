@@ -66,6 +66,14 @@ main = putStrLn . show . flip runState 0 $ do
   treeToInsert <- assertAST
   -- define some helper variables that make things easier to read
   let p = find treeToInsertTo (\(AST n _) -> value n == "Statements")
-      e = InsTree {tree = treeToInsert, pos = uuidOf $ crack p, index = 0}
+      e = InsTree {treeToInsert = treeToInsert, pos = uuidOf $ crack p, index = 0}
   -- do the actual functionality
   return (edit e treeToInsertTo)
+
+  -- go to ghci with: stack ghci
+  -- In ghci:
+  --   to get info: ":i NAME"
+  --   to exit: ":q"
+  --   to reload: ":r"
+  --   autobuild: "stack build --file-watch"
+  --   autorun main: "stack build --file-watch --exec "stack run ftr""

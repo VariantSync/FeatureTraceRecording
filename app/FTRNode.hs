@@ -17,4 +17,4 @@ newNode a t = do num <- get
                  return Node {value = a, ntype = t, uuid = num}
 
 uuidOf :: AST (Node a) -> UUID
-uuidOf t = uuid . element $ t
+uuidOf = uuid . element
