@@ -23,7 +23,7 @@ uuidOf :: AST a -> UUID
 uuidOf = uuid . element
 
 abstract :: AST a -> AST a
-abstract = filterNodes (\(Tree n _) -> ntype n == Plain)
+abstract = filterNodes (\(Tree n _) -> ntype n /= Plain)
 
 legatorAncestors :: Eq a => AST a -> AST a -> [AST a]
 legatorAncestors root = (filter (\(Tree n _) -> ntype n == Legator)).(ancestors root)

@@ -24,7 +24,7 @@ instance Foldable Tree where
 
 instance Applicative Tree where
    pure a = Tree a []
-   (<*>) (Tree f cf) (Tree x cx) = Tree (f x) (concatMap (\g -> fmap (\c -> g <*> c) cx) cf)
+   (Tree f cf) <*> (Tree x cx) = Tree (f x) ((fmap (fmap f) cx)++(concatMap (\g -> fmap (\c -> g <*> c) cx) cf))
 
 --instance Traversable Tree where
 --  traverse g (Tree x []) = fmap pure (g x)
@@ -59,17 +59,17 @@ manipulate :: (Tree a -> Tree a) -> Tree a -> Tree a
 manipulate f (Tree x children) = f (Tree x (fmap (manipulate f) children))
 
 {-
-Removes all subtrees meeting the imposed condition.
+Removes all subtrees not meeting the imposed condition.
 The root remains untouched.
 -}
 filterTrees :: (Tree a -> Bool) -> Tree a -> Tree a
 filterTrees p = manipulate (\(Tree n c) -> Tree n (Data.List.filter p c))
 
 {-
-Removes all nodes meeting the imposed condition.
+Removes all nodes not meeting the imposed condition.
 Children of removed nodes are moved up and become children of the parent of the removed node.
 The root remains untouched.
 -}
 filterNodes :: (Tree a -> Bool) -> Tree a -> Tree a
 filterNodes p = manipulate (\tree@(Tree node children) ->
-    Tree node (concat $ fmap (\c@(Tree _ cc) -> if p c then cc else [c]) children))
+    Tree node (concat $ fmap (\c@(Tree _ cc) -> if p c then [c] else cc) children))
