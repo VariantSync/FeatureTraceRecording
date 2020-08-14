@@ -24,7 +24,11 @@ dependencies:
 - mtl
 
 library:
-  source-dirs: src
+  source-dirs:
+    - src
+    - src/feature
+    - src/tree
+    - src/propositions
 
 executables:
   ftr-exe:

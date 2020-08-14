@@ -15,5 +15,9 @@ crack :: Maybe a -> a
 crack Nothing = error "This Maybe does not contain a value"
 crack (Just x) = x
 
+safecrack :: Maybe a -> (() -> a) -> a
+safecrack Nothing gen = gen ()
+safecrack (Just x) gen = x
+
 reversefoldr :: (a -> b -> b) -> b -> [a] -> b
 reversefoldr f zero container = foldr f zero $ reverse container

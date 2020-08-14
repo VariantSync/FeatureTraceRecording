@@ -36,6 +36,9 @@ isleaf (Tree _ children) = null children
 element :: Tree a -> a
 element (Tree n _) = n
 
+tree :: Eq a => Tree a -> a -> Maybe(Tree a)
+tree t x = Tree.find t (\(Tree y _) -> x == y)
+
 find :: Tree a -> (Tree a -> Bool) -> Maybe(Tree a)
 find x@(Tree _ children) predicate = case predicate x of
   True -> Just x
@@ -43,6 +46,14 @@ find x@(Tree _ children) predicate = case predicate x of
 
 parent :: Eq a => Tree a -> Tree a -> Maybe(Tree a)
 parent root t = Tree.find root (\(Tree _ children) -> elem t children)
+
+{-
+Retrieves all nodes that are above the given node (second argument) in the given tree (first argument)
+-}
+ancestors :: Eq a => Tree a -> Tree a -> [Tree a]
+ancestors root t = case parent root t of
+  Nothing -> []
+  Just p -> (ancestors root p)++[p]
 
 manipulate :: (Tree a -> Tree a) -> Tree a -> Tree a
 manipulate f (Tree x children) = f (Tree x (fmap (manipulate f) children))

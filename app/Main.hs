@@ -4,7 +4,7 @@ import Control.Monad.State
 
 import Util
 import Tree
-import FTRNode
+import AST
 import Edits
 import Data.List (intercalate)
 
