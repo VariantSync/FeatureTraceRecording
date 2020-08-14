@@ -12,8 +12,11 @@ type Feature = String
 type FeatureFormula = NullableFormula Feature
 data FeatureTrace a = F (Node a -> FeatureFormula)
 
+showTrace :: Show b => (Node a -> b) -> AST a -> String
+showTrace toshowable t = show $ fmap toshowable t
+
 newTrace :: UUID -> Int -> FeatureFormula -> FeatureTrace a
-newTrace id version' formula = F(\n -> if (uuid n == id) && (version n == version') then formula else Nothing)
+newTrace id version' formula = F(\n -> if (uuid n == id) && (version n == version') && (ntype n /= Plain) then formula else Nothing)
 
 {-
 Combine two feature traces in the same notion as for functions:
@@ -25,9 +28,6 @@ Combine two feature traces in the same notion as for functions:
     Nothing -> t' n
     Just x -> Just x
     )
-
-showTrace :: Show b => (Node a -> b) -> AST a -> String
-  
 
 {-
 Calculates the presence condition of a node (third argument) in the given tree (first argument) with the given feature traces (second argument).
