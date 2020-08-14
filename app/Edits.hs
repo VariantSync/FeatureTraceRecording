@@ -1,24 +1,19 @@
 module Edits where
 
-import AST
+import Tree
 import FTRNode
 import Util
 
-data EditType = Insert | Delete | Move | Update
+data EditType = Insert | Delete | Move | Update deriving (Eq, Show)
+data Edit a = Edit {edittype :: EditType, name :: String, run :: FTRAST a -> FTRAST a} -- inverse :: Edit a
 
-class Edit e where
-  edittype :: e a -> EditType
-  edit :: e a -> AST (Node a) -> AST (Node a)
+-- Add the tree s as the i-th child of node p
+ins_tree :: Show a => FTRAST a -> UUID -> Int -> Edit a
+ins_tree s p i = Edit {edittype = Insert, run = (fmap $ increaseVersion 1).(manipulate ins), name = "ins_tree("++(show $ uuidOf s)++", "++(show p)++", "++(show i)++")"} -- inverse = del_tree $ uuidOf s
+ where ins x@(Tree n c) = if uuid n == p
+                         then Tree n (Util.insertAtIndex i s c)
+                         else x
 
-data InsTree a = InsTree {treeToInsert::(AST (Node a)), pos::UUID, index::Int}
-instance Edit InsTree where
-  edittype _ = Insert
-  edit e t = manipulate ins t
-    where ins x@(AST n c) = if uuid n == pos e
-                            then AST n (Util.insertAtIndex (index e) (treeToInsert e) c)
-                            else x
-
-data DelTree a = DelTree UUID
-instance Edit DelTree where
-  edittype _ = Delete
-  edit (DelTree pos) t = AST.filter ((pos /=) . uuidOf) t
+-- delete the subtree rooted in v
+del_tree :: UUID -> Edit a
+del_tree v = Edit {edittype = Delete, run = (fmap $ increaseVersion 1).(filterTrees ((v /=) . uuidOf)), name = "del_tree("++(show v)++")"}

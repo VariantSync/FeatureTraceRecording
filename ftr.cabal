@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b811c42c73bc1b662d3d936f052d957f2ab8e38a718d30a16c599bb340eba0e8
+-- hash: 553b07985e451d75a8557ca27b66dca41c1c36d47225cdc4ee0335139d77f8a5
 
 name:           ftr
 version:        0.1.0.0
@@ -40,10 +40,10 @@ library
 executable ftr-exe
   main-is: Main.hs
   other-modules:
-      AST
       Edits
       FeatureTrace
       FTRNode
+      Tree
       Util
       Paths_ftr
   hs-source-dirs:

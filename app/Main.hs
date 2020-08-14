@@ -3,73 +3,81 @@ module Main where
 import Control.Monad.State
 
 import Util
-import AST
+import Tree
 import FTRNode
 import Edits
+import Data.List (intercalate)
 
-absAST :: State UUID (AST (Node String))
+absAST :: State UUID (Tree (Node String))
 absAST = sequence
-    (AST (newNode "abs" Legator) [
-        (AST (newNode "Parameters" Plain) [
-            (AST (newNode "VarDecl" Legator) [
-                (AST (newNode "int" Constituent) []),
-                (AST (newNode "x" Constituent) [])
+    (Tree (newNode "abs" Legator) [
+        (Tree (newNode "Parameters" Plain) [
+            (Tree (newNode "VarDecl" Legator) [
+                (Tree (newNode "int" Constituent) []),
+                (Tree (newNode "x" Constituent) [])
             ])
         ]),
-        (AST (newNode "Statements" Plain) [
-            (AST (newNode "if" Constituent) [
-                (AST (newNode "Expression" Plain) [
-                    (AST (newNode "<" Constituent) [
-                        (AST (newNode "x" Plain) []),
-                        (AST (newNode "0" Plain) [])
+        (Tree (newNode "Statements" Plain) [
+            (Tree (newNode "if" Constituent) [
+                (Tree (newNode "Expression" Plain) [
+                    (Tree (newNode "<" Constituent) [
+                        (Tree (newNode "x" Plain) []),
+                        (Tree (newNode "0" Plain) [])
                         -- Should these really be plain here?
                         -- They cant be removed because they belong to the definition of < which needs a left and right side.
                         -- However, they could be replaced in other variants.
                     ])
                 ]),
-                (AST (newNode "Statements" Legator) [
-                    (AST (newNode "return" Legator) [
-                        (AST (newNode "Expression" Plain) [
-                            (AST (newNode "UnaryMinus" Constituent) [
-                                (AST (newNode "x" Constituent) [])
+                (Tree (newNode "Statements" Legator) [
+                    (Tree (newNode "return" Legator) [
+                        (Tree (newNode "Expression" Plain) [
+                            (Tree (newNode "UnaryMinus" Constituent) [
+                                (Tree (newNode "x" Constituent) [])
                             ])
                         ])
                     ])
                 ])
             ]),
-            (AST (newNode "return" Legator) [
-                (AST (newNode "Expression" Plain) [
-                    (AST (newNode "x" Constituent) [])
+            (Tree (newNode "return" Legator) [
+                (Tree (newNode "Expression" Plain) [
+                    (Tree (newNode "x" Constituent) [])
                 ])
             ])
         ])
     ])
 
-assertAST :: State UUID (AST (Node String))
+assertAST :: State UUID (Tree (Node String))
 assertAST = sequence -- fix types
-    (AST (newNode "Assertion" Legator) [
-        (AST (newNode "Expression" Plain) [
-            (AST (newNode "!=" Legator) [
-                (AST (newNode "x" Constituent) []),
-                (AST (newNode "NaN" Constituent) [])
+    (Tree (newNode "Assertion" Legator) [
+        (Tree (newNode "Expression" Plain) [
+            (Tree (newNode "!=" Legator) [
+                (Tree (newNode "x" Constituent) []),
+                (Tree (newNode "NaN" Constituent) [])
             ])
         ])
     ])
 
 main :: IO ()
 -- main = putStrLn . show $ runState absAST 0
--- main = putStrLn . show $ runState (assertAST >>= \smallTree -> absAST >>= \bigTree -> return $ edit (InsTree {tree = smallTree, pos = uuidOf $ crack $ find bigTree (\(AST n _) -> value n == "Statements"), index = 0}) bigTree) 0
+-- main = putStrLn . show $ runState (assertAST >>= \smallTree -> absAST >>= \bigTree -> return $ edit (InsTree {tree = smallTree, pos = uuidOf $ crack $ find bigTree (\(Tree n _) -> value n == "Statements"), index = 0}) bigTree) 0
 
 main = putStrLn . show . flip runState 0 $ do
   -- Unpack the states i.e. apply >>= in a more convenient way
-  treeToInsertTo <- absAST
+  tree0 <- absAST
   treeToInsert <- assertAST
   -- define some helper variables that make things easier to read
-  let p = find treeToInsertTo (\(AST n _) -> value n == "Statements")
-      e = InsTree {treeToInsert = treeToInsert, pos = uuidOf $ crack p, index = 0}
-  -- do the actual functionality
-  return (edit e treeToInsertTo)
+  let p = crack $ find tree0 (\(Tree n _) -> value n == "Statements")
+      editscript = [
+           ins_tree treeToInsert (uuidOf p) 0
+          ,del_tree (uuidOf treeToInsert)
+          ]
+  -- do the actual functionality: Therefore, we fold the edit script into one big edit
+--   return $ tree0
+--   return $ abstract tree0
+  return $ (reversefoldr (.) id (fmap run editscript)) tree0
+--   return $ intercalate ", " (fmap name editscript)
 
+-- GHCI COMMANDS
   -- go to ghci with: stack ghci
   -- In ghci:
   --   to get info: ":i NAME"
