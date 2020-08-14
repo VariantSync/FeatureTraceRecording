@@ -10,8 +10,7 @@ Combines a list of nullable formulas with the AND operator according where "Noth
 -}
 ffand :: [NullableFormula a] -> NullableFormula a
 ffand [] = Nothing
-ffand (x:xs) = case x of
-    Nothing -> ffand xs
-    Just y -> case ffand xs of
-        Nothing -> Just y
-        Just z -> Just (PAnd y z)
+ffand (Nothing:xs) = ffand xs
+ffand ((Just x):xs) = case ffand xs of
+    Nothing -> Just x
+    Just x' -> Just (PAnd x x')
