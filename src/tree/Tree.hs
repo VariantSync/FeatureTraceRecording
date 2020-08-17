@@ -26,6 +26,11 @@ instance Applicative Tree where
    pure a = Tree a []
    (Tree f cf) <*> (Tree x cx) = Tree (f x) ((fmap (fmap f) cx)++(concatMap (\g -> fmap (\c -> g <*> c) cx) cf))
 
+-- instance Monad Tree where
+--   return = pure
+--   (Tree x c) >>= f = f x
+
+
 --instance Traversable Tree where
 --  traverse g (Tree x []) = fmap pure (g x)
 --  traverse g t@(Tree x c) = fmap (traverse g) c

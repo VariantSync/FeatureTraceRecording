@@ -12,19 +12,19 @@ type Feature = String
 type FeatureFormula = NullableFormula Feature
 data FeatureTrace a = F (Node a -> FeatureFormula)
 
-showTrace :: Show b => (Node a -> b) -> AST a -> String
-showTrace toshowable t = show $ fmap toshowable t
+showTrace :: Show a => FeatureTrace a -> AST a -> Tree String
+showTrace (F f) = fmap (\n -> "<"++(show $ f n)++"> "++(show n))
 
 newTrace :: UUID -> Int -> FeatureFormula -> FeatureTrace a
-newTrace id version' formula = F(\n -> if (uuid n == id) && (version n == version') && (ntype n /= Plain) then formula else Nothing)
+newTrace id version' formula = F(\n -> if (uuid n == id) && (ntype n /= Plain) then formula else Nothing)
 
 {-
 Combine two feature traces in the same notion as for functions:
   t1.t2 means t1 'after' t2, i.e. if t2 is undefined on a node, t1 will be used.
   t1 will not overwrite the traces that are already defined by t2.
 -}
-(.) :: FeatureTrace a -> FeatureTrace a -> FeatureTrace a
-(F t') . (F t) = F (\n -> case t n of
+combine :: FeatureTrace a -> FeatureTrace a -> FeatureTrace a
+combine (F t') (F t) = F (\n -> case t n of
     Nothing -> t' n
     Just x -> Just x
     )

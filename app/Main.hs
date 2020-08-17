@@ -6,9 +6,11 @@ import Util
 import Tree
 import AST
 import Edits
+import FeatureTrace
+import Propositions
 import Data.List (intercalate)
 
-absAST :: State UUID (Tree (Node String))
+absAST :: State UUID (AST String)
 absAST = sequence
     (Tree (newNode "abs" Legator) [
         (Tree (newNode "Parameters" Plain) [
@@ -46,7 +48,7 @@ absAST = sequence
         ])
     ])
 
-assertAST :: State UUID (Tree (Node String))
+assertAST :: State UUID (AST String)
 assertAST = sequence -- fix types
     (Tree (newNode "Assertion" Legator) [
         (Tree (newNode "Expression" Plain) [
@@ -68,20 +70,12 @@ main = putStrLn . show . flip runState 0 $ do
   -- define some helper variables that make things easier to read
   let p = crack $ find tree0 (\(Tree n _) -> value n == "Statements")
       editscript = [
-           ins_tree treeToInsert (uuidOf p) 0
-          ,del_tree (uuidOf treeToInsert)
+           edit_ins_tree treeToInsert (uuidOf p) 0
+          ,edit_del_tree (uuidOf treeToInsert)
           ]
   -- do the actual functionality: Therefore, we fold the edit script into one big edit
 --   return $ tree0
 --   return $ abstract tree0
-  return $ (reversefoldr (.) id (fmap run editscript)) tree0
+  return $ showTrace (newTrace 15 2 (Just $ PAnd (PVariable "A") (PVariable "B"))) $ foldEditScript editscript tree0
 --   return $ intercalate ", " (fmap name editscript)
 
--- GHCI COMMANDS
-  -- go to ghci with: stack ghci
-  -- In ghci:
-  --   to get info: ":i NAME"
-  --   to exit: ":q"
-  --   to reload: ":r"
-  --   autobuild: "stack build --file-watch"
-  --   autorun main: "stack build --file-watch --exec "stack run ftr""
