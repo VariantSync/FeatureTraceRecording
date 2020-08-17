@@ -8,8 +8,14 @@ import Control.Monad.State
 type UUID = Int
 
 data NodeType = Plain | Constituent | Legator deriving (Show, Eq)
-data Node a = Node {value::a, ntype::NodeType, uuid::UUID} deriving (Show, Functor, Eq, Foldable, Traversable) --, version::Int
+data Node a = Node {value::a, ntype::NodeType, uuid::UUID} deriving (Show, Eq, Functor) --, version::Int
 type AST a = Tree (Node a)
+
+-- instance (Ord a, Eq a) => Ord (Node a) where
+--   v <= w = (value v) <= (value w)
+
+instance (Eq a) => Ord (Node a) where
+  v <= w = (uuid v) <= (uuid w)
 
 newNode :: a -> NodeType -> State UUID (Node a)
 newNode a t = do num <- get
