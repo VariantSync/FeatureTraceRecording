@@ -76,6 +76,6 @@ main = putStrLn . show . flip runState 0 $ do
   -- do the actual functionality: Therefore, we fold the edit script into one big edit
 --   return $ tree0
 --   return $ abstract tree0
-  return $ showTrace (newTrace 15 2 (Just $ PAnd (PVariable "A") (PVariable "B"))) $ foldEditScript editscript tree0
+  return $ showTrace (newTrace 15 2 (Just $ PAnd [PVariable "A", PVariable "B"])) $ foldEditScript editscript tree0
 --   return $ intercalate ", " (fmap name editscript)
 
