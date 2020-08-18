@@ -31,7 +31,7 @@ edit_trace_only :: Set (Node a) -> Edit a
 edit_trace_only nodes = Edit {edittype = TraceOnly,
                               run = id,
                               delta = \t -> nodes,
-                              name = "identity"}
+                              name = "tracechange"}
 
 -- Add the tree s as the i-th child of node p
 edit_ins_tree :: (Eq a, Show a) => AST a -> UUID -> Int -> Edit a
