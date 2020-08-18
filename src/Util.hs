@@ -11,6 +11,10 @@ insertAtIndex i x l@(head:tail) = if i <= 0 then x:l else head:(insertAtIndex (i
 genIndent :: Int -> String
 genIndent i = concat $ replicate i "  "
 
+hasvalue :: Maybe a -> Bool
+hasvalue Nothing = False
+hasvalue (Just x) = True
+
 crack :: Maybe a -> a
 crack Nothing = error "This Maybe does not contain a value"
 crack (Just x) = x
