@@ -58,5 +58,25 @@ toCNF n@(PNot a) = case a of
     (PNot x) -> toCNF x
     (PAnd cs) -> toCNF $ POr $ fmap pnegate cs
     (POr cs) -> toCNF $ PAnd $ fmap pnegate cs
-toCNF a@(PAnd cs) = PAnd $ fmap toCNF cs -- TODO: Flatten this
-toCNF o@(POr cs) = PTrue -- TODO
+toCNF a@(PAnd cs) = simplify $ PAnd $ fmap toCNF cs
+toCNF o@(POr cs) = simplify $ POr $ fmap toCNF cs -- TODO
+
+simplify :: PropositionalFormula a -> PropositionalFormula a
+simplify (PNot a) = case simplify a of
+    PTrue -> PFalse
+    PFalse -> PTrue
+    (PNot x) -> x
+    p -> PNot p
+simplify (PAnd cs) =
+    case PAnd (concat $ flip fmap cs (\c -> case simplify c of
+        PAnd cs' -> cs'
+        p -> [p])) of
+            PAnd [] -> PTrue
+            p -> p
+simplify (POr cs) =
+    case POr (concat $ flip fmap cs (\c -> case simplify c of
+        POr cs' -> cs'
+        p -> [p])) of
+            POr [] -> PFalse
+            p -> p
+simplify p = p
