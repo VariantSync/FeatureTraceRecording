@@ -59,23 +59,47 @@ assertAST = sequence -- fix types
         ])
     ])
 
+testImpl :: PropositionalFormula String
+testImpl = pimplies (PAnd [PVariable "A", PVariable "B"]) (PVariable "C")
+
+testDNF :: PropositionalFormula String
+testDNF = POr [PAnd [PVariable "A", PVariable "B"], PAnd [PVariable "C", PNot (POr [PVariable "A", PVariable "B"])]]
+
+testNot :: PropositionalFormula String
+testNot = PNot testImpl
+
+testCNF :: PropositionalFormula String
+testCNF = PAnd [POr [PVariable "A", PVariable "B"], POr [PNot (PVariable "A"), PVariable "D"]]
+
+testSimplify :: PropositionalFormula String
+testSimplify = PAnd [PTrue, POr [PFalse, pimplies PFalse PTrue]]
+
 main :: IO ()
 -- main = putStrLn . show $ runState absAST 0
 -- main = putStrLn . show $ runState (assertAST >>= \smallTree -> absAST >>= \bigTree -> return $ edit (InsTree {tree = smallTree, pos = uuidOf $ crack $ find bigTree (\(Tree n _) -> value n == "Statements"), index = 0}) bigTree) 0
 
-main = putStrLn . show . flip runState 0 $ do
-  -- Unpack the states i.e. apply >>= in a more convenient way
-  tree0 <- absAST
-  treeToInsert <- assertAST
-  -- define some helper variables that make things easier to read
-  let p = crack $ find tree0 (\(Tree n _) -> value n == "Statements")
-      editscript = [
-           edit_ins_tree treeToInsert (uuidOf p) 0
-          ,edit_del_tree (uuidOf treeToInsert)
-          ]
-  -- do the actual functionality: Therefore, we fold the edit script into one big edit
---   return $ tree0
---   return $ abstract tree0
-  return $ showTrace (newTrace 15 2 (Just $ PAnd [PVariable "A", PVariable "B"])) $ foldEditScript editscript tree0
---   return $ intercalate ", " (fmap name editscript)
+-- main = putStrLn . show . flip runState 0 $ do
+--   -- Unpack the states i.e. apply >>= in a more convenient way
+--   tree0 <- absAST
+--   treeToInsert <- assertAST
+--   -- define some helper variables that make things easier to read
+--   let p = crack $ find tree0 (\(Tree n _) -> value n == "Statements")
+--       editscript = [
+--            edit_ins_tree treeToInsert (uuidOf p) 0
+--           ,edit_del_tree (uuidOf treeToInsert)
+--           ]
+--   -- do the actual functionality: Therefore, we fold the edit script into one big edit
+-- --   return $ tree0
+-- --   return $ abstract tree0
+--   return $ showTrace (newTrace 15 2 (Just $ PAnd [PVariable "A", PVariable "B"])) $ foldEditScript editscript tree0
+-- --   return $ intercalate ", " (fmap name editscript)
 
+main = putStrLn $
+    foldr (\a b -> a++"\n"++b) "" $
+    map (\a ->
+        "Formula: "++(show a)++
+        "\n  isCNF: "++(show $ isCNF a)++
+        "\n    CNF: "++(show $ toCNF a)++
+        "\n  isCNF: "++(show $ isCNF $ toCNF a)++
+        "\n=====\n")
+    [testImpl, testDNF, testNot, testCNF, testSimplify]

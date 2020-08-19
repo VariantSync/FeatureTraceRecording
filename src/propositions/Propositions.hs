@@ -1,6 +1,7 @@
 module Propositions where
 
 import Data.List
+import Util
 
 data PropositionalFormula a =
     PTrue
@@ -9,11 +10,26 @@ data PropositionalFormula a =
     | PNot (PropositionalFormula a)
     | PAnd [PropositionalFormula a]
     | POr [PropositionalFormula a]
-    deriving (Show, Eq)
+    deriving (Eq)
 
 data Configuration a = Configuration (a -> Bool)
 
 -- type CNF a = CNF (PAnd [POr a])
+
+isPTrue :: PropositionalFormula a -> Bool
+isPTrue PTrue = True
+isPTrue _ = False
+
+isPFalse :: PropositionalFormula a -> Bool
+isPFalse PFalse = True
+isPFalse _ = False
+
+isLiteral :: PropositionalFormula a -> Bool
+isLiteral PTrue = True
+isLiteral PFalse = True
+isLiteral (PVariable x) = True
+isLiteral (PNot f) = isLiteral f
+isLiteral _ = False
 
 pimplies :: PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
 pimplies a b = POr [(PNot a), b]
@@ -35,22 +51,12 @@ eval config (PNot x) = not $ eval config x
 eval config (PAnd cs) = and $ fmap (eval config) cs
 eval config (POr cs) = or $ fmap (eval config) cs
 
-isLiteral :: PropositionalFormula a -> Bool
-isLiteral PTrue = True
-isLiteral PFalse = True
-isLiteral (PVariable x) = True
-isLiteral (PNot f) = isLiteral f
-isLiteral _ = False
-
 isCNF :: PropositionalFormula a -> Bool
 isCNF (PAnd cs) = all isCNF cs
 isCNF (POr cs) = all isLiteral cs
 isCNF p = isLiteral p
 
 toCNF :: PropositionalFormula a -> PropositionalFormula a
-toCNF PTrue = PTrue
-toCNF PFalse = PFalse
-toCNF v@(PVariable x) = v
 toCNF n@(PNot a) = case a of
     PTrue -> PFalse
     PFalse -> PTrue
@@ -60,6 +66,12 @@ toCNF n@(PNot a) = case a of
     (POr cs) -> toCNF $ PAnd $ fmap pnegate cs
 toCNF a@(PAnd cs) = simplify $ PAnd $ fmap toCNF cs
 toCNF o@(POr cs) = simplify $ PAnd $ foldr cartesianOr [PFalse] $ fmap toCNFClauseList $ fmap toCNF cs -- TODO
+toCNF p = p
+
+lazyToCNF :: PropositionalFormula a -> PropositionalFormula a
+lazyToCNF p
+    | isCNF p   = p
+    | otherwise = toCNF p
 
 {-
 Assumes that the given formula is in CNF.
@@ -87,10 +99,37 @@ simplify (PNot a) = case simplify a of
     PFalse -> PTrue
     (PNot x) -> x
     p -> PNot p
-simplify (PAnd cs) = case PAnd (concat $ fmap (toCNFClauseList . simplify) cs) of
-    PAnd [] -> PTrue
-    p -> p
-simplify (POr cs) = case POr (concat $ fmap (toDNFClauseList . simplify) cs) of
-    POr [] -> PFalse
-    p -> p
+simplify (PAnd cs) = case
+    filter (not . isPTrue) -- Filter all Trues
+    $ concat $ fmap (toCNFClauseList . simplify) cs -- simplify all children and flatten the formula
+    of
+        [] -> PTrue
+        clauses -> if any isPFalse clauses -- If any value in a disjunction is false, the disjunction becomes false.
+                   then PFalse
+                   else PAnd clauses
+simplify (POr cs) = case
+    filter (not . isPFalse) -- Filter all Falses
+    $ concat $ fmap (toDNFClauseList . simplify) cs -- simplify all children and flatten the formula
+    of
+        [] -> PFalse
+        clauses -> if any isPTrue clauses -- If any value in a disjunction is true, the disjunction becomes true.
+                   then PTrue
+                   else POr clauses
 simplify p = p
+
+-- instance Show a => Show (PropositionalFormula a) where
+--     show PTrue = "⊤"
+--     show PFalse = "⊥"
+--     show (PVariable v) = show v
+--     show (PNot p) = "¬"++show p
+--     show (PAnd cs) = "("++(intercalate " ∧ " $ map show cs)++")"
+--     show (POr cs) = "("++(intercalate " ∨ " $ map show cs)++")"
+
+instance Show a => Show (PropositionalFormula a) where
+    show PTrue = "T"
+    show PFalse = "F"
+    show (PVariable v) = show v
+    show (PNot p) = "¬"++show p
+    show (PAnd cs) = parenIf (length cs > 1) (intercalate " ^ " $ map show cs)
+    show (POr cs) = parenIf (length cs > 1) (intercalate " v " $ map show cs)
+

@@ -25,3 +25,7 @@ safecrack (Just x) gen = x
 
 reversefoldr :: (a -> b -> b) -> b -> [a] -> b
 reversefoldr f zero container = foldr f zero $ reverse container
+
+parenIf :: Bool -> String -> String
+parenIf True s = "("++s++")"
+parenIf False s = s
