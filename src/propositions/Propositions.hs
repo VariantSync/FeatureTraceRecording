@@ -12,6 +12,15 @@ data PropositionalFormula a =
     | POr [PropositionalFormula a]
     deriving (Eq)
 
+instance Functor PropositionalFormula where
+    fmap f PTrue = PTrue
+    fmap f PFalse = PFalse
+    fmap f (PVariable a) = PVariable (f a)
+    fmap f (PNot p) = PNot (fmap f p)
+    fmap f (PAnd c) = PAnd (fmap (fmap f) c)
+    fmap f (POr c) = POr (fmap (fmap f) c)
+
+
 data Configuration a = Configuration (a -> Bool)
 
 -- type CNF a = CNF (PAnd [POr a])
@@ -116,6 +125,26 @@ simplify (POr cs) = case
                    then PTrue
                    else POr clauses
 simplify p = p
+
+{-
+Assumes that the given formula is in CNF.
+The first argument is a functions resolving negation, i.e. it should take an 'a' and give its negated version.
+The first argument is a functions resolving negation, i.e. it should take an 'a' and give its negated version.
+-}
+clausifyCNF :: (Show a) => (a -> a) -> (() -> a) -> PropositionalFormula a -> [[a]]
+clausifyCNF _ _ PTrue  = [[]]
+clausifyCNF _ false PFalse = [[false ()]]--error "PFalse cannot be clausifed."
+clausifyCNF _ _ (PVariable v) = [[v]]
+clausifyCNF negator _ n@(PNot p) = case p of
+    PVariable v -> [[negator v]]
+    _ -> error $ "Given formula "++show n++" not in CNF!"
+clausifyCNF negator false and@(PAnd clauses) = if isCNF and
+    then concat $ fmap (clausifyCNF negator false) clauses
+    else error $ "Given formula "++show and++" not in CNF!"
+clausifyCNF negator false or@(POr literals) = if isCNF or
+    then [concat $ concat $ fmap (clausifyCNF negator false) literals]
+    else error $ "Given formula "++show or++" not in CNF!"
+                            
 
 -- instance Show a => Show (PropositionalFormula a) where
 --     show PTrue = "⊤"
