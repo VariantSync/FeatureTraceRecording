@@ -1,18 +1,81 @@
 module SAT where
 
+import UUID
 import Propositions
 import Picosat
+import Control.Monad.State
+import Data.Bimap
 
-toPicosatFormat :: PropositionalFormula a -> [[Int]]
-toPicosatFormat p = [[1]] --(map toDNFClauseList $ toCNFClauseList $ lazyToCNF p)
+-- We hack this for now. Once our system works, we can remove this and let the monads take over.
+import System.IO.Unsafe (unsafePerformIO)
 
-sat :: PropositionalFormula a -> IO Bool
-sat p = do
+sat :: (Ord a) => PropositionalFormula a -> Bool
+sat p = unsafePerformIO $ do -- TODO: Remove this hack
     res <- solve $ toPicosatFormat p
     case res of
         Solution _ -> return True
         Unsatisfiable -> return False
         Unknown -> return False
 
-taut :: PropositionalFormula a -> IO Bool
-taut p = sat (PNot p) >>= \s -> return $ not s
+taut :: (Ord a) => PropositionalFormula a -> Bool
+-- taut p = sat (PNot p) >>= return . not
+taut p = not $ sat (PNot p)
+
+
+toPicosatFormat :: (Ord a) => PropositionalFormula a -> [[Int]]
+-- toPicosatFormat p = [[1]]
+toPicosatFormat p = fst $ flip runState 1 $ do
+    (_, p') <- intifyFormula empty $ simplify p
+    return $ clausifyCNF (\x -> -x) (\_ -> error "buggety bug") $ lazyToCNF p'
+
+intifyFormula :: (Ord a) => Bimap a Int -> PropositionalFormula a -> State UUID (Bimap a Int, PropositionalFormula Int)
+intifyFormula m PTrue = do
+    (m', conflict) <- createConflictingLiterals m
+    return (m', POr conflict)
+intifyFormula m PFalse = do
+    (m', conflict) <- createConflictingLiterals m
+    return (m', PAnd conflict)
+intifyFormula m (PVariable v) =
+    if member v m
+    then return (m, PVariable (m ! v))
+    else do
+        next ()
+        uuidForV <- get
+        let intval = toInt uuidForV in
+            return (insert v intval m, PVariable intval)
+intifyFormula m (PNot p) = do
+    (m', p') <- intifyFormula m p
+    return (m', PNot p')
+intifyFormula m (PAnd cs) = do
+    (m', cs') <- intifyFormulas m cs
+    return (m', PAnd cs')
+intifyFormula m (POr cs) = do
+    (m', cs') <- intifyFormulas m cs
+    return (m', POr cs')
+
+{-
+Applies 'intifyFormula' to all formulas
+-}
+intifyFormulas :: (Ord a) => Bimap a Int -> [PropositionalFormula a] -> State UUID (Bimap a Int, [PropositionalFormula Int])
+-- (m, []) is the initial state of the fold. At the beginning, the map is unchanged and no formulas have been processed.
+-- foldM will fill this list of formulas one step at a time while adapting the map if necessary.
+intifyFormulas m formulas = foldM intifyFormulas_fold (m, []) (reverse formulas) -- reverse is just here for human readability: The output will have the same order as the input then.
+
+{-
+The folding function for intifyFormulas.
+It takes the current progress of the fold (mi, cis) and a formula to intify c:
+    mi  - The current mapping from values a to ints.
+    cis - A list of already intified formulas
+    c   - A formula of values a that has to be intified and merged into (mi, cis).
+-}
+intifyFormulas_fold :: (Ord a) => (Bimap a Int, [PropositionalFormula Int]) -> PropositionalFormula a -> State UUID (Bimap a Int, [PropositionalFormula Int])
+intifyFormulas_fold (mi, cis) c = do
+    (mi', c') <- intifyFormula mi c
+    return (mi', [c']++cis)
+
+createConflictingLiterals :: (Ord a) => Bimap a Int -> State UUID (Bimap a Int, [PropositionalFormula Int])
+createConflictingLiterals m =  do
+    next ()
+    z <- get
+    let intval = toInt z in
+        return (m, [PVariable intval, PNot $ PVariable intval])

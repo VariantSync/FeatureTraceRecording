@@ -2,12 +2,18 @@ module Main where
 
 import Control.Monad.State
 
+-- import Prelude hiding (putStr)
+-- import Data.ByteString.Char8 (putStr)
+-- import Data.ByteString.UTF8 (fromString)
+
+import UUID
 import Util
 import Tree
 import AST
 import Edits
 import FeatureTrace
 import Propositions
+import SAT
 import Data.List (intercalate)
 
 absAST :: State UUID (AST String)
@@ -71,8 +77,11 @@ testNot = PNot testImpl
 testCNF :: PropositionalFormula String
 testCNF = PAnd [POr [PVariable "A", PVariable "B"], POr [PNot (PVariable "A"), PVariable "D"]]
 
-testSimplify :: PropositionalFormula String
-testSimplify = PAnd [PTrue, POr [PFalse, pimplies PFalse PTrue]]
+testTrue :: PropositionalFormula String
+testTrue = PAnd [PTrue, POr [PFalse, pimplies PFalse PTrue]]
+
+testFalse :: PropositionalFormula String
+testFalse = PAnd [PAnd [PFalse, PTrue], POr [PFalse, pimplies PFalse PTrue]]
 
 main :: IO ()
 -- main = putStrLn . show $ runState absAST 0
@@ -94,12 +103,16 @@ main :: IO ()
 --   return $ showTrace (newTrace 15 2 (Just $ PAnd [PVariable "A", PVariable "B"])) $ foldEditScript editscript tree0
 -- --   return $ intercalate ", " (fmap name editscript)
 
-main = putStrLn $
+{-Test CNF conversion-}
+main = putStrLn $ 
     foldr (\a b -> a++"\n"++b) "" $
-    map (\a ->
-        "Formula: "++(show a)++
-        "\n  isCNF: "++(show $ isCNF a)++
-        "\n    CNF: "++(show $ toCNF a)++
-        "\n  isCNF: "++(show $ isCNF $ toCNF a)++
+    map (\a -> let c = toCNF a in
+        "   Formula: "++(show a)++
+        "\n  -> isCNF: "++(show $ isCNF a)++
+        "\n       CNF: "++(show $ c)++
+        "\n  -> isCNF: "++(show $ isCNF $ c)++
+        "\nclausified: "++(show $ clausifyCNF (\s -> "not "++s) (\() -> "False") c)++
+        "\nin picosat: "++(show $ toPicosatFormat a)++
+        "\n       sat: "++(show $ sat a)++
         "\n=====\n")
-    [testImpl, testDNF, testNot, testCNF, testSimplify]
+    [testImpl, testDNF, testNot, testCNF, testTrue, testFalse]

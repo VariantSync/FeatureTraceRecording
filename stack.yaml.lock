@@ -3,7 +3,14 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: picosat-0.1.6@sha256:7d3130af636c6c8a0b373446a090daa15511d6cb0b264f4b921fa5d4a81b59a3,2138
+    pantry-tree:
+      size: 541
+      sha256: 4cb3a66ee7b3ca57b680ebe41815a5965b0860d191cdf08787bb78d0e2fb650b
+  original:
+    hackage: picosat-0.1.6@sha256:7d3130af636c6c8a0b373446a090daa15511d6cb0b264f4b921fa5d4a81b59a3,2138
 snapshots:
 - completed:
     size: 532379
