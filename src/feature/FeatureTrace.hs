@@ -1,5 +1,6 @@
 module FeatureTrace where
 
+import UUID
 import Tree
 import AST
 import Data.Maybe

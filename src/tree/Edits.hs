@@ -1,5 +1,6 @@
 module Edits where
 
+import UUID
 import Tree
 import AST
 import Util
