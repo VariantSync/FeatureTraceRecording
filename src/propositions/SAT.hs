@@ -22,7 +22,7 @@ sat = hasvalue.satAssignment
 
 satAssignment :: (Show a, Ord a) => PropositionalFormula a -> Maybe (Assignment a)
 satAssignment p = 
-    let (m, cnf) = toIntCNF p in
+    let (cnf, m) = toIntCNF p in
         unsafePerformIO $ do -- TODO: Remove this hack
             res <- solve cnf
             case res of
@@ -44,10 +44,17 @@ Otherwise, returns a counterexample, i.e., an assignment under which the given f
 tautCounterExample :: (Show a, Ord a) => PropositionalFormula a -> Maybe (Assignment a)
 tautCounterExample = satAssignment.PNot
 
-toIntCNF :: (Ord a) => PropositionalFormula a -> (Bimap a Int, [[Int]])
+{-
+Converts the given formula to a list of clauses (first argument).
+Each clause is represented as a list of literals where literals are represented as integers.
+Negative literals indicate negation of variables.
+For example, the literal '-3' translates to 'PNot x', where x is the variable represented by '3'.
+The mapping from integers to variables is returned as a bimap in the second argument.
+-}
+toIntCNF :: (Ord a) => PropositionalFormula a -> ([[Int]], Bimap a Int)
 toIntCNF p = fst $ flip runState 1 $ do
     (m, p') <- intifyFormula empty $ simplify p
-    return (m, clausifyCNF (\x -> -x) (\_ -> error "This is impossible.") $ lazyToCNF p')
+    return (clausifyCNF (\x -> -x) (\_ -> error "This is impossible.") $ lazyToCNF p', m)
 
 intifyFormula :: (Ord a) => Bimap a Int -> PropositionalFormula a -> State UUID (Bimap a Int, PropositionalFormula Int)
 intifyFormula m PTrue = do
