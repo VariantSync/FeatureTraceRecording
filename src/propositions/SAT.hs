@@ -1,32 +1,53 @@
-module SAT where
+module SAT (
+    sat,
+    satAssignment,
+    tautCounterExample,
+    taut,
+    toIntCNF) where
 
 import UUID
 import Propositions
+import Util
+
 import Picosat
 import Control.Monad.State
 import Data.Bimap
+import Data.List (find)
 
 -- We hack this for now. Once our system works, we can remove this and let the monads take over.
 import System.IO.Unsafe (unsafePerformIO)
 
-sat :: (Ord a) => PropositionalFormula a -> Bool
-sat p = unsafePerformIO $ do -- TODO: Remove this hack
-    res <- solve $ toPicosatFormat p
-    case res of
-        Solution _ -> return True
-        Unsatisfiable -> return False
-        Unknown -> return False
+sat :: (Show a, Ord a) => PropositionalFormula a -> Bool
+sat = hasvalue.satAssignment
 
-taut :: (Ord a) => PropositionalFormula a -> Bool
+satAssignment :: (Show a, Ord a) => PropositionalFormula a -> Maybe (Assignment a)
+satAssignment p = 
+    let (m, cnf) = toIntCNF p in
+        unsafePerformIO $ do -- TODO: Remove this hack
+            res <- solve cnf
+            case res of
+                Solution s -> return $ Just (Assignment
+                    (\x -> case find (\i -> abs i == m ! x) s of
+                        Nothing -> error $ (show x)++" is not a variable in this configuration!"
+                        Just i -> i >= 0))
+                Unsatisfiable -> return Nothing
+                Unknown -> return Nothing
+
+taut :: (Show a, Ord a) => PropositionalFormula a -> Bool
 -- taut p = sat (PNot p) >>= return . not
-taut p = not $ sat (PNot p)
+taut = not.sat.PNot
 
+{-
+Returns 'Nothing' if the given formula is a tautology.
+Otherwise, returns a counterexample, i.e., an assignment under which the given formula evaluates to 'False'.
+-}
+tautCounterExample :: (Show a, Ord a) => PropositionalFormula a -> Maybe (Assignment a)
+tautCounterExample = satAssignment.PNot
 
-toPicosatFormat :: (Ord a) => PropositionalFormula a -> [[Int]]
--- toPicosatFormat p = [[1]]
-toPicosatFormat p = fst $ flip runState 1 $ do
-    (_, p') <- intifyFormula empty $ simplify p
-    return $ clausifyCNF (\x -> -x) (\_ -> error "buggety bug") $ lazyToCNF p'
+toIntCNF :: (Ord a) => PropositionalFormula a -> (Bimap a Int, [[Int]])
+toIntCNF p = fst $ flip runState 1 $ do
+    (m, p') <- intifyFormula empty $ simplify p
+    return (m, clausifyCNF (\x -> -x) (\_ -> error "This is impossible.") $ lazyToCNF p')
 
 intifyFormula :: (Ord a) => Bimap a Int -> PropositionalFormula a -> State UUID (Bimap a Int, PropositionalFormula Int)
 intifyFormula m PTrue = do
@@ -73,6 +94,9 @@ intifyFormulas_fold (mi, cis) c = do
     (mi', c') <- intifyFormula mi c
     return (mi', [c']++cis)
 
+{-
+Creates a list of the two literals 'x' and 'not x' where x is a new generated variable.
+-}
 createConflictingLiterals :: (Ord a) => Bimap a Int -> State UUID (Bimap a Int, [PropositionalFormula Int])
 createConflictingLiterals m =  do
     next ()

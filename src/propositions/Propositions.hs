@@ -20,8 +20,8 @@ instance Functor PropositionalFormula where
     fmap f (PAnd c) = PAnd (fmap (fmap f) c)
     fmap f (POr c) = POr (fmap (fmap f) c)
 
-
-data Configuration a = Configuration (a -> Bool)
+-- Maybe this should better be implemented as a map as an Assignment always is a partial function.
+data Assignment a = Assignment (a -> Bool)
 
 -- type CNF a = CNF (PAnd [POr a])
 
@@ -52,10 +52,10 @@ pnegate PTrue = PFalse
 pnegate PFalse = PTrue
 pnegate p = PNot p
 
-eval :: Configuration a -> PropositionalFormula a -> Bool
+eval :: Assignment a -> PropositionalFormula a -> Bool
 eval _ PTrue = True
 eval _ PFalse = False
-eval (Configuration c) v@(PVariable x) = c x
+eval (Assignment c) v@(PVariable x) = c x
 eval config (PNot x) = not $ eval config x
 eval config (PAnd cs) = and $ fmap (eval config) cs
 eval config (POr cs) = or $ fmap (eval config) cs

@@ -112,7 +112,7 @@ main = putStrLn $
         "\n       CNF: "++(show $ c)++
         "\n  -> isCNF: "++(show $ isCNF $ c)++
         "\nclausified: "++(show $ clausifyCNF (\s -> "not "++s) (\() -> "False") c)++
-        "\nin picosat: "++(show $ toPicosatFormat a)++
+        "\nin picosat: "++(show $ toIntCNF a)++
         "\n       sat: "++(show $ sat a)++
         "\n=====\n")
     [testImpl, testDNF, testNot, testCNF, testTrue, testFalse]
