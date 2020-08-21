@@ -15,6 +15,8 @@ import FeatureTrace
 import FeatureTraceRecording
 import Propositions
 import SAT
+
+import Data.Maybe
 import Data.List (intercalate)
 
 absAST :: State UUID (AST String)
@@ -79,7 +81,7 @@ main = putStrLn . show . flip runState 0 $ do
       trace0 = emptyTrace
       -- The edits "made by the developer"
       editscript = [
-           edit_ins_tree treeToInsert (uuidOf $ crack $ find tree0 (\(Tree n _) -> value n == "Statements")) 0
+           edit_ins_tree treeToInsert (uuidOf . fromJust $ find tree0 (\(Tree n _) -> value n == "Statements")) 0
         --   ,edit_del_tree (uuidOf treeToInsert)
           ]
       -- The feature contexts assigned to each edit

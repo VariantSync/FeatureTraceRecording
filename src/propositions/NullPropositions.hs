@@ -2,20 +2,24 @@ module NullPropositions where
 
 import Propositions
 import Data.List
+import Data.Maybe (isNothing, isJust, fromJust, catMaybes)
 
 -- The Nothing case represents null
 type NullableFormula a = Maybe (PropositionalFormula a)
+
+isnull :: NullableFormula a -> Bool
+isnull = isNothing
+
+notnull :: NullableFormula a -> Bool
+notnull = not.isnull
+
+assure :: NullableFormula a -> PropositionalFormula a
+assure = fromJust
 
 {-
 Combines a list of nullable formulas with the AND operator according where "Nothing && x = x" for any nullable formula x.
 -}
 ffand :: [NullableFormula a] -> NullableFormula a
-ffand l = case [x | Just x <- l] of --I inlined catMaybes here because catMaybes could not be found. I dont know why.
+ffand l = case catMaybes l of
     [] -> Nothing
     justs -> Just $ PAnd justs
-
-    -- ffand [] = Nothing
--- ffand (Nothing:xs) = ffand xs
--- ffand ((Just x):xs) = case ffand xs of
---     Nothing -> Just x
---     Just x' -> Just (PAnd [x,++x')

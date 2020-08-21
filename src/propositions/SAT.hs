@@ -13,12 +13,13 @@ import Picosat
 import Control.Monad.State
 import Data.Bimap
 import Data.List (find)
+import Data.Maybe (isJust)
 
 -- We hack this for now. Once our system works, we can remove this and let the monads take over.
 import System.IO.Unsafe (unsafePerformIO)
 
 sat :: (Show a, Ord a) => PropositionalFormula a -> Bool
-sat = hasvalue.satAssignment
+sat = isJust.satAssignment
 
 satAssignment :: (Show a, Ord a) => PropositionalFormula a -> Maybe (Assignment a)
 satAssignment p = 

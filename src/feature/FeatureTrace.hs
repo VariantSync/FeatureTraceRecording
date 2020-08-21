@@ -42,4 +42,4 @@ pc :: Eq a => AST a -> FeatureTrace a -> Node a -> FeatureFormula
 pc root (FeatureTrace trace) node =
   ffand $
   [trace node] ++
-  (fmap trace $ fmap element $ legatorAncestors root $ safecrack (safetree root node) (\() -> Tree node []))
+  (fmap trace $ fmap element $ legatorAncestors root $ fromJust (safetree root node)) --(\() -> Tree node [])

@@ -72,22 +72,22 @@ ftr_del e = Recorder (\context trace@(FeatureTrace f_old) tree ->
         if not $ member v d
             then f_old v
             else (
-                let pcIsNull = not $ hasvalue (pc tree trace v)
-                    contextIsNull = not $ hasvalue context in
+                let pcIsNull = isnull $ pc tree trace v
+                    contextIsNull = isnull context in
                     if contextIsNull && (not pcIsNull)
                         then Just PFalse
-                        else ffand [f_old v, Just $ PNot (crack context)] -- crack is safe here because we know that context is not null
+                        else ffand [f_old v, Just $ PNot (assure context)] -- crack is safe here because we know that context is not null
             )))
 
 ftr_move :: (Show a, Eq a) => Edit a -> Recorder a
 ftr_move e = Recorder (\context trace@(FeatureTrace f_old) tree ->
     let d = delta e tree in
     FeatureTrace (\v ->
-        if hasvalue context && member v d
+        if notnull context && member v d
         then (
             let tn = run e tree
-                inherits_phi = inherits (crack context) tn d trace v -- cracking phi is safe because we checked that the context has a value
-                inherits_f_old = (hasvalue $ f_old v) && (inherits (crack $ f_old v) tn d trace v)
+                inherits_phi = inherits (assure context) tn d trace v -- cracking phi is safe because we checked that the context has a value
+                inherits_f_old = (notnull $ f_old v) && (inherits (assure $ f_old v) tn d trace v)
                 in
             case (inherits_phi, inherits_f_old) of
                 (False, False) -> ffand [f_old v, context]
@@ -102,7 +102,7 @@ ftr_up e = Recorder (\context trace@(FeatureTrace f_old) tree ->
     let d = delta e tree in
     FeatureTrace (\v ->
         let pc_old = pc tree trace v in
-        if (hasvalue context) && (hasvalue pc_old) && (member v d) && (taut $ pimplies (crack pc_old) (crack context))
+        if (notnull context) && (notnull pc_old) && (member v d) && (taut $ pimplies (assure pc_old) (assure context))
         then context
         else f_old v))
 
