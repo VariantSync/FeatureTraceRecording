@@ -63,7 +63,7 @@ ftr_ins e = Recorder (\context trace@(FeatureTrace f_old) tree ->
             then f_old v
             else (case context of
                 Nothing -> Nothing
-                Just phi -> (if inherits phi tn d trace v then Nothing else Just phi))))
+                Just phi -> (if willInherit phi tn d trace v then Nothing else Just phi))))
 
 ftr_del :: (Eq a) => Edit a -> Recorder a
 ftr_del e = Recorder (\context trace@(FeatureTrace f_old) tree ->
@@ -76,7 +76,7 @@ ftr_del e = Recorder (\context trace@(FeatureTrace f_old) tree ->
                     contextIsNull = isnull context in
                     if contextIsNull && (not pcIsNull)
                         then Just PFalse
-                        else ffand [f_old v, Just $ PNot (assure context)] -- crack is safe here because we know that context is not null
+                        else nullable_and [f_old v, Just $ PNot (assure context)] -- crack is safe here because we know that context is not null
             )))
 
 ftr_move :: (Show a, Eq a) => Edit a -> Recorder a
@@ -85,15 +85,10 @@ ftr_move e = Recorder (\context trace@(FeatureTrace f_old) tree ->
     FeatureTrace (\v ->
         if notnull context && member v d
         then (
-            let tn = run e tree
-                inherits_phi = inherits (assure context) tn d trace v -- cracking phi is safe because we checked that the context has a value
-                inherits_f_old = (notnull $ f_old v) && (inherits (assure $ f_old v) tn d trace v)
-                in
-            case (inherits_phi, inherits_f_old) of
-                (False, False) -> ffand [f_old v, context]
-                (False,  True) -> context
-                ( True, False) -> f_old v
-                ( True,  True) -> Nothing
+            let tn = run e tree in
+            nullable_and [
+                filterNullable (f_old v) (\nonnull_f_old_v -> not $ willInherit nonnull_f_old_v tn d trace v),
+                filterNullable context (\phi -> willInherit phi tn d trace v)]
         )
         else f_old v))
 
@@ -109,13 +104,13 @@ ftr_up e = Recorder (\context trace@(FeatureTrace f_old) tree ->
 
 {-
 formula - The formula of interest that may or may not be inherited by v
-tn - the AST after the edit. It contains the new nodes delta
+tn - the AST after the edit. It contains the new nodes delta.
 delta - Nodes in the tree that dont have a mapping yet, i.e., their traces evaluate to Nothing.
 FeatureTrace - feature trace defined on the nodes in tn except for the nodes in delta
 v - The node of which we want to know if it can inherit the given formula
 -}
-inherits :: (Show a, Eq a) => NonNullFeatureFormula -> AST a -> Set (Node a) -> FeatureTrace a -> Node a -> Bool
-inherits formula tn delta (FeatureTrace f) v =
+willInherit :: (Show a, Eq a) => NonNullFeatureFormula -> AST a -> Set (Node a) -> FeatureTrace a -> Node a -> Bool
+willInherit formula tn delta (FeatureTrace f) v =
     let al = fromList $ fmap element $ legatorAncestors tn $ tree tn v in
     (not $ disjoint delta al) -- There is an edited node in tn above v from which v can inherit the formula
     || (any

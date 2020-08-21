@@ -21,3 +21,9 @@ reversefoldr f zero container = foldr f zero $ reverse container
 parenIf :: Bool -> String -> String
 parenIf True s = "("++s++")"
 parenIf False s = s
+
+filterMaybe :: Maybe a -> (a -> Bool) -> Maybe a
+filterMaybe Nothing _ = Nothing
+filterMaybe (Just x) p
+    | p x = Just x
+    | otherwise = Nothing

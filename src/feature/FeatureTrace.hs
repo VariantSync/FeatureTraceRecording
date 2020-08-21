@@ -40,6 +40,6 @@ If the given node is not in the tree, the feature trace of the node will be retu
 -}
 pc :: Eq a => AST a -> FeatureTrace a -> Node a -> FeatureFormula
 pc root (FeatureTrace trace) node =
-  ffand $
+  nullable_and $
   [trace node] ++
   (fmap trace $ fmap element $ legatorAncestors root $ fromJust (safetree root node)) --(\() -> Tree node [])

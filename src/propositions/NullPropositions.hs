@@ -1,6 +1,7 @@
 module NullPropositions where
 
 import Propositions
+import Util
 import Data.List
 import Data.Maybe (isNothing, isJust, fromJust, catMaybes)
 
@@ -16,10 +17,13 @@ notnull = not.isnull
 assure :: NullableFormula a -> PropositionalFormula a
 assure = fromJust
 
+filterNullable :: NullableFormula a -> (PropositionalFormula a -> Bool) -> NullableFormula a
+filterNullable = filterMaybe
+
 {-
 Combines a list of nullable formulas with the AND operator according where "Nothing && x = x" for any nullable formula x.
 -}
-ffand :: [NullableFormula a] -> NullableFormula a
-ffand l = case catMaybes l of
+nullable_and :: [NullableFormula a] -> NullableFormula a
+nullable_and l = case catMaybes l of
     [] -> Nothing
     justs -> Just $ PAnd justs
