@@ -129,11 +129,13 @@ simplify p = p
 {-
 Assumes that the given formula is in CNF.
 The first argument is a functions resolving negation, i.e. it should take an 'a' and give its negated version.
-The first argument is a functions resolving negation, i.e. it should take an 'a' and give its negated version.
+The second argument is a function creating the value of type a that should be associated with 'false' (PFalse).
+For example, 0 could represent False in propositional formulas over numerals.
+(Note, if no such value exists, the 'false' function can also produce an error.)
 -}
 clausifyCNF :: (Show a) => (a -> a) -> (() -> a) -> PropositionalFormula a -> [[a]]
 clausifyCNF _ _ PTrue  = [[]]
-clausifyCNF _ false PFalse = [[false ()]]--error "PFalse cannot be clausifed."
+clausifyCNF _ false PFalse = [[false ()]] --error "PFalse cannot be clausifed."
 clausifyCNF _ _ (PVariable v) = [[v]]
 clausifyCNF negator _ n@(PNot p) = case p of
     PVariable v -> [[negator v]]
