@@ -51,8 +51,8 @@ ftr_trace e = Recorder (\context (FeatureTrace f) tree ->
     let d = delta e tree in
     FeatureTrace (\v ->
         if member v d
-            then context
-            else f(v)))
+        then context
+        else f(v)))
 
 ftr_ins :: (Show a, Eq a) => Edit a -> Recorder a
 ftr_ins e = Recorder (\context trace@(FeatureTrace f_old) tree ->
@@ -60,24 +60,22 @@ ftr_ins e = Recorder (\context trace@(FeatureTrace f_old) tree ->
         tn = run e tree in
     FeatureTrace (\v ->
         if not $ member v d
-            then f_old v
-            else (case context of
-                Nothing -> Nothing
-                Just phi -> (if willInherit phi tn d trace v then Nothing else Just phi))))
+        then f_old v
+        else takeIf (\phi -> not $ willInherit phi tn d trace v) context))
 
 ftr_del :: (Eq a) => Edit a -> Recorder a
 ftr_del e = Recorder (\context trace@(FeatureTrace f_old) tree ->
     let d = delta e tree in
     FeatureTrace (\v ->
         if not $ member v d
-            then f_old v
-            else (
-                let pcIsNull = isnull $ pc tree trace v
-                    contextIsNull = isnull context in
-                    if contextIsNull && (not pcIsNull)
-                        then Just PFalse
-                        else nullable_and [f_old v, Just $ PNot (assure context)] -- crack is safe here because we know that context is not null
-            )))
+        then f_old v
+        else (
+            let pcIsNull = isnull $ pc tree trace v
+                contextIsNull = isnull context in
+                if contextIsNull && not pcIsNull
+                then Just PFalse
+                else nullable_and [f_old v, Just $ PNot (assure context)] -- assure is safe here because we know that context is not null
+        )))
 
 ftr_move :: (Show a, Eq a) => Edit a -> Recorder a
 ftr_move e = Recorder (\context trace@(FeatureTrace f_old) tree ->
@@ -87,8 +85,8 @@ ftr_move e = Recorder (\context trace@(FeatureTrace f_old) tree ->
         then (
             let tn = run e tree in
             nullable_and [
-                filterNullable (f_old v) (\nonnull_f_old_v -> not $ willInherit nonnull_f_old_v tn d trace v),
-                filterNullable context (\phi -> willInherit phi tn d trace v)]
+                takeIf (\traceof_v -> not $ willInherit traceof_v tn d trace v) (f_old v),
+                takeIf (\phi -> willInherit phi tn d trace v) context]
         )
         else f_old v))
 

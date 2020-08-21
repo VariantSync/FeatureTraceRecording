@@ -17,9 +17,6 @@ notnull = not.isnull
 assure :: NullableFormula a -> PropositionalFormula a
 assure = fromJust
 
-filterNullable :: NullableFormula a -> (PropositionalFormula a -> Bool) -> NullableFormula a
-filterNullable = filterMaybe
-
 {-
 Combines a list of nullable formulas with the AND operator according where "Nothing && x = x" for any nullable formula x.
 -}

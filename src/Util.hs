@@ -22,8 +22,8 @@ parenIf :: Bool -> String -> String
 parenIf True s = "("++s++")"
 parenIf False s = s
 
-filterMaybe :: Maybe a -> (a -> Bool) -> Maybe a
-filterMaybe Nothing _ = Nothing
-filterMaybe (Just x) p
+takeIf :: (a -> Bool) -> Maybe a -> Maybe a
+takeIf _ Nothing = Nothing
+takeIf p (Just x)
     | p x = Just x
     | otherwise = Nothing
