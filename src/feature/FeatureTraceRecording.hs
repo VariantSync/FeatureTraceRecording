@@ -1,4 +1,6 @@
-module FeatureTraceRecording where
+module FeatureTraceRecording (
+    featureTraceRecording
+) where
 
 import Edits
 import Tree
@@ -11,10 +13,24 @@ import Util
 
 import Data.Set
 
-data Recording a = Recording {record :: FeatureFormula -> FeatureTrace a -> AST a -> FeatureTrace a}
+featureTraceRecording :: (Show a, Eq a) => FeatureTrace a -> AST a -> EditScript a -> [FeatureFormula] -> (FeatureTrace a, AST a)
+featureTraceRecording f0 t0 editscript contexts = reversefoldr record (f0, t0) $ zip editscript recorders
+    where recorders = zipRecordingScript (fromEditScript editscript) contexts
+          record = \(edit, recorder) (f_old, t_old) -> (recorder f_old t_old, run edit t_old)
 
-ftr :: (Show a, Eq a) => Edit a -> Recording a
-ftr edit = record edit where
+data Recorder a = Recorder (FeatureFormula -> FeatureTrace a -> AST a -> FeatureTrace a)
+type RecordingScript a = [Recorder a]
+
+zipRecordingScript :: RecordingScript a -> [FeatureFormula] -> [FeatureTrace a -> AST a -> FeatureTrace a]
+zipRecordingScript recordings contexts 
+    | length recordings == length contexts = zipWith (\(Recorder r) phi -> r phi) recordings contexts
+    | otherwise = error "number of contexts does not match number of recordings"
+
+fromEditScript :: (Show a, Eq a) => EditScript a -> RecordingScript a
+fromEditScript = fmap fromEdit
+
+fromEdit :: (Show a, Eq a) => Edit a -> Recorder a
+fromEdit edit = record edit where
     record = case edittype edit of
         Identity -> ftr_id
         TraceOnly -> ftr_trace
@@ -23,20 +39,19 @@ ftr edit = record edit where
         Move -> ftr_move
         Update -> ftr_up
 
-ftr_id :: Edit a -> Recording a
-ftr_id e = Recording {record = \_ trace _ -> trace}
+ftr_id :: Edit a -> Recorder a
+ftr_id e = Recorder (\_ trace _ -> trace)
 
-ftr_trace :: (Eq a) => Edit a -> Recording a
-ftr_trace e = Recording {record = \context (FeatureTrace f) tree ->
+ftr_trace :: (Eq a) => Edit a -> Recorder a
+ftr_trace e = Recorder (\context (FeatureTrace f) tree ->
     let d = delta e tree in
     FeatureTrace (\v ->
         if member v d
             then context
-            else f(v)
-)}
+            else f(v)))
 
-ftr_ins :: (Show a, Eq a) => Edit a -> Recording a
-ftr_ins e = Recording {record = \context trace@(FeatureTrace f_old) tree ->
+ftr_ins :: (Show a, Eq a) => Edit a -> Recorder a
+ftr_ins e = Recorder (\context trace@(FeatureTrace f_old) tree ->
     let d = delta e tree
         tn = run e tree in
     FeatureTrace (\v ->
@@ -44,11 +59,10 @@ ftr_ins e = Recording {record = \context trace@(FeatureTrace f_old) tree ->
             then f_old v
             else (case context of
                 Nothing -> Nothing
-                Just phi -> (if inherits phi tn d trace v then Nothing else Just phi)
-))}
+                Just phi -> (if inherits phi tn d trace v then Nothing else Just phi))))
 
-ftr_del :: (Eq a) => Edit a -> Recording a
-ftr_del e = Recording {record = \context trace@(FeatureTrace f_old) tree ->
+ftr_del :: (Eq a) => Edit a -> Recorder a
+ftr_del e = Recorder (\context trace@(FeatureTrace f_old) tree ->
     let d = delta e tree in
     FeatureTrace (\v ->
         if not $ member v d
@@ -59,15 +73,15 @@ ftr_del e = Recording {record = \context trace@(FeatureTrace f_old) tree ->
                     if contextIsNull && (not pcIsNull)
                         then Just PFalse
                         else ffand [f_old v, Just $ PNot (crack context)] -- crack is safe here because we know that context is not null
-            )
-)}
+            )))
+
 
 -- TODO
-ftr_move :: Edit a -> Recording a
+ftr_move :: Edit a -> Recorder a
 ftr_move = ftr_id
 
 -- TODO
-ftr_up :: Edit a -> Recording a
+ftr_up :: Edit a -> Recorder a
 ftr_up = ftr_id
 
 

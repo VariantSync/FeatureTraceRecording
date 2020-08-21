@@ -17,6 +17,9 @@ data FeatureTrace a = FeatureTrace (Node a -> FeatureFormula)
 showTrace :: Show a => FeatureTrace a -> AST a -> Tree String
 showTrace (FeatureTrace f) = fmap (\n -> "<"++(show $ f n)++"> "++(show n))
 
+emptyTrace :: FeatureTrace a
+emptyTrace = FeatureTrace (\_ -> Nothing)
+
 newTrace :: UUID -> Int -> FeatureFormula -> FeatureTrace a
 newTrace id version' formula = FeatureTrace(\n -> if (uuid n == id) && (ntype n /= Plain) then formula else Nothing)
 
