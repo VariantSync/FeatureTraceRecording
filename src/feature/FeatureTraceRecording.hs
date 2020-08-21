@@ -13,6 +13,10 @@ import Util
 
 import Data.Set
 
+{-
+Runs the given editscript on the given AST producing the returned AST.
+While doing so, the given feature trace will be adapted a 
+-}
 featureTraceRecording :: (Show a, Eq a) => FeatureTrace a -> AST a -> EditScript a -> [FeatureFormula] -> (FeatureTrace a, AST a)
 featureTraceRecording f0 t0 editscript contexts = reversefoldr record (f0, t0) $ zip editscript recorders
     where recorders = zipRecordingScript (fromEditScript editscript) contexts
@@ -68,21 +72,39 @@ ftr_del e = Recorder (\context trace@(FeatureTrace f_old) tree ->
         if not $ member v d
             then f_old v
             else (
-                let pcIsNull = hasvalue (pc tree trace v)
-                    contextIsNull = hasvalue context in
+                let pcIsNull = not $ hasvalue (pc tree trace v)
+                    contextIsNull = not $ hasvalue context in
                     if contextIsNull && (not pcIsNull)
                         then Just PFalse
                         else ffand [f_old v, Just $ PNot (crack context)] -- crack is safe here because we know that context is not null
             )))
 
+ftr_move :: (Show a, Eq a) => Edit a -> Recorder a
+ftr_move e = Recorder (\context trace@(FeatureTrace f_old) tree ->
+    let d = delta e tree in
+    FeatureTrace (\v ->
+        if hasvalue context && member v d
+        then (
+            let tn = run e tree
+                inherits_phi = inherits (crack context) tn d trace v -- cracking phi is safe because we checked that the context has a value
+                inherits_f_old = (hasvalue $ f_old v) && (inherits (crack $ f_old v) tn d trace v)
+                in
+            case (inherits_phi, inherits_f_old) of
+                (False, False) -> ffand [f_old v, context]
+                (False,  True) -> context
+                ( True, False) -> f_old v
+                ( True,  True) -> Nothing
+        )
+        else f_old v))
 
--- TODO
-ftr_move :: Edit a -> Recorder a
-ftr_move = ftr_id
-
--- TODO
-ftr_up :: Edit a -> Recorder a
-ftr_up = ftr_id
+ftr_up :: (Eq a) => Edit a -> Recorder a
+ftr_up e = Recorder (\context trace@(FeatureTrace f_old) tree ->
+    let d = delta e tree in
+    FeatureTrace (\v ->
+        let pc_old = pc tree trace v in
+        if (hasvalue context) && (hasvalue pc_old) && (member v d) && (taut $ pimplies (crack pc_old) (crack context))
+        then context
+        else f_old v))
 
 
 {-
