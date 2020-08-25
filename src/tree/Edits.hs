@@ -14,7 +14,7 @@ type EditScript a = [Edit a]
 -- Turns an edit script into one single function
 -- The returned function will run the entire edit script on the given AST.
 foldEditScript :: EditScript a -> AST a -> AST a
-foldEditScript es = reversefoldr (.) id $ fmap run es
+foldEditScript es = reversefoldr (.) id $ run <$> es
 
 -- The identity of edits
 edit_identity :: Edit a

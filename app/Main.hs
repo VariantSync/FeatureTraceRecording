@@ -58,8 +58,8 @@ absAST = sequence
     ])
 
 assertAST :: State UUID (AST String)
-assertAST = sequence -- fix types
-    (Tree (newNode "Assertion" Plain) [
+assertAST = sequence
+    (Tree (newNode "Assertion" Legator) [
         (Tree (newNode "Expression" Plain) [
             (Tree (newNode "!=" Legator) [
                 (Tree (newNode "x" Constituent) []),
@@ -72,7 +72,7 @@ main :: IO ()
 -- main = putStrLn . show $ runState absAST 0
 -- main = putStrLn . show $ runState (assertAST >>= \smallTree -> absAST >>= \bigTree -> return $ edit (InsTree {tree = smallTree, pos = uuidOf $ crack $ find bigTree (\(Tree n _) -> value n == "Statements"), index = 0}) bigTree) 0
 
-main = putStrLn . show . flip runState 0 $ do
+main = putStrLn . show . fst . flip runState 0 $ do
   -- Unpack the states i.e. apply >>= in a more convenient way
   tree0 <- absAST
   treeToInsert <- assertAST

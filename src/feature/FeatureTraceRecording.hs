@@ -22,19 +22,19 @@ featureTraceRecording f0 t0 editscript contexts = reversefoldr record (f0, t0) $
     where recorders = zipRecordingScript (fromEditScript editscript) contexts
           record = \(edit, recorder) (f_old, t_old) -> (recorder f_old t_old, run edit t_old)
 
-data Recorder a = Recorder (FeatureFormula -> FeatureTrace a -> AST a -> FeatureTrace a)
+type Recorder a = FeatureFormula -> FeatureTrace a -> AST a -> FeatureTrace a
 type RecordingScript a = [Recorder a]
 
 zipRecordingScript :: RecordingScript a -> [FeatureFormula] -> [FeatureTrace a -> AST a -> FeatureTrace a]
 zipRecordingScript recordings contexts 
-    | length recordings == length contexts = zipWith (\(Recorder r) phi -> r phi) recordings contexts
+    | length recordings == length contexts = recordings <*> contexts
     | otherwise = error "number of contexts does not match number of recordings"
 
 fromEditScript :: (Show a, Eq a) => EditScript a -> RecordingScript a
 fromEditScript = fmap fromEdit
 
 fromEdit :: (Show a, Eq a) => Edit a -> Recorder a
-fromEdit edit = record edit where
+fromEdit edit = ftr_killplain $ record edit where
     record = case edittype edit of
         Identity -> ftr_id
         TraceOnly -> ftr_trace
@@ -43,61 +43,67 @@ fromEdit edit = record edit where
         Move -> ftr_move
         Update -> ftr_up
 
+ftr_killplain :: Recorder a -> Recorder a
+ftr_killplain wrappee = \context f t_old -> \v ->
+    if ntype v == Plain
+    then Nothing
+    else wrappee context f t_old v
+
 ftr_id :: Edit a -> Recorder a
-ftr_id e = Recorder (\_ trace _ -> trace)
+ftr_id e = \_ trace _ -> trace
 
 ftr_trace :: (Eq a) => Edit a -> Recorder a
-ftr_trace e = Recorder (\context (FeatureTrace f) tree ->
-    let d = delta e tree in
-    FeatureTrace (\v ->
+ftr_trace e = \context f t_old ->
+    let d = delta e t_old in
+    \v ->
         if member v d
         then context
-        else f(v)))
+        else f(v)
 
 ftr_ins :: (Show a, Eq a) => Edit a -> Recorder a
-ftr_ins e = Recorder (\context trace@(FeatureTrace f_old) tree ->
-    let d = delta e tree
-        tn = run e tree in
-    FeatureTrace (\v ->
+ftr_ins e = \context f_old t_old ->
+    let d = delta e t_old
+        t_new = run e t_old in
+    \v ->
         if not $ member v d
         then f_old v
-        else takeIf (\phi -> not $ willInherit phi tn d trace v) context))
+        else takeIf (\phi -> not $ willInherit phi t_new d f_old v) context
 
 ftr_del :: (Eq a) => Edit a -> Recorder a
-ftr_del e = Recorder (\context trace@(FeatureTrace f_old) tree ->
-    let d = delta e tree in
-    FeatureTrace (\v ->
+ftr_del e = \context f_old t_old ->
+    let d = delta e t_old in
+    \v ->
         if not $ member v d
         then f_old v
         else (
-            let pcIsNull = isnull $ pc tree trace v
+            let pcIsNull = isnull $ pc t_old f_old v
                 contextIsNull = isnull context in
                 if contextIsNull && not pcIsNull
                 then Just PFalse
                 else nullable_and [f_old v, Just $ PNot (assure context)] -- assure is safe here because we know that context is not null
-        )))
+        )
 
 ftr_move :: (Show a, Eq a) => Edit a -> Recorder a
-ftr_move e = Recorder (\context trace@(FeatureTrace f_old) tree ->
-    let d = delta e tree in
-    FeatureTrace (\v ->
+ftr_move e = \context f_old t_old ->
+    let d = delta e t_old in
+    \v ->
         if notnull context && member v d
         then (
-            let tn = run e tree in
+            let t_new = run e t_old in
             nullable_and [
-                takeIf (\traceof_v -> not $ willInherit traceof_v tn d trace v) (f_old v),
-                takeIf (\phi -> willInherit phi tn d trace v) context]
+                takeIf (\traceof_v -> not $ willInherit traceof_v t_new d f_old v) (f_old v),
+                takeIf (\phi -> willInherit phi t_new d f_old v) context]
         )
-        else f_old v))
+        else f_old v
 
 ftr_up :: (Eq a) => Edit a -> Recorder a
-ftr_up e = Recorder (\context trace@(FeatureTrace f_old) tree ->
-    let d = delta e tree in
-    FeatureTrace (\v ->
-        let pc_old = pc tree trace v in
+ftr_up e = \context f_old t_old ->
+    let d = delta e t_old in
+    \v ->
+        let pc_old = pc t_old f_old v in
         if (notnull context) && (notnull pc_old) && (member v d) && (taut $ pimplies (assure pc_old) (assure context))
         then context
-        else f_old v))
+        else f_old v
 
 
 {-
@@ -108,8 +114,8 @@ FeatureTrace - feature trace defined on the nodes in tn except for the nodes in 
 v - The node of which we want to know if it can inherit the given formula
 -}
 willInherit :: (Show a, Eq a) => NonNullFeatureFormula -> AST a -> Set (Node a) -> FeatureTrace a -> Node a -> Bool
-willInherit formula tn delta (FeatureTrace f) v =
-    let al = fromList $ fmap element $ legatorAncestors tn $ tree tn v in
+willInherit formula t_new delta f v =
+    let al = fromList $ fmap element $ legatorAncestors t_new $ tree t_new v in
     (not $ disjoint delta al) -- There is an edited node in tn above v from which v can inherit the formula
     || (any
         (\a -> case f a of

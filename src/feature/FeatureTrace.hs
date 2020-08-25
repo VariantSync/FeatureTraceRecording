@@ -12,16 +12,16 @@ type Feature = String
 
 type NonNullFeatureFormula = PropositionalFormula Feature
 type FeatureFormula = NullableFormula Feature
-data FeatureTrace a = FeatureTrace (Node a -> FeatureFormula)
+type FeatureTrace a = Node a -> FeatureFormula
 
-showTrace :: Show a => FeatureTrace a -> AST a -> Tree String
-showTrace (FeatureTrace f) = fmap (\n -> "<"++(show $ f n)++"> "++(show n))
+showTrace :: FeatureTrace a -> AST a -> Tree (FeatureFormula, Node a)
+showTrace f = fmap (\n -> (f n, n))
 
 emptyTrace :: FeatureTrace a
-emptyTrace = FeatureTrace (\_ -> Nothing)
+emptyTrace = \_ -> Nothing
 
 newTrace :: UUID -> Int -> FeatureFormula -> FeatureTrace a
-newTrace id version' formula = FeatureTrace(\n -> if (uuid n == id) && (ntype n /= Plain) then formula else Nothing)
+newTrace id version' formula = \n -> if (uuid n == id) && (ntype n /= Plain) then formula else Nothing
 
 {-
 Combine two feature traces in the same notion as for functions:
@@ -29,17 +29,16 @@ Combine two feature traces in the same notion as for functions:
   t1 will not overwrite the traces that are already defined by t2.
 -}
 combine :: FeatureTrace a -> FeatureTrace a -> FeatureTrace a
-combine (FeatureTrace t') (FeatureTrace t) = FeatureTrace (\n -> case t n of
-    Nothing -> t' n
+combine t1 t2 = \n -> case t2 n of
+    Nothing -> t1 n
     Just x -> Just x
-    )
 
 {-
 Calculates the presence condition of a node (third argument) in the given tree (first argument) with the given feature traces (second argument).
 If the given node is not in the tree, the feature trace of the node will be returned.
 -}
 pc :: Eq a => AST a -> FeatureTrace a -> Node a -> FeatureFormula
-pc root (FeatureTrace trace) node =
+pc root trace node =
   nullable_and $
   [trace node] ++
   (fmap trace $ fmap element $ legatorAncestors root $ fromJust (safetree root node)) --(\() -> Tree node [])

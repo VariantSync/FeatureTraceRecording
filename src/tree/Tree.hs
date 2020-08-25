@@ -47,11 +47,11 @@ tree t x = case safetree t x of
   Nothing -> error $ "The element "++(show x)++" is not part of tree "++(show t)
   Just t' -> t'
 
-toset :: Ord a => Tree a -> Set a
-toset t = fromList $ foldMap pure t
-
 safetree :: Eq a => Tree a -> a -> Maybe(Tree a)
 safetree t x = Tree.find t (\(Tree y _) -> x == y)
+
+toset :: Ord a => Tree a -> Set a
+toset t = fromList $ foldMap pure t
 
 {-
 Find the first subtree in the given tree (first argument) whose root matches the predicate (second argument).
