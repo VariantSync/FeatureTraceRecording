@@ -42,9 +42,7 @@ edit_ins_tree :: (Eq a, Show a) => AST a -> UUID -> Int -> Edit a
 edit_ins_tree stree p i = Edit {
     edittype = Insert,
     run = manipulate ins,--(fmap $ increaseVersion 1).
-    delta = \t -> case Tree.find t $ (p==).uuidOf of
-        Nothing -> empty
-        Just p' -> toset stree,
+    delta = \t -> if any ((p==).uuid) t then toset stree else empty,
     name = "ins_tree("++(intercalate ", " $ show <$> [uuidOf stree, p, i])++")"} -- inverse = del_tree $ uuidOf s
     where ins x@(Tree n c) = if uuid n == p
                              then Tree n (Util.insertAtIndex i stree c)
@@ -60,10 +58,12 @@ order. If p = epsilon, root stree becomes the new root of T.
 edit_ins_partial :: (Eq a) => AST a -> UUID -> Int -> Int -> UUID -> Int -> Edit a 
 edit_ins_partial stree p i j snode k = Edit {
     edittype = Insert,
-    run = manipulate insp,
-    delta = \t -> case Tree.find t $ (p==).uuidOf of
-        Nothing -> empty
-        Just p' -> toset stree,
+    run = if p == epsilon
+          then \t -> inss [t] stree
+          else manipulate insp,
+    delta = \t -> if p == epsilon || any ((p==).uuid) t
+                  then toset stree
+                  else empty,
     name = "ins_partial("++(intercalate ", " $ show <$> [uuidOf stree, p, i, j, snode, k])++")"}
     where insp t@(Tree n c) = if uuid n == p
                               then Tree n (insertAtIndex i (newSubTreeWith $ getRange i j c) $ removeRange i j c)
