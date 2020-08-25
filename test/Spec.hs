@@ -1,5 +1,6 @@
 import Propositions
 import SAT
+import Util
 
 testImpl :: PropositionalFormula String
 testImpl = pimplies (PAnd [PVariable "A", PVariable "B"]) (PVariable "C")
@@ -32,3 +33,5 @@ main = putStrLn $
         "\n       sat: "++(show $ sat a)++
         "\n=====\n")
     [testImpl, testDNF, testNot, testCNF, testTrue, testFalse]
+
+-- main = putStrLn . show $ getRange 2 4 ['a'..'f']
