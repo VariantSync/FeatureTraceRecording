@@ -21,37 +21,37 @@ import Data.List (intercalate)
 
 absAST :: State UUID (AST String)
 absAST = sequence
-    (Tree (newNode "abs" Legator) [
-        (Tree (newNode "Parameters" Plain) [
-            (Tree (newNode "VarDecl" Legator) [
-                (Tree (newNode "int" Constituent) []),
-                (Tree (newNode "x" Constituent) [])
+    (Tree (node "abs" ASTT_FuncDef) [
+        (Tree (node "params" ASTT_Parameters) [
+            (Tree (node "param" ASTT_VarDecl) [
+                (Tree (node "int" ASTT_Type) []),
+                (Tree (node "x" ASTT_Literal) [])
             ])
         ]),
-        (Tree (newNode "Statements" Plain) [
-            (Tree (newNode "if" Constituent) [
-                (Tree (newNode "Expression" Plain) [
-                    (Tree (newNode "<" Constituent) [
-                        (Tree (newNode "x" Plain) []),
-                        (Tree (newNode "0" Plain) [])
+        (Tree (node "body" ASTT_Statements) [
+            (Tree (node "if" ASTT_Condition) [
+                (Tree (node "cond" ASTT_Expression) [
+                    (Tree (node "<" ASTT_BinaryOp) [
+                        (Tree (node "x" ASTT_VarRef) []),
+                        (Tree (node "0" ASTT_Literal) [])
                         -- Should these really be plain here?
                         -- They cant be removed because they belong to the definition of < which needs a left and right side.
                         -- However, they could be replaced in other variants.
                     ])
                 ]),
-                (Tree (newNode "Statements" Legator) [
-                    (Tree (newNode "return" Legator) [
-                        (Tree (newNode "Expression" Plain) [
-                            (Tree (newNode "UnaryMinus" Constituent) [
-                                (Tree (newNode "x" Constituent) [])
+                (Tree (node "Statements" ASTT_Statements) [
+                    (Tree (node "return" ASTT_Return) [
+                        (Tree (node "Expression" ASTT_Expression) [
+                            (Tree (node "UnaryMinus" ASTT_UnaryOp) [
+                                (Tree (node "x" ASTT_VarRef) [])
                             ])
                         ])
                     ])
                 ])
             ]),
-            (Tree (newNode "return" Legator) [
-                (Tree (newNode "Expression" Plain) [
-                    (Tree (newNode "x" Constituent) [])
+            (Tree (node "return" ASTT_Return) [
+                (Tree (node "Expression" ASTT_Expression) [
+                    (Tree (node "x" ASTT_VarRef) [])
                 ])
             ])
         ])
@@ -59,11 +59,11 @@ absAST = sequence
 
 assertAST :: State UUID (AST String)
 assertAST = sequence
-    (Tree (newNode "Assertion" Legator) [
-        (Tree (newNode "Expression" Plain) [
-            (Tree (newNode "!=" Legator) [
-                (Tree (newNode "x" Constituent) []),
-                (Tree (newNode "NaN" Constituent) [])
+    (Tree (node "Assertion" ASTT_FuncCall) [
+        (Tree (node "assert_expr" ASTT_Expression) [
+            (Tree (node "!=" ASTT_BinaryOp) [
+                (Tree (node "x" ASTT_VarRef) []),
+                (Tree (node "NaN" ASTT_Literal) [])
             ])
         ])
     ])
