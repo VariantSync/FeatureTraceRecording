@@ -12,3 +12,6 @@ next x = do
 
 toInt :: UUID -> Int
 toInt = id
+
+epsilon :: UUID
+epsilon = -1
