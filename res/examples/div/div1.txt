@@ -1,0 +1,4 @@
+﻿double reciprocal(double x) {
+    assert(x != 0);
+    return 1.0 / x;
+}

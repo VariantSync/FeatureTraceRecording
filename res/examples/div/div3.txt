@@ -1,0 +1,6 @@
+﻿double reciprocal(double x) {
+    if (x == 0) {
+        error("Cannot divide by 0!");
+    }
+    return 1.0 / x;
+}

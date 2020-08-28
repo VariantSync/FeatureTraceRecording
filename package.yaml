@@ -38,7 +38,9 @@ library:
 executables:
   ftr-exe:
     main:                Main.hs
-    source-dirs:         app
+    source-dirs:
+      - app
+      - app/examples
     ghc-options:
     - -threaded
     - -rtsopts
