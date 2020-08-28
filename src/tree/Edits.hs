@@ -9,7 +9,11 @@ import Data.List
 import Data.Set
 
 data EditType = Identity | TraceOnly | Insert | Delete | Move | Update deriving (Eq, Show)
-data Edit a = Edit {edittype :: EditType, name :: String, run :: AST a -> AST a, delta :: AST a -> Set (Node a)} -- inverse :: Edit a
+data Edit a = Edit {
+    edittype :: EditType,
+    name :: String,
+    run :: AST a -> AST a,
+    delta :: AST a -> Set (Node a)} -- inverse :: Edit a
 type EditScript a = [Edit a]
 
 -- Turns an edit script into one single function
@@ -49,17 +53,16 @@ edit_ins_tree stree p i = Edit {
                              else x
 
 {-
-i <= j
-Replaces the children of node p \in T in range [i, j] with the new
-tree stree nosubtreeof T, then located at index i. The replaced children
-are added as children of snode \in stree at index k preserving their
-order. If p = epsilon, root stree becomes the new root of T.
+Replaces the children of node p \in T in range [i, j] (i <= j)
+with the new tree stree nosubtreeof T, then located at index i.
+The replaced children are added as children of snode \in stree at index k preserving their order.
+If p = epsilon, root stree becomes the new root of T.
 -}
 edit_ins_partial :: (Eq a) => AST a -> UUID -> Int -> Int -> UUID -> Int -> Edit a 
 edit_ins_partial stree p i j snode k = Edit {
     edittype = Insert,
     run = if p == epsilon
-          then \t -> inss [t] stree
+          then \t -> manipulate (insertMovedChildren [t]) stree
           else manipulate insp,
     delta = \t -> if p == epsilon || any ((p==).uuid) t
                   then toset stree
@@ -68,8 +71,8 @@ edit_ins_partial stree p i j snode k = Edit {
     where insp t@(Tree n c) = if uuid n == p
                               then Tree n (insertAtIndex i (newSubTreeWith $ getRange i j c) $ removeRange i j c)
                               else t
-          newSubTreeWith children = manipulate (inss children) stree
-          inss children t@(Tree n c) = if uuid n == snode
+          newSubTreeWith children = manipulate (insertMovedChildren children) stree
+          insertMovedChildren children t@(Tree n c) = if uuid n == snode
                                        then Tree n (insertListAtIndex i children c)
                                        else t
 
