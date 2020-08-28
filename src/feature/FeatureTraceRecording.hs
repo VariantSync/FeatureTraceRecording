@@ -22,12 +22,15 @@ featureTraceRecording f0 t0 editscript contexts = reversefoldr record (f0, t0) $
     where recorders = zipRecordingScript (fromEditScript editscript) contexts
           record = \(edit, recorder) (f_old, t_old) -> (recorder f_old t_old, run edit t_old)
 
+-- featureTraceRecordingWithIntermediateSteps :: (Show a, Eq a) => FeatureTrace a -> AST a -> EditScript a -> [FeatureFormula] -> [(FeatureTrace a, AST a)]
+-- featureTraceRecordingWithIntermediateSteps f0 t0 editscript contexts = []
+
 type Recorder a = FeatureFormula -> FeatureTrace a -> AST a -> FeatureTrace a
 type RecordingScript a = [Recorder a]
 
 zipRecordingScript :: RecordingScript a -> [FeatureFormula] -> [FeatureTrace a -> AST a -> FeatureTrace a]
 zipRecordingScript recordings contexts 
-    | length recordings == length contexts = recordings <*> contexts
+    | length recordings == length contexts = zipWith (\r phi -> r phi) recordings contexts
     | otherwise = error "number of contexts does not match number of recordings"
 
 fromEditScript :: (Show a, Eq a) => EditScript a -> RecordingScript a
