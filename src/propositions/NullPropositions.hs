@@ -24,3 +24,7 @@ nullable_and :: [NullableFormula a] -> NullableFormula a
 nullable_and l = case catMaybes l of
     [] -> Nothing
     justs -> Just $ PAnd justs
+
+prettyPrint :: (Show a) => NullableFormula a -> String
+prettyPrint Nothing = "null"
+prettyPrint (Just p) = show p
