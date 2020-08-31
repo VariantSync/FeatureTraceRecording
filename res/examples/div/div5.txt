@@ -1,4 +1,4 @@
-﻿double div(double a, double x) {
+﻿double div(double a, double b) {
     if (x == 0) {
         error("Cannot divide by 0!");
     }

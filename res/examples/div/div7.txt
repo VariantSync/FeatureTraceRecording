@@ -2,9 +2,9 @@
     if (b == 0) {
         error("Cannot divide by 0!");
     }
-    return 1.0 / b;
+    return a / b;
 }
 
 double reciprocal(double x) {
-    
+    return div(1.0, x);
 }

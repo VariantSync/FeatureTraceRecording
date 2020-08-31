@@ -1,4 +1,4 @@
-﻿double div(double a, double x) {
+﻿double div(double a, double b) {
 
 }
 
