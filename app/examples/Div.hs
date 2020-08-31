@@ -29,7 +29,7 @@ div0 = sequence
 
 div_assert :: State UUID (AST String)
 div_assert = sequence
-    (Tree (node "Assertion" ASTT_FuncCall) [
+    (Tree (node "assert" ASTT_FuncCall) [
         (Tree (node "assert_expr" ASTT_Expression) [
             (Tree (node "!=" ASTT_BinaryOp) [
                 (Tree (node "x" ASTT_VarRef) []),
