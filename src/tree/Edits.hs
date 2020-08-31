@@ -45,10 +45,10 @@ edit_trace_only nodes = Edit {
     name = "tracechange"}
 
 -- Add the tree s as the i-th child of node p
-edit_ins_tree :: (Eq a, Show a) => AST a -> UUID -> Int -> Edit a
+edit_ins_tree :: (Eq a) => AST a -> UUID -> Int -> Edit a
 edit_ins_tree stree p i = Edit {
     edittype = Insert,
-    run = manipulate ins,--(fmap $ increaseVersion 1).
+    run = \t -> if any ((p==).uuid) t then manipulate ins t else error $ "The given parent node "++(show p)++" does not exist!",
     delta = \t -> if any ((p==).uuid) t then toset stree else empty,
     name = "ins_tree("++(intercalate ", " $ show <$> [uuidOf stree, p, i])++")"} -- inverse = del_tree $ uuidOf s
     where ins x@(Tree n c) = if uuid n == p
@@ -61,6 +61,7 @@ with the new tree stree nosubtreeof T, then located at index i.
 The replaced children are added as children of snode \in stree at index k preserving their order.
 If p = epsilon, root stree becomes the new root of T.
 -}
+-- TODO: Do we want to split ins_partial into two edits: one where p = epsilon and one where p != epsilon?
 edit_ins_partial :: (Eq a) => AST a -> UUID -> Int -> Int -> UUID -> Int -> Edit a 
 edit_ins_partial stree p i j snode k = Edit {
     edittype = Insert,
@@ -76,7 +77,7 @@ edit_ins_partial stree p i j snode k = Edit {
                               else t
           newSubTreeWith children = manipulate (insertMovedChildren children) stree
           insertMovedChildren children t@(Tree n c) = if uuid n == snode
-                                       then Tree n (insertListAtIndex i children c)
+                                       then Tree n (insertListAtIndex k children c)
                                        else t
 
 -- delete the node v and move its children up
@@ -98,3 +99,12 @@ edit_del_tree v = Edit {
         Nothing -> empty
         Just t' -> toset t',
     name = "del_tree("++(show v)++")"}
+
+edit_move_tree :: (Eq a) => AST a -> UUID -> Int -> Edit a
+edit_move_tree stree p i = Edit {
+    edittype = Move,
+    run = ins.del,
+    delta = \t -> if any ((p==).uuid) t then toset stree else empty,
+    name = "move_tree("++(intercalate ", " $ show <$> [uuidOf stree, p, i])++")"}
+    where del = run $ edit_del_tree $ uuidOf stree
+          ins = run $ edit_ins_tree stree p i

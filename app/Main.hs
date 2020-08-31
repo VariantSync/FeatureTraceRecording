@@ -26,8 +26,10 @@ main :: IO ()
 main = putStrLn . fst . flip runState 0 $ do
     -- Unpack the states i.e. apply >>= in a more convenient way
     tree0 <- div0
-    assert <- div_assert
-    condition <- div_condition
+    tree_assert <- div_assert
+    tree_error <- div_error
+    tree_condition <- div_condition
+    tree_div <- div_div
     let 
         -- Output settings
         showPC = False
@@ -35,15 +37,24 @@ main = putStrLn . fst . flip runState 0 $ do
         trace0 = emptyTrace
         -- Some helper variables for edits
         id_div_body = uuidOf . fromJust $ find tree0 (\(Tree n _) -> value n == "body")
+        id_div_cond_body = uuidOf . fromJust $ find tree_condition (\(Tree n _) -> value n == "body")
         -- The edits "made by the developer"
         editscript = [
-            edit_ins_tree assert id_div_body 0
-          , edit_ins_partial condition id_div_body 0 0 (uuidOf . fromJust $ find condition (\(Tree n _) -> value n == "body")) 0
+            edit_ins_tree tree_assert id_div_body 0
+          , edit_ins_partial tree_condition id_div_body 0 0 id_div_cond_body 0
+          , edit_del_tree (uuidOf tree_assert)
+          , edit_ins_tree tree_error id_div_cond_body 0
+          --, edit_ins_partial tree_div epsilon 0 0 (uuidOf tree_div) 1 -- Values i and j dont matter here. So instead of just 0 0 they could take any value.
+          -- ins_partial with p = epsilon will never occur if we have immutable root nodes such as "file" or an empty abstract project root node as in Ecco.
+          , edit_ins_tree tree_div (uuidOf tree0) 0
             ]
         -- The feature contexts assigned to each edit
         featureContexts = [
             Just $ PVariable "Debug"
           , Just $ PVariable "Reciprocal"
+          , Just $ PVariable "Reciprocal" -- Error by user. Should actually be PTrue
+          , Just $ PVariable "Reciprocal"
+          , Just $ PVariable "Division"
             ]
         -- (finalTrace, finalTree) = featureTraceRecording trace0 tree0 editscript featureContexts
         tracesAndTrees = featureTraceRecordingWithIntermediateSteps trace0 tree0 editscript featureContexts
