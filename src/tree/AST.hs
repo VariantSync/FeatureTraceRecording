@@ -22,6 +22,7 @@ data ASTTypeAlphabet =
   | ASTT_VarRef
   | ASTT_Literal
   | ASTT_Type
+  | ASTT_File
   deriving (Eq, Show)
 
 data Node a = Node {value::a, valuetype::ASTTypeAlphabet, uuid::UUID} deriving (Eq, Functor) --, version::Int
@@ -49,6 +50,7 @@ nodetypeof ASTT_VarDecl = Legator
 nodetypeof ASTT_VarRef = Constituent -- leaf type
 nodetypeof ASTT_Literal = Constituent -- leaf type
 nodetypeof ASTT_Type = Constituent
+nodetypeof ASTT_File = Legator
 
 ntype :: Node a -> NodeType
 ntype n = nodetypeof $ valuetype n
