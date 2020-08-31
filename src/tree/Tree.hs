@@ -9,13 +9,17 @@ import Util
 
 data Tree a = Tree a [Tree a] deriving (Eq, Traversable)
 
-prettyPrint :: Show a => Int -> Tree a -> String
-prettyPrint i (Tree n []) = (genIndent i) ++ (show n) ++ " []\n"
-prettyPrint i (Tree n children) =
-  (genIndent i) ++ (show n) ++ " [\n" ++ (concat $ fmap (prettyPrint $ i+1) children) ++ (genIndent i) ++ "]\n"
+prettyPrint :: (Show a, Monoid b) => Int -> (String -> b) -> (a -> b) -> Tree a -> b
+prettyPrint i strToB nodePrinter (Tree n []) = (strToB $ genIndent i) <> (nodePrinter n) <>  (strToB " []\n")
+prettyPrint i strToB nodePrinter (Tree n children) = (strToB $ genIndent i)
+  <> (nodePrinter n)
+  <> (strToB " [\n")
+  <> (mconcat $ fmap (prettyPrint (i+1) strToB nodePrinter) children)
+  <> (strToB $ genIndent i)
+  <> (strToB "]\n")
 
 instance Show a => Show (Tree a) where
-  show = prettyPrint 0
+  show = prettyPrint 0 id show
 
 instance Functor Tree where
   fmap f (Tree n c) = Tree (f n) (fmap (fmap f) c)

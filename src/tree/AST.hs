@@ -24,7 +24,7 @@ data ASTTypeAlphabet =
   | ASTT_Type
   deriving (Eq, Show)
 
-data Node a = Node {value::a, valuetype::ASTTypeAlphabet, uuid::UUID} deriving (Show, Eq, Functor) --, version::Int
+data Node a = Node {value::a, valuetype::ASTTypeAlphabet, uuid::UUID} deriving (Eq, Functor) --, version::Int
 type AST a = Tree (Node a)
 
 instance (Eq a) => Ord (Node a) where
@@ -70,3 +70,6 @@ abstract = filterNodes (\(Tree n _) -> ntype n /= Plain)
 
 legatorAncestors :: Eq a => AST a -> AST a -> [AST a]
 legatorAncestors root = (filter (\(Tree n _) -> ntype n == Legator)).(ancestors root)
+
+instance (Show a) => Show (Node a) where
+  show n = "("++(show $ uuid n)++", "++(show $ valuetype n)++", "++(show $ value n)++", "++(show $ ntype n)++")"

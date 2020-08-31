@@ -1,5 +1,6 @@
 module FeatureTraceRecording (
-    featureTraceRecording
+    featureTraceRecording,
+    featureTraceRecordingWithIntermediateSteps
 ) where
 
 import Edits
@@ -22,8 +23,16 @@ featureTraceRecording f0 t0 editscript contexts = reversefoldr record (f0, t0) $
     where recorders = zipRecordingScript (fromEditScript editscript) contexts
           record = \(edit, recorder) (f_old, t_old) -> (recorder f_old t_old, run edit t_old)
 
--- featureTraceRecordingWithIntermediateSteps :: (Show a, Eq a) => FeatureTrace a -> AST a -> EditScript a -> [FeatureFormula] -> [(FeatureTrace a, AST a)]
--- featureTraceRecordingWithIntermediateSteps f0 t0 editscript contexts = []
+featureTraceRecordingWithIntermediateSteps :: (Show a, Eq a) => FeatureTrace a -> AST a -> EditScript a -> [FeatureFormula] -> [(FeatureTrace a, AST a)]
+featureTraceRecordingWithIntermediateSteps f0 t0 editscript contexts = foldWithLast record (f0, t0) $ zip editscript recorders
+    where recorders = zipRecordingScript (fromEditScript editscript) contexts
+          record = \(edit, recorder) (f_old, t_old) -> (recorder f_old t_old, run edit t_old)
+
+foldWithLast :: (a -> b -> b) -> b -> [a] -> [b]
+foldWithLast _ _ [] = []
+foldWithLast transformer lastresult (head:tail) = (res):foldWithLast transformer res tail
+    where res = transformer head lastresult
+
 
 type Recorder a = FeatureFormula -> FeatureTrace a -> AST a -> FeatureTrace a
 type RecordingScript a = [Recorder a]

@@ -14,9 +14,6 @@ type NonNullFeatureFormula = PropositionalFormula Feature
 type FeatureFormula = NullableFormula Feature
 type FeatureTrace a = Node a -> FeatureFormula
 
-showTrace :: FeatureTrace a -> AST a -> Tree (FeatureFormula, Node a)
-showTrace f = fmap (\n -> (f n, n))
-
 emptyTrace :: FeatureTrace a
 emptyTrace = \_ -> Nothing
 
@@ -42,3 +39,9 @@ pc root trace node =
   nullable_and $
   [trace node] ++
   (fmap trace $ fmap element $ legatorAncestors root $ fromJust (safetree root node)) --(\() -> Tree node [])
+
+augmentWithTrace :: (Node a -> FeatureFormula) -> AST a -> Tree (FeatureFormula, Node a)
+augmentWithTrace f = fmap (\n -> (f n, n))
+
+prettyPrint :: (Show a) => Tree (FeatureFormula, Node a) -> String
+prettyPrint = Tree.prettyPrint 0 id (\(trace, node) -> "<"++(NullPropositions.prettyPrint trace)++">"++(show node))
