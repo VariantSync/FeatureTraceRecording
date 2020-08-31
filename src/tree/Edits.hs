@@ -16,6 +16,9 @@ data Edit a = Edit {
     delta :: AST a -> Set (Node a)} -- inverse :: Edit a
 type EditScript a = [Edit a]
 
+instance Show (Edit a) where
+    show = name
+
 -- Turns an edit script into one single function
 -- The returned function will run the entire edit script on the given AST.
 foldEditScript :: EditScript a -> AST a -> AST a
