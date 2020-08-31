@@ -19,20 +19,12 @@ Runs the given editscript on the given AST producing the returned AST.
 While doing so, the given feature trace will be adapted a 
 -}
 featureTraceRecording :: (Show a, Eq a) => FeatureTrace a -> AST a -> EditScript a -> [FeatureFormula] -> (FeatureTrace a, AST a)
-featureTraceRecording f0 t0 editscript contexts = reversefoldr record (f0, t0) $ zip editscript recorders
-    where recorders = zipRecordingScript (fromEditScript editscript) contexts
-          record = \(edit, recorder) (f_old, t_old) -> (recorder f_old t_old, run edit t_old)
+featureTraceRecording  f0 t0 editscript contexts = last $ featureTraceRecordingWithIntermediateSteps f0 t0 editscript contexts
 
 featureTraceRecordingWithIntermediateSteps :: (Show a, Eq a) => FeatureTrace a -> AST a -> EditScript a -> [FeatureFormula] -> [(FeatureTrace a, AST a)]
-featureTraceRecordingWithIntermediateSteps f0 t0 editscript contexts = foldWithLast record (f0, t0) $ zip editscript recorders
+featureTraceRecordingWithIntermediateSteps f0 t0 editscript contexts = tail $ scanl record (f0, t0) $ zip editscript recorders
     where recorders = zipRecordingScript (fromEditScript editscript) contexts
-          record = \(edit, recorder) (f_old, t_old) -> (recorder f_old t_old, run edit t_old)
-
-foldWithLast :: (a -> b -> b) -> b -> [a] -> [b]
-foldWithLast _ _ [] = []
-foldWithLast transformer lastresult (head:tail) = (res):foldWithLast transformer res tail
-    where res = transformer head lastresult
-
+          record = \(f_old, t_old) (edit, recorder) -> (recorder f_old t_old, run edit t_old)
 
 type Recorder a = FeatureFormula -> FeatureTrace a -> AST a -> FeatureTrace a
 type RecordingScript a = [Recorder a]
