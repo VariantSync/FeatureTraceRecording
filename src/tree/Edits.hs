@@ -77,7 +77,8 @@ edit_ins_partial stree p i j snode k = Edit {
                               then Tree n (insertAtIndex i (newSubTreeWith $ getRange i j c) $ removeRange i j c)
                               else t
           newSubTreeWith children = manipulate (insertMovedChildren children) stree
-          insertMovedChildren children t@(Tree n c) = if uuid n == snode
+          insertMovedChildren children t@(Tree n c) = 
+                                       if uuid n == snode
                                        then Tree n (insertListAtIndex k children c)
                                        else t
 
@@ -86,7 +87,7 @@ edit_del_node :: (Eq a) => UUID -> Edit a
 edit_del_node v = Edit {
     edittype = Delete,
     run = (filterNodes ((v /=) . uuidOf)), --(fmap $ increaseVersion 1).
-    delta = \t -> case Tree.find t $ (v==).uuidOf of
+    delta = \t -> case Tree.find ((v==).uuidOf) t of
         Nothing -> empty
         Just t' -> singleton $ element t',
     name = "del_node("++(show v)++")"}
@@ -96,16 +97,24 @@ edit_del_tree :: (Eq a) => UUID -> Edit a
 edit_del_tree v = Edit {
     edittype = Delete,
     run = (filterTrees ((v /=) . uuidOf)), --(fmap $ increaseVersion 1).
-    delta = \t -> case Tree.find t $ (v==).uuidOf of
+    delta = \t -> case Tree.find ((v==).uuidOf) t of
         Nothing -> empty
         Just t' -> toset t',
     name = "del_tree("++(show v)++")"}
 
-edit_move_tree :: (Eq a) => AST a -> UUID -> Int -> Edit a
-edit_move_tree stree p i = Edit {
+-- This commented out signature is the signature of move_tree in the paper.
+-- Actually, the given subtree should just be an index because the subtree is present in the given tree.
+-- edit_move_tree :: (Eq a) => AST a -> UUID -> Int -> Edit a
+edit_move_tree :: (Eq a, Show a) => UUID -> UUID -> Int -> Edit a
+edit_move_tree s p i = Edit {
     edittype = Move,
-    run = ins.del,
-    delta = \t -> if any ((p==).uuid) t then toset stree else empty,
-    name = "move_tree("++(intercalate ", " $ show <$> [uuidOf stree, p, i])++")"}
-    where del = run $ edit_del_tree $ uuidOf stree
-          ins = run $ edit_ins_tree stree p i
+    run = \t -> case streeIn t of
+        Just stree -> (ins stree).del $ t
+        Nothing -> error $ "The subtree "++(show s)++" cannot be moved because it does not exist in the given tree \n"++(show t),
+    delta = \t -> case streeIn t of
+        Just stree -> toset stree
+        Nothing -> empty,
+    name = "move_tree("++(intercalate ", " $ show <$> [s, p, i])++")"}
+    where streeIn = Tree.find ((s==).uuidOf)
+          del = run $ edit_del_tree s
+          ins t = run $ edit_ins_tree t p i

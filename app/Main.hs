@@ -37,8 +37,8 @@ main = putStrLn . fst . flip runState 0 $ do
         -- The initial feature trace of the first tree.
         trace0 = emptyTrace
         -- Some helper variables for edits
-        id_div_body = uuidOf . fromJust $ find tree0 (\(Tree n _) -> value n == "body")
-        id_div_cond_body = uuidOf . fromJust $ find tree_condition (\(Tree n _) -> value n == "body")
+        id_div_body = uuidOf . fromJust $ find (\(Tree n _) -> value n == "body") tree0
+        id_div_cond_body = uuidOf . fromJust $ find (\(Tree n _) -> value n == "body") tree_condition
         -- The edits "made by the developer"
         editscript = [
             edit_ins_tree tree_assert id_div_body 0
@@ -46,6 +46,7 @@ main = putStrLn . fst . flip runState 0 $ do
           , edit_del_tree (uuidOf tree_assert)
           , edit_ins_tree tree_error id_div_cond_body 0
           , edit_ins_tree tree_div (uuidOf tree0) 0
+          -- , edit_move_tree 
             ]
         -- The feature contexts assigned to each edit
         featureContexts = [
@@ -54,6 +55,7 @@ main = putStrLn . fst . flip runState 0 $ do
           , Just $ PVariable "Reciprocal" -- Error by user. Should actually be PTrue
           , Just $ PVariable "Reciprocal"
           , Just $ PVariable "Division"
+          -- , Just $ PVariable "Division"
             ]
         -- (finalTrace, finalTree) = featureTraceRecording trace0 tree0 editscript featureContexts
         -- Run the ftr

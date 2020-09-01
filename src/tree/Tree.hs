@@ -52,7 +52,7 @@ tree t x = case safetree t x of
   Just t' -> t'
 
 safetree :: Eq a => Tree a -> a -> Maybe(Tree a)
-safetree t x = Tree.find t (\(Tree y _) -> x == y)
+safetree t x = Tree.find (\(Tree y _) -> x == y) t
 
 toset :: Ord a => Tree a -> Set a
 toset t = fromList $ foldMap pure t
@@ -60,13 +60,13 @@ toset t = fromList $ foldMap pure t
 {-
 Find the first subtree in the given tree (first argument) whose root matches the predicate (second argument).
 -}
-find :: Tree a -> (Tree a -> Bool) -> Maybe(Tree a)
-find x@(Tree _ children) predicate = case predicate x of
+find :: (Tree a -> Bool) -> Tree a -> Maybe(Tree a)
+find predicate x@(Tree _ children) = case predicate x of
   True -> Just x
-  False -> safehead $ catMaybes $ fmap (\t -> Tree.find t predicate) children
+  False -> safehead $ catMaybes $ fmap (\t -> Tree.find predicate t) children
 
 parent :: Eq a => Tree a -> Tree a -> Maybe(Tree a)
-parent root t = Tree.find root (\(Tree _ children) -> elem t children)
+parent root t = Tree.find (\(Tree _ children) -> elem t children) root
 
 {-
 Retrieves all nodes that are above the given node (second argument) in the given tree (first argument)
