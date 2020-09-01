@@ -87,6 +87,14 @@ ftr_del e = \context f_old t_old ->
                 else nullable_and [f_old v, Just $ PNot (assure context)] -- assure is safe here because we know that context is not null
         )
 
+{-
+Moving is ambigous.
+Here, we say that existing traces should not be kept (except for simplification).
+This could be unwanted but there is no way to differentiate both cases.
+When removing existing traces, considering moves explicitly is pointless.
+Given that moves are harder to detect in general, not keeping traces could actually be a more consistent, reliable, and comprehensible experience for the user.
+Such a conclusion would also be valid, though. (That there is no need for handling moves explicitly).
+-}
 ftr_move :: (Show a, Eq a) => Edit a -> Recorder a
 ftr_move e = \context f_old t_old ->
     let d = delta e t_old in
@@ -95,8 +103,8 @@ ftr_move e = \context f_old t_old ->
         then (
             let t_new = run e t_old in
             nullable_and [
-                takeIf (\traceof_v -> not $ willInherit traceof_v t_new d f_old v) (f_old v),
-                takeIf (\phi -> willInherit phi t_new d f_old v) context]
+                takeIf (\traceof_v -> not $ willInherit2 traceof_v t_new f_old v) (f_old v),
+                takeIf (\phi -> not $ willInherit phi t_new d f_old v) context]
         )
         else f_old v
 
@@ -126,3 +134,10 @@ willInherit formula t_new delta f v =
             Nothing -> False
             Just m -> taut $ pimplies m formula)
         (al \\ delta)) -- There is an old ancestor that already has the mapping
+
+willInherit2 :: (Show a, Eq a) => NonNullFeatureFormula -> AST a-> FeatureTrace a -> Node a -> Bool
+willInherit2 formula t_new f v =
+    let al = fromList $ fmap element $ legatorAncestors t_new $ tree t_new v in
+    any (\a -> case f a of
+        Nothing -> False
+        Just m -> taut $ pimplies m formula) al
