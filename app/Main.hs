@@ -36,7 +36,7 @@ main = putStrLn . fst . flip runState 0 $ do
     let 
         -- Debug settings
         codeStyle = ShowAST
-        traceStyle = ShowPresenceCondition
+        traceStyle = ShowTrace
         abstractTrees = False
         -- The initial feature trace of the first tree.
         trace0 = emptyTrace
@@ -53,7 +53,7 @@ main = putStrLn . fst . flip runState 0 $ do
           , edit_ins_tree tree_error id_cond_body 0
           , edit_ins_tree tree_div (uuidOf tree0) 0
           , edit_move_tree (uuidOf tree_condition) id_div_body 0
-          , edit_move_tree id_return id_div_body 1
+          , edit_move_tree id_return id_div_body 1 -- now we are done with div5.txt
             ]
         -- The feature contexts assigned to each edit
         featureContexts = [

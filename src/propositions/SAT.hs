@@ -106,7 +106,7 @@ intifyFormulas_fold (mi, cis) c = do
 Creates a list of the two literals 'x' and 'not x' where x is a new generated variable.
 -}
 createConflictingLiterals :: (Ord a) => Bimap a Int -> State UUID (Bimap a Int, [PropositionalFormula Int])
-createConflictingLiterals m =  do
+createConflictingLiterals m = do
     next ()
     z <- get
     let intval = toInt z in
