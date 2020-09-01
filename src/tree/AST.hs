@@ -4,6 +4,8 @@ module AST where
 
 import UUID
 import Tree
+import Util
+import Data.List
 import Control.Monad.State
 
 -- These are the grammar rules of a language
@@ -38,19 +40,19 @@ There should be a unique mapping ASTTypeAlphabet -> NodeType.
 data NodeType = Plain | Constituent | Legator deriving (Show, Eq)
 nodetypeof :: ASTTypeAlphabet -> NodeType
 nodetypeof ASTT_FuncDef = Legator
-nodetypeof ASTT_Parameters = Plain
-nodetypeof ASTT_Statements = Plain
 nodetypeof ASTT_Return = Legator
-nodetypeof ASTT_Condition = Constituent
-nodetypeof ASTT_FuncCall = Legator
-nodetypeof ASTT_Expression = Constituent -- Expressions only have expressions as children
-nodetypeof ASTT_UnaryOp = Constituent
+nodetypeof ASTT_File = Legator
 nodetypeof ASTT_BinaryOp = Legator
 nodetypeof ASTT_VarDecl = Legator
+nodetypeof ASTT_FuncCall = Legator
+nodetypeof ASTT_Condition = Constituent
+nodetypeof ASTT_UnaryOp = Constituent
 nodetypeof ASTT_VarRef = Constituent -- leaf type
 nodetypeof ASTT_Literal = Constituent -- leaf type
 nodetypeof ASTT_Type = Constituent
-nodetypeof ASTT_File = Legator
+nodetypeof ASTT_Expression = Plain
+nodetypeof ASTT_Parameters = Plain
+nodetypeof ASTT_Statements = Plain
 
 ntype :: Node a -> NodeType
 ntype n = nodetypeof $ valuetype n
@@ -72,6 +74,31 @@ abstract = filterNodes (\(Tree n _) -> ntype n /= Plain)
 
 legatorAncestors :: Eq a => AST a -> AST a -> [AST a]
 legatorAncestors root = (filter (\(Tree n _) -> ntype n == Legator)).(ancestors root)
+
+showContent :: Int -> (Node a -> String) -> AST a -> String
+showContent i tostr (Tree n children) = 
+  let indent = genIndent i
+      nextIndent = i + 2
+      me = tostr n
+      showList sep l = intercalate sep $ showContent nextIndent tostr <$> l
+      showListNoIndentIncrease sep l = intercalate sep $ showContent i tostr <$> l
+      showHead = showContent nextIndent tostr $ head children
+  in  
+    case valuetype n of
+      ASTT_FuncDef -> indent++showHead++" "++me++(showListNoIndentIncrease " " $ tail children)
+      ASTT_Parameters -> "("++(showList ", " children)++")"
+      ASTT_Statements -> "\n"++indent++"{\n"++(showList "\n" children)++"\n"++indent++"}"
+      ASTT_Return -> indent++"return "++(showList " " children)++";"
+      ASTT_Condition -> indent++"if ("++showHead++")"++(showListNoIndentIncrease " " $ tail children)
+      ASTT_FuncCall -> indent++me++(showList ", " children)++";"
+      ASTT_Expression -> if length children == 1 then showHead else error "Expressios can only have one child"
+      ASTT_UnaryOp -> if length children == 1 then me++showHead else error "Unary operations can only have one child"
+      ASTT_BinaryOp -> if length children == 2 then showHead++" "++me++" "++(showContent nextIndent tostr $ head $ tail children) else error "Binary operations must have exactly two children"
+      ASTT_VarDecl -> (showList " " children)
+      ASTT_VarRef -> me
+      ASTT_Literal -> me
+      ASTT_Type -> me
+      ASTT_File -> indent++"FILE ["++me++"] {\n"++(showList "\n" children)++"\n"++indent++"}"
 
 instance (Show a) => Show (Node a) where
   show n = "("++(show $ uuid n)++", "++(show $ valuetype n)++", "++(show $ value n)++", "++(show $ ntype n)++")"
