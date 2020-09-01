@@ -51,7 +51,7 @@ testCases = [
 main :: IO ()
 main = putStrLn $
     foldr (\a b -> a++"\n"++b) mempty $
-    map (\(parent, formula) -> concat [
-        "             axiom = ", show parent, "\n",
+    map (\(axiom, formula) -> concat [
+        "             axiom = ", show axiom, "\n",
         "           formula = ", show formula, "\n",
-        "simplified formula = ", show $ removeRedundancy parent formula, "\n"]) testCases
+        "simplified formula = ", show $ removeRedundancy axiom formula, "\n"]) testCases
