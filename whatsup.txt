@@ -1,0 +1,3 @@
+﻿- Plain nodes should not have presence conditions at all. These nodes need to be exactly present in those variants in which their parent has to be present.
+- How to remove redundancies in ftr: For each node v in delta: F(v) <- Simplify.removeRedundancy (PC of nearest ancestor legator) F(v)
+- Können wir immer und überal mit PCs rechnen statt der Traces, wo wir jetzt Redundanzen entfernen koennen?
