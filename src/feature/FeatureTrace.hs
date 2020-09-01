@@ -35,10 +35,9 @@ Calculates the presence condition of a node (third argument) in the given tree (
 If the given node is not in the tree, the feature trace of the node will be returned.
 -}
 pc :: Eq a => AST a -> FeatureTrace a -> Node a -> FeatureFormula
-pc root trace node =
-  nullable_and $
-  [trace node] ++
-  (fmap trace $ fmap element $ legatorAncestors root $ fromJust (safetree root node)) --(\() -> Tree node [])
+pc root trace node
+  | ntype node == Plain = Nothing
+  | otherwise = nullable_and $ (trace node):(fmap trace $ fmap element $ legatorAncestors root $ fromJust (safetree root node)) --(\() -> Tree node [])
 
 augmentWithTrace :: (Node a -> FeatureFormula) -> AST a -> Tree (FeatureFormula, Node a)
 augmentWithTrace f = fmap (\n -> (f n, n))
