@@ -31,8 +31,9 @@ main = putStrLn . fst . flip runState 0 $ do
     tree_condition <- div_condition
     tree_div <- div_div
     let 
-        -- Output settings
+        -- Debug settings
         showPC = False
+        abstractTrees = True
         -- The initial feature trace of the first tree.
         trace0 = emptyTrace
         -- Some helper variables for edits
@@ -44,8 +45,6 @@ main = putStrLn . fst . flip runState 0 $ do
           , edit_ins_partial tree_condition id_div_body 0 0 id_div_cond_body 0
           , edit_del_tree (uuidOf tree_assert)
           , edit_ins_tree tree_error id_div_cond_body 0
-          --, edit_ins_partial tree_div epsilon 0 0 (uuidOf tree_div) 1 -- Values i and j dont matter here. So instead of just 0 0 they could take any value.
-          -- ins_partial with p = epsilon will never occur if we have immutable root nodes such as "file" or an empty abstract project root node as in Ecco.
           , edit_ins_tree tree_div (uuidOf tree0) 0
             ]
         -- The feature contexts assigned to each edit
@@ -57,11 +56,13 @@ main = putStrLn . fst . flip runState 0 $ do
           , Just $ PVariable "Division"
             ]
         -- (finalTrace, finalTree) = featureTraceRecording trace0 tree0 editscript featureContexts
+        -- Run the ftr
         tracesAndTrees = featureTraceRecordingWithIntermediateSteps trace0 tree0 editscript featureContexts
+        -- Some helper variables for output formatting
+        featureFormulaOutputFormatter = \trace tree -> if showPC then pc tree trace else trace
+        treeOutputFormatter = if abstractTrees then abstract else id
     --   return $ show $ showTrace finalTrace finalTree
     return
-      $ (++) "\n==== Initial State ====\n"
-      $ (++) (FeatureTrace.prettyPrint $ augmentWithTrace trace0 tree0)
       $ foldr (\(fc, edit, tree) s ->
         "\n==== Run "
         ++(show edit)
@@ -70,8 +71,7 @@ main = putStrLn . fst . flip runState 0 $ do
         ++" giving us ====\n"
         ++(FeatureTrace.prettyPrint tree)
         ++s) ""
-      $ zip3 featureContexts editscript (uncurry augmentWithTrace <$> (if showPC then fmap (\(trace, tree) -> (pc tree trace, tree)) else id) tracesAndTrees)
-    --   return $ abstract tree0
-    --   return $ showTrace (newTrace 15 2 (Just $ PAnd [PVariable "A", PVariable "B"])) $ foldEditScript editscript tree0
-    --   return $ intercalate ", " (fmap name editscript)
-
+      $ zip3
+          ((Just $ PAnd [PVariable "meta_Debug", PVariable "meta_DoesNotMatterAtAll"]):featureContexts) -- Prepend dummy feature context here as fc for initial tree
+          (edit_identity:editscript) -- Prepend identity edit here to show initial tree.
+          ((uncurry augmentWithTrace).(\(trace, tree) -> (featureFormulaOutputFormatter trace tree, treeOutputFormatter tree)) <$> ((trace0, tree0):tracesAndTrees))

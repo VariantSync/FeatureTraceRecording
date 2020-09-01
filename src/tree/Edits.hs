@@ -62,6 +62,7 @@ The replaced children are added as children of snode \in stree at index k preser
 If p = epsilon, root stree becomes the new root of T.
 -}
 -- TODO: Do we want to split ins_partial into two edits: one where p = epsilon and one where p != epsilon?
+-- ins_partial with p = epsilon will never occur if we have immutable root nodes such as "file" or an empty abstract project root node as in Ecco.
 edit_ins_partial :: (Eq a) => AST a -> UUID -> Int -> Int -> UUID -> Int -> Edit a 
 edit_ins_partial stree p i j snode k = Edit {
     edittype = Insert,
