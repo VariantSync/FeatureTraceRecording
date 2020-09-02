@@ -57,12 +57,12 @@ ftr_id :: Edit a -> Recorder a
 ftr_id e = \_ trace _ -> trace
 
 ftr_trace :: (Eq a) => Edit a -> Recorder a
-ftr_trace e = \context f t_old ->
+ftr_trace e = \context f_old t_old ->
     let d = delta e t_old in
     \v ->
         if member v d
         then context
-        else f(v)
+        else f_old v
 
 ftr_ins :: (Show a, Eq a) => Edit a -> Recorder a
 ftr_ins e = \context f_old t_old ->
@@ -73,7 +73,7 @@ ftr_ins e = \context f_old t_old ->
         then f_old v
         else takeIf (\phi -> not $ willInherit phi t_new d f_old v) context
 
-ftr_del :: (Eq a) => Edit a -> Recorder a
+ftr_del :: (Eq a, Show a) => Edit a -> Recorder a
 ftr_del e = \context f_old t_old ->
     let d = delta e t_old in
     \v ->
@@ -108,7 +108,7 @@ ftr_move e = \context f_old t_old ->
         )
         else f_old v
 
-ftr_up :: (Eq a) => Edit a -> Recorder a
+ftr_up :: (Eq a, Show a) => Edit a -> Recorder a
 ftr_up e = \context f_old t_old ->
     let d = delta e t_old in
     \v ->

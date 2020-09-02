@@ -34,9 +34,11 @@ combine t1 t2 = \n -> case t2 n of
 Calculates the presence condition of a node (third argument) in the given tree (first argument) with the given feature traces (second argument).
 If the given node is not in the tree, the feature trace of the node will be returned.
 -}
-pc :: Eq a => AST a -> FeatureTrace a -> Node a -> FeatureFormula
+pc :: (Show a, Eq a) => AST a -> FeatureTrace a -> Node a -> FeatureFormula
 pc root trace node
-  | ntype node == Plain = Nothing
+  | ntype node == Plain = case parent root $ tree root node of
+                            Nothing -> Nothing
+                            Just p -> pc root trace (element p)
   | otherwise = nullable_and $ (trace node):(fmap trace $ fmap element $ legatorAncestors root $ fromJust (safetree root node)) --(\() -> Tree node [])
 
 augmentWithTrace :: (Node a -> FeatureFormula) -> AST a -> Tree (FeatureFormula, Node a)
