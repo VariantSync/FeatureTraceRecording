@@ -141,3 +141,20 @@ willInherit2 formula t_new f v =
     any (\a -> case f a of
         Nothing -> False
         Just m -> taut $ pimplies m formula) al
+
+simple_ftr_ins :: (Show a, Eq a) => Edit a -> Recorder a
+simple_ftr_ins e = \context f_old t_old ->
+    let d = delta e t_old
+        t_new = run e t_old in
+    \v ->
+        if member v d
+        then context
+        else f_old v
+
+simple_ftr_move :: (Show a, Eq a) => Edit a -> Recorder a
+simple_ftr_move e = \context f_old t_old ->
+    let d = delta e t_old in
+    \v ->
+        if member v d
+        then nullable_and [f_old v, context]
+        else f_old v
