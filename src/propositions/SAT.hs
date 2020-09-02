@@ -3,6 +3,7 @@ module SAT (
     satAssignment,
     tautCounterExample,
     taut,
+    contradicts,
     toIntCNF) where
 
 import UUID
@@ -44,6 +45,9 @@ Otherwise, returns a counterexample, i.e., an assignment under which the given f
 -}
 tautCounterExample :: (Show a, Ord a) => PropositionalFormula a -> Maybe (Assignment a)
 tautCounterExample = satAssignment.PNot
+
+contradicts :: (Show a, Ord a) => PropositionalFormula a -> Bool
+contradicts = not.sat
 
 {-
 Converts the given formula to a list of clauses (first argument).

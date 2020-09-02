@@ -43,9 +43,19 @@ testCases = [
     (PAnd [PVariable "A", PVariable "B"], PVariable "A"),
     (PVariable "A", PAnd [PVariable "A", PVariable "B"]),
     (PVariable "A", PAnd [PVariable "B", PVariable "A"]),
-    (POr [PVariable "A", PVariable "B"], POr [PVariable "B", PVariable "A"]),
+    (PVariable "A", PAnd [POr [PVariable "X", PVariable "A"], PVariable "B"]),
+    (PAnd [PVariable "A", PVariable "B"], PAnd [PVariable "B", PVariable "A"]),
     (POr [PVariable "A", PVariable "B"], PAnd [POr [PVariable "B", PVariable "A"], PVariable "X"]),
-    (POr [PVariable "A", PVariable "B"], PAnd [PVariable "X", POr [PVariable "B", PVariable "A"]])
+    (POr [PVariable "A", PVariable "B"], PAnd [PVariable "X", POr [PVariable "B", PVariable "A"]]),
+    (PVariable "A", POr [PVariable "A", PVariable "B"]),
+    (POr [PVariable "A", PVariable "B"], PVariable "A"),
+    (PNot $ PVariable "A", POr [PVariable "A", PVariable "B"]),
+    (PAnd [PNot $ PVariable "A", PVariable "X"], POr [PVariable "A", PVariable "B"]),
+    (PNot $ PVariable "A", POr [PAnd [PVariable "A", PVariable "X"], PVariable "B"]),
+    (PNot $ PVariable "A", PVariable "A"),
+    (POr [PVariable "A", PVariable "B"], POr [PVariable "B", PVariable "A"]),
+    (PVariable "A", POr [PVariable "B", PVariable "A"]),
+    (PNot $ PVariable "A", PAnd [PVariable "B", PVariable "A"])
     ]
 
 main :: IO ()
