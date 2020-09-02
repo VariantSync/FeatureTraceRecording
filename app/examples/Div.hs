@@ -21,7 +21,7 @@ div0 = sequence
                     (Tree (node "Expression" ASTT_Expression) [
                         (Tree (node "/" ASTT_BinaryOp) [
                             (Tree (node "1.0" ASTT_Literal) []),
-                            (Tree (node "b" ASTT_VarRef) [])
+                            (Tree (node "x" ASTT_VarRef) [])
                         ])
                     ])
                 ])
