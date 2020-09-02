@@ -42,17 +42,17 @@ nodetypeof :: ASTTypeAlphabet -> NodeType
 nodetypeof ASTT_FuncDef = Legator
 nodetypeof ASTT_Return = Legator
 nodetypeof ASTT_File = Legator
-nodetypeof ASTT_BinaryOp = Legator
 nodetypeof ASTT_VarDecl = Legator
 nodetypeof ASTT_FuncCall = Legator
 nodetypeof ASTT_Condition = Constituent
-nodetypeof ASTT_UnaryOp = Constituent
-nodetypeof ASTT_VarRef = Constituent -- leaf type
-nodetypeof ASTT_Literal = Constituent -- leaf type
-nodetypeof ASTT_Type = Constituent
-nodetypeof ASTT_Expression = Plain
+nodetypeof ASTT_UnaryOp = Constituent --Plain
+nodetypeof ASTT_VarRef = Plain -- leaf type
+nodetypeof ASTT_Literal = Plain -- leaf type
+nodetypeof ASTT_Type = Plain
+nodetypeof ASTT_Expression = Plain -- Virtual
 nodetypeof ASTT_Parameters = Plain
 nodetypeof ASTT_Statements = Plain
+nodetypeof ASTT_BinaryOp = Plain
 
 ntype :: Node a -> NodeType
 ntype n = nodetypeof $ valuetype n
