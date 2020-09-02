@@ -4,7 +4,7 @@ import Data.List
 import Util
 
 data PropositionalFormula a =
-    PTrue
+      PTrue
     | PFalse
     | PVariable a
     | PNot (PropositionalFormula a)
@@ -42,6 +42,9 @@ isLiteral _ = False
 
 pimplies :: PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
 pimplies a b = POr [(PNot a), b]
+
+pequiv :: PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
+pequiv a b = PAnd [pimplies a b, pimplies b a]
 
 pand :: [PropositionalFormula a] -> PropositionalFormula a
 pand [] = PTrue
