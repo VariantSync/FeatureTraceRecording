@@ -31,15 +31,20 @@ combine t1 t2 = \n -> case t2 n of
     Just x -> Just x
 
 {-
+Calculates the parental part of the presence condition of a node (third argument) in the given tree (first argument) with the given feature traces (second argument).
+Crashes when the given node is not in the given tree.
+(This should be more helpful for debugging instead of just returning Nothing.)
+-}
+pc_parentpart :: (Show a, Eq a) => AST a -> FeatureTrace a -> Node a -> FeatureFormula
+pc_parentpart root trace node
+  | ntype node == Plain = (parent root $ tree root node) >>= \p -> pc root trace $ element p
+  | otherwise = nullable_and $ fmap trace $ fmap element $ legatorAncestors root $ tree root node --(\() -> Tree node [])
+
+{-
 Calculates the presence condition of a node (third argument) in the given tree (first argument) with the given feature traces (second argument).
-If the given node is not in the tree, the feature trace of the node will be returned.
 -}
 pc :: (Show a, Eq a) => AST a -> FeatureTrace a -> Node a -> FeatureFormula
-pc root trace node
-  | ntype node == Plain = case parent root $ tree root node of
-                            Nothing -> Nothing
-                            Just p -> pc root trace (element p)
-  | otherwise = nullable_and $ (trace node):(fmap trace $ fmap element $ legatorAncestors root $ fromJust (safetree root node)) --(\() -> Tree node [])
+pc root trace node = nullable_and [trace node, pc_parentpart root trace node]
 
 augmentWithTrace :: (Node a -> FeatureFormula) -> AST a -> Tree (FeatureFormula, Node a)
 augmentWithTrace f = fmap (\n -> (f n, n))
