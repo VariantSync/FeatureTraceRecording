@@ -1,10 +1,12 @@
 {-# LANGUAGE DeriveTraversable #-}
 
 module Tree where
+
 import Data.List
 import Data.Maybe
 import Data.Set
 
+import ListUtil
 import Util
 
 data Tree a = Tree a [Tree a] deriving (Eq, Traversable)

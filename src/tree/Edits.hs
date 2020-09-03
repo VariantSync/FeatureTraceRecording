@@ -4,6 +4,7 @@ import UUID
 import Tree
 import AST
 import Util
+import ListUtil
 
 import Data.List
 import Data.Set
@@ -52,7 +53,7 @@ edit_ins_tree stree p i = Edit {
     delta = \t -> if any ((p==).uuid) t then toset stree else empty,
     name = "ins_tree("++(intercalate ", " $ show <$> [uuidOf stree, p, i])++")"} -- inverse = del_tree $ uuidOf s
     where ins x@(Tree n c) = if uuid n == p
-                             then Tree n (Util.insertAtIndex i stree c)
+                             then Tree n (ListUtil.insertAtIndex i stree c)
                              else x
 
 {-
