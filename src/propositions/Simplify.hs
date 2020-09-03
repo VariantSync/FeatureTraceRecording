@@ -22,6 +22,6 @@ removeRedundancy axiom (POr cs) =
 removeRedundancy axiom x =
     let y = removeRedundancyBase axiom x in
     if contradicts $ PAnd [y, axiom] then PFalse else y
-    
+
 removeRedundancyBase :: (Ord a, Show a) => PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
 removeRedundancyBase axiom x = simplify $ if taut $ pimplies axiom x then PTrue else x

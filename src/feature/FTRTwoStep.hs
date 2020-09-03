@@ -19,15 +19,10 @@ builder edit = removeTheRedundanciesWeIntroduced edit $ killplain $ record edit 
         Update -> ftr_up
 
 removeTheRedundanciesWeIntroduced :: (Eq a, Show a) => Edit a -> FTRecorder a -> FTRecorder a
-removeTheRedundanciesWeIntroduced edit wrappee =
-    \context f t_old ->
-        let f_new = wrappee context f t_old
-            t_new = run edit t_old in
-        \v -> case (pc_parentpart t_new f_new v, f_new v) of
-                (Just p, Just f) -> case removeRedundancy p f of
-                    PTrue -> Nothing
-                    p -> Just p
-                _ -> f_new v >>= \f -> Just $ simplify f
+removeTheRedundanciesWeIntroduced edit wrappee = \context f_old t_old ->
+    let f_new = wrappee context f_old t_old
+        t_new = run edit t_old in
+        FeatureTrace.simplify f_new t_new
 
 ftr_ins :: (Show a, Eq a) => Edit a -> FTRecorder a
 ftr_ins e = \context f_old t_old ->

@@ -26,5 +26,5 @@ nullable_and l = case catMaybes l of
     justs -> Just $ PAnd justs
 
 prettyPrint :: (Show a) => NullableFormula a -> String
-prettyPrint Nothing = "null"
+prettyPrint Nothing = "null" -- null, nothing, empty, unknown
 prettyPrint (Just p) = show p
