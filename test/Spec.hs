@@ -55,7 +55,8 @@ testCases = [
     (PNot $ PVariable "A", PVariable "A"),
     (POr [PVariable "A", PVariable "B"], POr [PVariable "B", PVariable "A"]),
     (PVariable "A", POr [PVariable "B", PVariable "A"]),
-    (PNot $ PVariable "A", PAnd [PVariable "B", PVariable "A"])
+    (PNot $ PVariable "A", PAnd [PVariable "B", PVariable "A"]),
+    (PAnd [PNot $ PVariable "A", PVariable "A"], PVariable "X")
     ]
 
 main :: IO ()
