@@ -11,11 +11,13 @@ import Util
 import Tree
 import AST
 import Edits
-import FeatureTrace
-import FeatureTraceRecording
 import Propositions
 import NullPropositions
 import SAT
+import FeatureTrace
+import FeatureTraceRecording
+import FTRDirect
+import FTRTwoStep
 
 import Div
 
@@ -23,7 +25,7 @@ import Data.Maybe
 import Data.List (intercalate)
 
 data CodePrintStyle = ShowAST | ShowCode
-data TraceStyle = ShowTrace | ShowPresenceCondition | ShowNone deriving Eq
+data TraceStyle = ShowTrace | ShowPC | ShowNone deriving Eq
 
 main :: IO ()
 main = putStrLn . fst . flip runState 0 $ do
@@ -36,7 +38,7 @@ main = putStrLn . fst . flip runState 0 $ do
     let 
         -- Debug settings
         codeStyle = ShowAST
-        traceStyle = ShowTrace
+        traceStyle = ShowPC
         abstractTrees = False
         -- The initial feature trace of the first tree.
         trace0 = emptyTrace
@@ -65,11 +67,13 @@ main = putStrLn . fst . flip runState 0 $ do
           , Just $ PVariable "Division"
           , Just $ PVariable "Division"
             ]
-        -- (finalTrace, finalTree) = featureTraceRecording trace0 tree0 editscript featureContexts
+        -- Select the FeatureTraceRecording implementation to run
+        recordBuilder = FTRTwoStep.builder
         -- Run the ftr
-        tracesAndTrees = featureTraceRecordingWithIntermediateSteps trace0 tree0 editscript featureContexts
+        -- tracesAndTrees = featureTraceRecordingWithIntermediateSteps recordBuilder trace0 tree0 editscript featureContexts
+        tracesAndTrees = [featureTraceRecording recordBuilder trace0 tree0 editscript featureContexts]
         -- Some helper variables for output formatting
-        toPC = \trace tree -> if traceStyle == ShowPresenceCondition then pc tree trace else trace
+        toPC = \trace tree -> if traceStyle == ShowPC then pc tree trace else trace
         treeAbstract = if abstractTrees then abstract else id
         treePrint = case codeStyle of
           ShowAST -> \tree trace -> if traceStyle /= ShowNone then FeatureTrace.prettyPrint $ augmentWithTrace trace tree else show tree
