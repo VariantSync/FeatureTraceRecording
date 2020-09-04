@@ -4,10 +4,26 @@ import Control.Monad.State
 import UUID
 import Tree
 import AST
+import FeatureTrace
+import System.Terminal
+
+feature_Debug :: Feature
+feature_Debug = toFeature "Debug"
+feature_Reciprocal :: Feature
+feature_Reciprocal = toFeature "Reciprocal"
+feature_Division :: Feature
+feature_Division = toFeature "Division"
+
+colourOf :: (MonadColorPrinter m) => Feature -> Color m
+colourOf feature 
+    | feature == feature_Debug = green
+    | feature == feature_Reciprocal = yellow
+    | feature == feature_Division = cyan
+    | otherwise = red
 
 div0 :: State UUID (AST String)
 div0 = sequence
-    (Tree (node "IchKannTeilen.cpp" ASTT_File) [
+    (Tree (node "Divider9000.cpp" ASTT_File) [
         (Tree (node "reciprocal" ASTT_FuncDef) [
             (Tree (node "double" ASTT_Type) []),
             (Tree (node "params" ASTT_Parameters) [

@@ -19,7 +19,7 @@ featureTraceRecording :: (Show a, Eq a) => FTRecorderBuilder a -> FeatureTrace a
 featureTraceRecording builder f0 t0 editscript contexts = last $ featureTraceRecordingWithIntermediateSteps builder f0 t0 editscript contexts
 
 featureTraceRecordingWithIntermediateSteps :: (Show a, Eq a) => FTRecorderBuilder a -> FeatureTrace a -> AST a -> EditScript a -> [FeatureFormula] -> [(FeatureTrace a, AST a)]
-featureTraceRecordingWithIntermediateSteps builder f0 t0 editscript contexts = tail $ scanl record (f0, t0) $ zip editscript recorders
+featureTraceRecordingWithIntermediateSteps builder f0 t0 editscript contexts = scanl record (f0, t0) $ zip editscript recorders
     where recorders = zipRecordingScript (fromEditScript builder editscript) contexts
           record = \(f_old, t_old) (edit, recorder) -> (recorder f_old t_old, run edit t_old)
 

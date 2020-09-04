@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveTraversable #-}
-
 module AST where
 
 import UUID
@@ -27,11 +25,17 @@ data ASTTypeAlphabet =
   | ASTT_File
   deriving (Eq, Show)
 
-data Node a = Node {value::a, valuetype::ASTTypeAlphabet, uuid::UUID} deriving (Eq, Functor) --, version::Int
+data Node a = Node {value::a, valuetype::ASTTypeAlphabet, uuid::UUID} --, version::Int
 type AST a = Tree (Node a)
+
+instance Eq (Node a) where
+  n == m = (uuid n) == (uuid m)
 
 instance (Eq a) => Ord (Node a) where
   v <= w = (uuid v) <= (uuid w)
+
+instance Functor Node where
+  fmap f n = Node {value = f $ value n, valuetype = valuetype n, uuid = uuid n}
 
 {-
 Classification for Feature Traces and Presence Condition
@@ -75,30 +79,35 @@ abstract = filterNodes (\(Tree n _) -> ntype n /= Plain)
 legatorAncestors :: Eq a => AST a -> AST a -> [AST a]
 legatorAncestors root = (filter (\(Tree n _) -> ntype n == Legator)).(ancestors root)
 
-showContent :: Int -> (Node a -> String) -> AST a -> String
-showContent i tostr (Tree n children) = 
+showCode :: (Show a) => AST a -> String
+showCode = showCodeAs 0 (\_ s -> s) show
+
+showCodeAs :: (Monoid b) => Int -> (Node a -> String -> b) -> (Node a -> b) -> AST a -> b
+showCodeAs i prtStrWithContext prtNode (Tree n children) = 
   let indent = genIndent i
       nextIndent = i + 2
-      me = tostr n
-      showList sep l = intercalate sep $ showContent nextIndent tostr <$> l
-      showListNoIndentIncrease sep l = intercalate sep $ showContent i tostr <$> l
-      showHead = showContent nextIndent tostr $ head children
+      prtStr = prtStrWithContext n
+      me = prtNode n
+      showList sep l = mconcat $ intersperse (prtStr sep) $ (showCodeAs nextIndent prtStrWithContext prtNode) <$> l
+      showListNoIndentIncrease sep l = mconcat $ intersperse (prtStr sep) $ showCodeAs i prtStrWithContext prtNode <$> l
+      showHead = showCodeAs nextIndent prtStrWithContext prtNode $ head children
   in  
+    mconcat $
     case valuetype n of
-      ASTT_FuncDef -> indent++showHead++" "++me++(showListNoIndentIncrease " " $ tail children)
-      ASTT_Parameters -> "("++(showList ", " children)++")"
-      ASTT_Statements -> "\n"++indent++"{\n"++(showList "\n" children)++"\n"++indent++"}"
-      ASTT_Return -> indent++"return "++(showList " " children)++";"
-      ASTT_Condition -> indent++"if ("++showHead++")"++(showListNoIndentIncrease " " $ tail children)
-      ASTT_FuncCall -> indent++me++(showList ", " children)++";"
-      ASTT_Expression -> if length children == 1 then showHead else error "Expressios can only have one child"
-      ASTT_UnaryOp -> if length children == 1 then me++showHead else error "Unary operations can only have one child"
-      ASTT_BinaryOp -> if length children == 2 then showHead++" "++me++" "++(showContent nextIndent tostr $ head $ tail children) else error "Binary operations must have exactly two children"
-      ASTT_VarDecl -> (showList " " children)
-      ASTT_VarRef -> me
-      ASTT_Literal -> me
-      ASTT_Type -> me
-      ASTT_File -> indent++"FILE ["++me++"] {\n"++(showList "\n" children)++"\n"++indent++"}"
+      ASTT_FuncDef -> [prtStr indent, showHead, prtStr " ", me, showListNoIndentIncrease " " $ tail children]
+      ASTT_Parameters -> [prtStr "(", showList ", " children, prtStr ")"]
+      ASTT_Statements -> [prtStr $ "\n"++indent++"{\n", showList "\n" children, prtStr $ "\n"++indent++"}"]
+      ASTT_Return -> [prtStr $ indent++"return ", showList " " children, prtStr ";"]
+      ASTT_Condition -> [prtStr $ indent++"if (", showHead, prtStr ")", showListNoIndentIncrease " " $ tail children]
+      ASTT_FuncCall -> [prtStr indent, me, showList ", " children, prtStr ";"]
+      ASTT_Expression -> return $ if length children == 1 then showHead else error "Expressios can only have one child"
+      ASTT_UnaryOp -> return $ if length children == 1 then mappend me showHead else error "Unary operations can only have one child"
+      ASTT_BinaryOp -> if length children == 2 then [showHead, prtStr " ", me, prtStr " ", showCodeAs nextIndent prtStrWithContext prtNode $ head $ tail children] else error "Binary operations must have exactly two children"
+      ASTT_VarDecl -> return $ showList " " children
+      ASTT_VarRef -> return me
+      ASTT_Literal -> return me
+      ASTT_Type -> return me
+      ASTT_File -> [prtStr $ indent++"FILE [", me, prtStr $ "] {\n", showList "\n" children, prtStr $ "\n"++indent++"}"]
 
 instance (Show a) => Show (Node a) where
   show n = "("++(show $ uuid n)++", "++(show $ valuetype n)++", "++(show $ value n)++", "++(show $ ntype n)++")"

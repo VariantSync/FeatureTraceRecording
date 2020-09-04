@@ -2,10 +2,6 @@ module Main where
 
 import Control.Monad.State
 
--- import Prelude hiding (putStr)
--- import Data.ByteString.Char8 (putStr)
--- import Data.ByteString.UTF8 (fromString)
-
 import UUID
 import Util
 import Tree
@@ -19,17 +15,36 @@ import FeatureTraceRecording
 import FTRDirect
 import FTRTwoStep
 
+import FeatureColour
+
 import Div
 
-import Data.Maybe
+import Data.Maybe ( fromJust )
 import Data.List (intercalate)
 
+-- Terminal printing ---------
+import Control.Concurrent ()
+import Control.Monad
+import Control.Monad.IO.Class
+
+import Data.Text.Prettyprint.Doc
+import System.Terminal
+
+-- import Prelude hiding ((<>))
+-----------------------------
+
 data CodePrintStyle = ShowAST | ShowCode
-data TraceStyle = ShowTrace | ShowPC | ShowNone deriving Eq
+data TraceDisplay = Trace | PC deriving Eq
+data TraceStyle = Text | Colour | None deriving Eq
 
 main :: IO ()
-main = putStrLn . fst . flip runState 0 $ do
-    -- Unpack the states i.e. apply >>= in a more convenient way
+main = withTerminal $ runTerminalT printer
+
+printer :: (MonadColorPrinter m) => m ()
+printer = (putDoc $ runFTR <+> hardline) >> flush
+    
+runFTR :: (MonadColorPrinter m) => Doc (Attribute m)
+runFTR = fst . flip runState 0 $ do
     tree0 <- div0
     tree_assert <- div_assert
     tree_error <- div_error
@@ -37,9 +52,11 @@ main = putStrLn . fst . flip runState 0 $ do
     tree_div <- div_div
     let 
         -- Debug settings
-        codeStyle = ShowAST
-        traceStyle = ShowPC
+        codeStyle = ShowCode
+        traceDisplay = PC
+        traceStyle = Colour
         abstractTrees = False
+        featureColourPalette = Div.colourOf
         -- The initial feature trace of the first tree.
         trace0 = emptyTrace
         -- Some helper variables for edits
@@ -59,35 +76,47 @@ main = putStrLn . fst . flip runState 0 $ do
             ]
         -- The feature contexts assigned to each edit
         featureContexts = [
-            Just $ PVariable "Debug"
-          , Just $ PVariable "Reciprocal"
-          , Just $ PVariable "Reciprocal" -- Error by user. Should actually be PTrue
-          , Just $ PVariable "Reciprocal"
-          , Just $ PVariable "Division"
-          , Just $ PVariable "Division"
-          , Just $ PVariable "Division"
+            Just $ PVariable feature_Debug
+          , Just $ PVariable feature_Reciprocal
+          , Just $ PVariable feature_Reciprocal -- Error by user. Should actually be PTrue
+          , Just $ PVariable feature_Reciprocal
+          , Just $ PVariable feature_Division
+          , Just $ PVariable feature_Division
+          , Just $ PVariable feature_Division
             ]
         -- Select the FeatureTraceRecording implementation to run
         recordBuilder = FTRTwoStep.builder
         -- Run the ftr
-        -- tracesAndTrees = featureTraceRecordingWithIntermediateSteps recordBuilder trace0 tree0 editscript featureContexts
-        tracesAndTrees = [featureTraceRecording recordBuilder trace0 tree0 editscript featureContexts]
+        tracesAndTrees = featureTraceRecordingWithIntermediateSteps recordBuilder trace0 tree0 editscript featureContexts
+        -- tracesAndTrees = [featureTraceRecording recordBuilder trace0 tree0 editscript featureContexts]
         -- Some helper variables for output formatting
-        toPC = \trace tree -> if traceStyle == ShowPC then pc tree trace else trace
+        toPC = \trace tree -> if traceDisplay == PC then pc tree trace else trace
         treeAbstract = if abstractTrees then abstract else id
-        treePrint = case codeStyle of
-          ShowAST -> \tree trace -> if traceStyle /= ShowNone then FeatureTrace.prettyPrint $ augmentWithTrace trace tree else show tree
-          ShowCode -> \tree trace -> showContent 0 (\n -> showIt trace n) tree
-            where showIt trace n = if traceStyle /= ShowNone then concat ["<", NullPropositions.prettyPrint $ trace n, ">", value n] else value n
-    --   return $ show $ showTrace finalTrace finalTree
+        treePrint = \tree trace -> case codeStyle of
+            ShowAST -> pretty $ (case traceStyle of
+                None -> show
+                Colour -> show
+                Text -> (FeatureTrace.prettyPrint).(augmentWithTrace trace)) tree
+            ShowCode -> showCodeAs 0 (stringPrint trace) (nodePrint trace) tree
+            where nodePrint trace n = case traceStyle of
+                      None -> pretty $ value n
+                      Colour -> annotate (foreground $ FeatureColour.colourOf featureColourPalette $ trace n) $ pretty $ value n
+                      Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ trace n, ">", value n]
+                  stringPrint trace n s = case traceStyle of
+                      Colour -> annotate (foreground $ FeatureColour.colourOf featureColourPalette $ trace n) $ pretty $ s
+                      _ -> pretty s
     return
-      $ flip foldr mempty (\(fc, edit, (trace, tree)) s ->
-        concat [
-        "\n==== Run ", (show edit), " under context = ", (NullPropositions.prettyPrint fc), " giving us ====\n"
-        -- ,(FeatureTrace.prettyPrint tree)
-        , treePrint tree trace
-        , s])
-      $ zip3
-          ((Just $ PAnd [PVariable "meta_Debug", PVariable "meta_DoesNotMatterAtAll"]):featureContexts) -- Prepend dummy feature context here as fc for initial tree
-          (edit_identity:editscript) -- Prepend identity edit here to show initial tree.
-          ((\(trace, tree) -> (toPC trace tree, treeAbstract tree)) <$> ((trace0, tree0):tracesAndTrees))
+        $ flip foldr mempty (\(fc, edit, (trace, tree)) s ->
+        mconcat [
+            hardline,
+            hardline,
+            pretty $ concat ["==== Run ", show edit, " under context = "],
+            annotate (foreground $ FeatureColour.colourOf featureColourPalette fc) $ pretty $ NullPropositions.prettyPrint fc,
+            pretty $ " giving us ====",
+            hardline,
+            treePrint tree trace,
+            s])
+        $ zip3
+            (Nothing:featureContexts) -- Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
+            (edit_identity:editscript) -- Prepend identity edit here to show initial tree.
+            ((\(trace, tree) -> (toPC trace tree, treeAbstract tree)) <$> tracesAndTrees)

@@ -41,6 +41,7 @@ packages:
 #
 extra-deps:
   - picosat-0.1.6@sha256:7d3130af636c6c8a0b373446a090daa15511d6cb0b264f4b921fa5d4a81b59a3,2138
+  - terminal-0.2.0.0@sha256:de6770ecaae3197c66ac1f0db5a80cf5a5b1d3b64a66a05b50f442de5ad39570,2977
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

@@ -25,6 +25,8 @@ dependencies:
 - containers >= 0.6.2.1
 - picosat >= 0.1.6
 - bimap
+- terminal >= 0.2.0.0
+- prettyprinter >= 1.6.2
 # - bytestring
 # - utf8-string
 
