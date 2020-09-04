@@ -61,5 +61,5 @@ ftr_del e = \context f_old t_old ->
                 contextIsNull = isnull context in
                 if contextIsNull && not pcIsNull
                 then Just PFalse
-                else nullable_and [f_old v, Just $ PNot (assure context)] -- assure is safe here because we know that context is not null
+                else nullable_and [f_old v, Just $ PNot (assure context)] -- TODO: THIS IS NOT SAFE. We have to make a nullable not!
         )
