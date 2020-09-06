@@ -55,6 +55,7 @@ runFTR = fst . flip runState 0 $ do
         codeStyle = ShowCode
         traceDisplay = PC
         traceStyle = Colour
+        withTraceLines = True
         abstractTrees = False
         featureColourPalette = Div.colourOf
         -- The initial feature trace of the first tree.
@@ -93,18 +94,22 @@ runFTR = fst . flip runState 0 $ do
         toPC = \trace tree -> if traceDisplay == PC then pc tree trace else trace
         treeAbstract = if abstractTrees then abstract else id
         treePrint = \tree trace -> case codeStyle of
-            ShowAST -> pretty $ (case traceStyle of
-                None -> show
-                Colour -> show
-                Text -> (FeatureTrace.prettyPrint).(augmentWithTrace trace)) tree
-            ShowCode -> showCodeAs 0 (stringPrint trace) (nodePrint trace) tree
+            ShowAST -> (case traceStyle of
+                None -> pretty.show
+                Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace n) $ show n)
+                Text -> pretty.(FeatureTrace.prettyPrint).(augmentWithTrace trace)) tree
+            ShowCode -> showCodeAs (pretty "") (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
             where nodePrint trace n = case traceStyle of
                       None -> pretty $ value n
-                      Colour -> annotate (foreground $ FeatureColour.colourOf featureColourPalette $ trace n) $ pretty $ value n
+                      Colour -> paint (trace n) $ value n
                       Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ trace n, ">", value n]
                   stringPrint trace n s = case traceStyle of
-                      Colour -> annotate (foreground $ FeatureColour.colourOf featureColourPalette $ trace n) $ pretty $ s
+                      Colour -> paint (trace n) s
                       _ -> pretty s
+                  indentGenerator trace n i = if traceStyle == Colour && traceDisplay == Trace && withTraceLines && ntype n == Legator
+                      then mappend (paint (trace n) "|") (pretty $ genIndent (i-1))
+                      else pretty $ genIndent i
+                  paint formula = (annotate (foreground $ FeatureColour.colourOf featureColourPalette formula)).pretty
     return
         $ flip foldr mempty (\(fc, edit, (trace, tree)) s ->
         mconcat [

@@ -16,7 +16,7 @@ prettyPrint i strToB nodePrinter (Tree n []) = (strToB $ genIndent i) <> (nodePr
 prettyPrint i strToB nodePrinter (Tree n children) = (strToB $ genIndent i)
   <> (nodePrinter n)
   <> (strToB " [\n")
-  <> (mconcat $ fmap (prettyPrint (i+1) strToB nodePrinter) children)
+  <> (mconcat $ fmap (prettyPrint (i+2) strToB nodePrinter) children)
   <> (strToB $ genIndent i)
   <> (strToB "]\n")
 

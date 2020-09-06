@@ -80,34 +80,34 @@ legatorAncestors :: Eq a => AST a -> AST a -> [AST a]
 legatorAncestors root = (filter (\(Tree n _) -> ntype n == Legator)).(ancestors root)
 
 showCode :: (Show a) => AST a -> String
-showCode = showCodeAs 0 (\_ s -> s) show
+showCode = showCodeAs "" (\_ i -> genIndent i) (\_ s -> s) show
 
-showCodeAs :: (Monoid b) => Int -> (Node a -> String -> b) -> (Node a -> b) -> AST a -> b
-showCodeAs i prtStrWithContext prtNode (Tree n children) = 
-  let indent = genIndent i
-      nextIndent = i + 2
+showCodeAs :: (Monoid b) => b -> (Node a -> Int -> b) -> (Node a -> String -> b) -> (Node a -> b) -> AST a -> b
+showCodeAs i indentGenerator prtStrWithContext prtNode (Tree n children) = 
+  let indentLen = 2
+      indent = mappend i $ indentGenerator n indentLen
       prtStr = prtStrWithContext n
       me = prtNode n
-      showList sep l = mconcat $ intersperse (prtStr sep) $ (showCodeAs nextIndent prtStrWithContext prtNode) <$> l
-      showListNoIndentIncrease sep l = mconcat $ intersperse (prtStr sep) $ showCodeAs i prtStrWithContext prtNode <$> l
-      showHead = showCodeAs nextIndent prtStrWithContext prtNode $ head children
+      showList sep l = mconcat $ intersperse (prtStr sep) $ (showCodeAs indent indentGenerator prtStrWithContext prtNode) <$> l
+      showListNoIndentIncrease sep l = mconcat $ intersperse (prtStr sep) $ showCodeAs i indentGenerator prtStrWithContext prtNode <$> l
+      showHead = showCodeAs indent indentGenerator prtStrWithContext prtNode $ head children
   in  
     mconcat $
     case valuetype n of
-      ASTT_FuncDef -> [prtStr indent, showHead, prtStr " ", me, showListNoIndentIncrease " " $ tail children]
+      ASTT_FuncDef -> [indent, showHead, prtStr " ", me, showList " " $ tail children]
       ASTT_Parameters -> [prtStr "(", showList ", " children, prtStr ")"]
-      ASTT_Statements -> [prtStr $ "\n"++indent++"{\n", showList "\n" children, prtStr $ "\n"++indent++"}"]
-      ASTT_Return -> [prtStr $ indent++"return ", showList " " children, prtStr ";"]
-      ASTT_Condition -> [prtStr $ indent++"if (", showHead, prtStr ")", showListNoIndentIncrease " " $ tail children]
-      ASTT_FuncCall -> [prtStr indent, me, showList ", " children, prtStr ";"]
+      ASTT_Statements -> [prtStr "\n", i, prtStr "{\n", showListNoIndentIncrease "\n" children, prtStr $ "\n", i, prtStr "}"]
+      ASTT_Return -> [indent, prtStr "return ", showList " " children, prtStr ";"]
+      ASTT_Condition -> [indent, prtStr "if (", showHead, prtStr ")", showList " " $ tail children]
+      ASTT_FuncCall -> [indent, me, showList ", " children, prtStr ";"]
       ASTT_Expression -> return $ if length children == 1 then showHead else error "Expressios can only have one child"
       ASTT_UnaryOp -> return $ if length children == 1 then mappend me showHead else error "Unary operations can only have one child"
-      ASTT_BinaryOp -> if length children == 2 then [showHead, prtStr " ", me, prtStr " ", showCodeAs nextIndent prtStrWithContext prtNode $ head $ tail children] else error "Binary operations must have exactly two children"
+      ASTT_BinaryOp -> if length children == 2 then [showHead, prtStr " ", me, prtStr " ", showCodeAs indent indentGenerator prtStrWithContext prtNode $ head $ tail children] else error "Binary operations must have exactly two children"
       ASTT_VarDecl -> return $ showList " " children
       ASTT_VarRef -> return me
       ASTT_Literal -> return me
       ASTT_Type -> return me
-      ASTT_File -> [prtStr $ indent++"FILE [", me, prtStr $ "] {\n", showList "\n" children, prtStr $ "\n"++indent++"}"]
+      ASTT_File -> [indent, prtStr "FILE [", me, prtStr $ "] {\n", showList "\n" children, prtStr "\n", indent, prtStr "}"]
 
 instance (Show a) => Show (Node a) where
   show n = "("++(show $ uuid n)++", "++(show $ valuetype n)++", "++(show $ value n)++", "++(show $ ntype n)++")"

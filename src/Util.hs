@@ -1,7 +1,7 @@
 module Util where
 
 genIndent :: Int -> String
-genIndent i = concat $ replicate i "  "
+genIndent i = concat $ replicate i " "
 
 safeFromJust :: Maybe a -> (() -> a) -> a
 safeFromJust Nothing gen = gen ()
