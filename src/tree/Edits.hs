@@ -88,7 +88,7 @@ edit_del_node :: (Eq a) => UUID -> Edit g a
 edit_del_node v = Edit {
     edittype = Delete,
     run = (filterNodes ((v /=) . uuidOf)), --(fmap $ increaseVersion 1).
-    delta = \t -> case Tree.find ((v==).uuidOf) t of
+    delta = \t -> case findById v t of
         Nothing -> empty
         Just t' -> singleton $ element t',
     name = "del_node("++(show v)++")"}
@@ -98,7 +98,7 @@ edit_del_tree :: (Eq a) => UUID -> Edit g a
 edit_del_tree v = Edit {
     edittype = Delete,
     run = (filterTrees ((v /=) . uuidOf)), --(fmap $ increaseVersion 1).
-    delta = \t -> case Tree.find ((v==).uuidOf) t of
+    delta = \t -> case findById v t of
         Nothing -> empty
         Just t' -> toset t',
     name = "del_tree("++(show v)++")"}
@@ -116,6 +116,19 @@ edit_move_tree s p i = Edit {
         Just stree -> toset stree
         Nothing -> empty,
     name = "move_tree("++(intercalate ", " $ show <$> [s, p, i])++")"}
-    where streeIn = Tree.find ((s==).uuidOf)
+    where streeIn = findById s
           del = run $ edit_del_tree s
           ins t = run $ edit_ins_tree t p i
+
+edit_update :: (Grammar g, Show a, Eq a) => UUID -> g -> a -> Edit g a
+edit_update id newRule newVal = Edit {
+    edittype = Update,
+    run = \t -> (\n ->
+        if uuid n == id
+        then Node {value = newVal, rule = newRule, uuid = uuid n}
+        else n) <$> t,
+    delta = \t -> case findById id t of
+        Nothing -> empty
+        Just x -> toset x,
+    name = "update("++(intercalate ", " $ [show id, show newRule, show newVal])++")"
+}

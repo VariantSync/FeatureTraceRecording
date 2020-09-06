@@ -50,12 +50,14 @@ div0 = sequence
 
 div_assert :: State UUID SSCXXAST
 div_assert = sequence
-    (Tree (node "assert" SCXX_FuncCall) [
-        (Tree (node "params" SCXX_Parameters) [
-            (Tree (node "param" SCXX_Expression) [
-                (Tree (node "!=" SCXX_BinaryOp) [
-                    (Tree (node "x" SCXX_VarRef) []),
-                    (Tree (node "0" SCXX_Literal) [])
+    (Tree (node mempty SCXX_ExprStatement) [
+        (Tree (node "assert" SCXX_FuncCall) [
+            (Tree (node "params" SCXX_Parameters) [
+                (Tree (node "param" SCXX_Expression) [
+                    (Tree (node "!=" SCXX_BinaryOp) [
+                        (Tree (node "x" SCXX_VarRef) []),
+                        (Tree (node "0" SCXX_Literal) [])
+                    ])
                 ])
             ])
         ])
@@ -63,10 +65,12 @@ div_assert = sequence
 
 div_error :: State UUID SSCXXAST
 div_error = sequence
-    (Tree (node "error" SCXX_FuncCall) [
-        (Tree (node "params" SCXX_Parameters) [
-            (Tree (node "param" SCXX_Expression) [
-                (Tree (node "\"Cannot divide by 0!\"" SCXX_Literal) [])
+    (Tree (node mempty SCXX_ExprStatement) [
+        (Tree (node "error" SCXX_FuncCall) [
+            (Tree (node "params" SCXX_Parameters) [
+                (Tree (node "param" SCXX_Expression) [
+                    (Tree (node "\"Cannot divide by 0!\"" SCXX_Literal) [])
+                ])
             ])
         ])
     ])
@@ -100,4 +104,21 @@ div_div = sequence
             ])
         ]),
         (Tree (node "body" SCXX_Statements) [])
+    ])
+
+div_reciprocal_return :: State UUID SSCXXAST
+div_reciprocal_return = sequence
+    (Tree (node "return" SCXX_Return) [
+        (Tree (node "Expression" SCXX_Expression) [
+            (Tree (node "div" SCXX_FuncCall) [
+                (Tree (node "params" SCXX_Parameters) [
+                    (Tree (node "param" SCXX_Expression) [
+                        (Tree (node "1.0" SCXX_Literal) [])
+                    ]),
+                    (Tree (node "param" SCXX_Expression) [
+                        (Tree (node "x" SCXX_VarRef) [])
+                    ])
+                ])
+            ])
+        ])
     ])

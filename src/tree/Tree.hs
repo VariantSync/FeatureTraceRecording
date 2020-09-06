@@ -57,7 +57,7 @@ safetree :: Eq a => Tree a -> a -> Maybe(Tree a)
 safetree t x = Tree.find (\(Tree y _) -> x == y) t
 
 toset :: Ord a => Tree a -> Set a
-toset t = fromList $ foldMap pure t
+toset = fromList.(foldMap pure)
 
 {-
 Find the first subtree in the given tree (first argument) whose root matches the predicate (second argument).

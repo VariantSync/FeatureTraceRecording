@@ -6,6 +6,7 @@ import UUID
 import Util
 import Tree
 import AST
+import SimpleCXX
 import Edits
 import Propositions
 import NullPropositions
@@ -50,6 +51,7 @@ runFTR = fst . flip runState 0 $ do
     tree_error <- div_error
     tree_condition <- div_condition
     tree_div <- div_div
+    tree_reciprocal_return <- div_reciprocal_return
     let 
         -- Debug settings
         codeStyle = ShowCode
@@ -62,9 +64,12 @@ runFTR = fst . flip runState 0 $ do
         trace0 = emptyTrace
         -- Some helper variables for edits
         id_reciprocal_body = uuidOf . fromJust $ find (\(Tree n _) -> value n == "body") tree0
-        id_return = uuidOf . fromJust $ find (\(Tree n _) -> value n == "return") tree0
+        tree_return = fromJust $ find (\(Tree n _) -> value n == "return") tree0
         id_cond_body = uuidOf . fromJust $ find (\(Tree n _) -> value n == "body") tree_condition
         id_div_body = uuidOf . fromJust $ find (\(Tree n _) -> value n == "body") tree_div
+        tree_x_condexpr = fromJust $ find (\(Tree n _) -> value n == "x") tree_condition
+        tree_x_return = fromJust $ find (\(Tree n _) -> value n == "x") tree_return
+        tree_1_return = fromJust $ find (\(Tree n _) -> value n == "1.0") tree_return
         -- The edits "made by the developer"
         editscript = [
             edit_ins_tree tree_assert id_reciprocal_body 0
@@ -73,7 +78,11 @@ runFTR = fst . flip runState 0 $ do
           , edit_ins_tree tree_error id_cond_body 0
           , edit_ins_tree tree_div (uuidOf tree0) 0
           , edit_move_tree (uuidOf tree_condition) id_div_body 0
-          , edit_move_tree id_return id_div_body 1 -- now we are done with div5.txt
+          , edit_move_tree (uuidOf tree_return) id_div_body 1 -- now we are done with div5.txt
+          , edit_update (uuidOf tree_x_condexpr) (rule $ element $ tree_x_condexpr) "b"
+          , edit_update (uuidOf tree_x_return) (rule $ element $ tree_x_return) "b"
+          , edit_update (uuidOf tree_1_return) SCXX_VarRef "a"
+          , edit_ins_tree tree_reciprocal_return id_reciprocal_body 0
             ]
         -- The feature contexts assigned to each edit
         featureContexts = [
@@ -84,6 +93,10 @@ runFTR = fst . flip runState 0 $ do
           , Just $ PVariable feature_Division
           , Just $ PVariable feature_Division
           , Just $ PVariable feature_Division
+          , Just $ PVariable feature_Division
+          , Just $ PVariable feature_Division
+          , Just $ PVariable feature_Division
+          , Just $ PVariable feature_Reciprocal
             ]
         -- Select the FeatureTraceRecording implementation to run
         recordBuilder = FTRTwoStep.builder
@@ -98,7 +111,7 @@ runFTR = fst . flip runState 0 $ do
                 None -> pretty.show
                 Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace n) $ show n)
                 Text -> pretty.(FeatureTrace.prettyPrint).(augmentWithTrace trace)) tree
-            ShowCode -> showCodeAs (pretty "") (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
+            ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
             where nodePrint trace n = case traceStyle of
                       None -> pretty $ value n
                       Colour -> paint (trace n) $ value n

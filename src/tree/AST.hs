@@ -40,6 +40,9 @@ node v vt = do
 uuidOf :: AST g a -> UUID
 uuidOf = uuid . element
 
+findById :: UUID -> AST g a -> Maybe (AST g a)
+findById i = Tree.find ((i==).uuidOf)
+
 abstract :: Grammar g => AST g a -> AST g a
 abstract = filterNodes (\(Tree n _) -> ntype n /= Plain)
 
