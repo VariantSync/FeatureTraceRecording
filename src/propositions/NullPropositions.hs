@@ -17,6 +17,10 @@ notnull = not.isnull
 assure :: NullableFormula a -> PropositionalFormula a
 assure = fromJust
 
+nullable_not :: NullableFormula a -> NullableFormula a
+nullable_not Nothing = Nothing
+nullable_not (Just p) = Just $ PNot p
+
 {-
 Combines a list of nullable formulas with the AND operator according where "Nothing && x = x" for any nullable formula x.
 -}

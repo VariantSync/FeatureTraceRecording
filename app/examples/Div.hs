@@ -5,7 +5,10 @@ import UUID
 import Tree
 import AST
 import FeatureTrace
+import SimpleCXX
 import System.Terminal
+
+type SSCXXAST = SCXXAST String
 
 feature_Debug :: Feature
 feature_Debug = toFeature "Debug"
@@ -21,23 +24,23 @@ colourOf feature
     | feature == feature_Division = cyan
     | otherwise = red
 
-div0 :: State UUID (AST String)
+div0 :: State UUID SSCXXAST
 div0 = sequence
-    (Tree (node "Divider9000.cpp" ASTT_File) [
-        (Tree (node "reciprocal" ASTT_FuncDef) [
-            (Tree (node "double" ASTT_Type) []),
-            (Tree (node "params" ASTT_Parameters) [
-                (Tree (node "param" ASTT_VarDecl) [
-                    (Tree (node "double" ASTT_Type) []),
-                    (Tree (node "x" ASTT_Literal) [])
+    (Tree (node "Divider9000.cpp" SCXX_File) [
+        (Tree (node "reciprocal" SCXX_FuncDef) [
+            (Tree (node "double" SCXX_Type) []),
+            (Tree (node "params" SCXX_Parameters) [
+                (Tree (node "param" SCXX_VarDecl) [
+                    (Tree (node "double" SCXX_Type) []),
+                    (Tree (node "x" SCXX_Literal) [])
                 ])
             ]),
-            (Tree (node "body" ASTT_Statements) [
-                (Tree (node "return" ASTT_Return) [
-                    (Tree (node "Expression" ASTT_Expression) [
-                        (Tree (node "/" ASTT_BinaryOp) [
-                            (Tree (node "1.0" ASTT_Literal) []),
-                            (Tree (node "x" ASTT_VarRef) [])
+            (Tree (node "body" SCXX_Statements) [
+                (Tree (node "return" SCXX_Return) [
+                    (Tree (node "Expression" SCXX_Expression) [
+                        (Tree (node "/" SCXX_BinaryOp) [
+                            (Tree (node "1.0" SCXX_Literal) []),
+                            (Tree (node "x" SCXX_VarRef) [])
                         ])
                     ])
                 ])
@@ -45,56 +48,56 @@ div0 = sequence
         ])
     ])
 
-div_assert :: State UUID (AST String)
+div_assert :: State UUID SSCXXAST
 div_assert = sequence
-    (Tree (node "assert" ASTT_FuncCall) [
-        (Tree (node "params" ASTT_Parameters) [
-            (Tree (node "param" ASTT_Expression) [
-                (Tree (node "!=" ASTT_BinaryOp) [
-                    (Tree (node "x" ASTT_VarRef) []),
-                    (Tree (node "0" ASTT_Literal) [])
+    (Tree (node "assert" SCXX_FuncCall) [
+        (Tree (node "params" SCXX_Parameters) [
+            (Tree (node "param" SCXX_Expression) [
+                (Tree (node "!=" SCXX_BinaryOp) [
+                    (Tree (node "x" SCXX_VarRef) []),
+                    (Tree (node "0" SCXX_Literal) [])
                 ])
             ])
         ])
     ])
 
-div_error :: State UUID (AST String)
+div_error :: State UUID SSCXXAST
 div_error = sequence
-    (Tree (node "error" ASTT_FuncCall) [
-        (Tree (node "params" ASTT_Parameters) [
-            (Tree (node "param" ASTT_Expression) [
-                (Tree (node "\"Cannot divide by 0!\"" ASTT_Literal) [])
+    (Tree (node "error" SCXX_FuncCall) [
+        (Tree (node "params" SCXX_Parameters) [
+            (Tree (node "param" SCXX_Expression) [
+                (Tree (node "\"Cannot divide by 0!\"" SCXX_Literal) [])
             ])
         ])
     ])
 
-div_condition :: State UUID (AST String)
+div_condition :: State UUID SSCXXAST
 div_condition = sequence
-    (Tree (node "if" ASTT_Condition) [
-        (Tree (node "cond" ASTT_Expression) [
-            (Tree (node "==" ASTT_BinaryOp) [
-                (Tree (node "x" ASTT_VarRef) []),
-                (Tree (node "0" ASTT_Literal) [])
+    (Tree (node "if" SCXX_Condition) [
+        (Tree (node "cond" SCXX_Expression) [
+            (Tree (node "==" SCXX_BinaryOp) [
+                (Tree (node "x" SCXX_VarRef) []),
+                (Tree (node "0" SCXX_Literal) [])
             ])
         ]),
-        (Tree (node "body" ASTT_Statements) [
+        (Tree (node "body" SCXX_Statements) [
             -- Here, other statements have to be entered later.
         ])
     ])
 
-div_div :: State UUID (AST String)
+div_div :: State UUID SSCXXAST
 div_div = sequence
-    (Tree (node "div" ASTT_FuncDef) [
-        (Tree (node "double" ASTT_Type) []),
-        (Tree (node "params" ASTT_Parameters) [
-            (Tree (node "param" ASTT_VarDecl) [
-                (Tree (node "double" ASTT_Type) []),
-                (Tree (node "a" ASTT_Literal) [])
+    (Tree (node "div" SCXX_FuncDef) [
+        (Tree (node "double" SCXX_Type) []),
+        (Tree (node "params" SCXX_Parameters) [
+            (Tree (node "param" SCXX_VarDecl) [
+                (Tree (node "double" SCXX_Type) []),
+                (Tree (node "a" SCXX_Literal) [])
             ]),
-            (Tree (node "param" ASTT_VarDecl) [
-                (Tree (node "double" ASTT_Type) []),
-                (Tree (node "b" ASTT_Literal) [])
+            (Tree (node "param" SCXX_VarDecl) [
+                (Tree (node "double" SCXX_Type) []),
+                (Tree (node "b" SCXX_Literal) [])
             ])
         ]),
-        (Tree (node "body" ASTT_Statements) [])
+        (Tree (node "body" SCXX_Statements) [])
     ])

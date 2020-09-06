@@ -11,7 +11,7 @@ import SAT
 import Data.Set
 import Util
 
-build :: (Eq a, Show a) => FTRecorderBuilder a
+build :: (Grammar g, Eq a, Show a) => FTRecorderBuilder g a
 build edit = killplain $ record edit where
     record = case edittype edit of
         Identity -> ftr_id
@@ -21,7 +21,7 @@ build edit = killplain $ record edit where
         Move -> ftr_move
         Update -> ftr_up
 
-ftr_ins :: (Show a, Eq a) => Edit a -> FTRecorder a
+ftr_ins :: (Grammar g, Show a, Eq a) => Edit g a -> FTRecorder g a
 ftr_ins e = \context f_old t_old ->
     let d = delta e t_old
         t_new = run e t_old in
@@ -38,7 +38,7 @@ When removing existing traces, considering moves explicitly is pointless.
 Given that moves are harder to detect in general, not keeping traces could actually be a more consistent, reliable, and comprehensible experience for the user.
 Such a conclusion would also be valid, though. (That there is no need for handling moves explicitly).
 -}
-ftr_move :: (Show a, Eq a) => Edit a -> FTRecorder a
+ftr_move :: (Grammar g, Show a, Eq a) => Edit g a -> FTRecorder g a
 ftr_move e = \context f_old t_old ->
     let d = delta e t_old in
     \v ->
@@ -51,7 +51,7 @@ ftr_move e = \context f_old t_old ->
         )
         else f_old v
 
-ftr_up :: (Eq a, Show a) => Edit a -> FTRecorder a
+ftr_up :: (Grammar g, Eq a, Show a) => Edit g a -> FTRecorder g a
 ftr_up e = \context f_old t_old ->
     let d = delta e t_old in
     \v ->
@@ -68,7 +68,7 @@ delta - Nodes in the tree that dont have a mapping yet, i.e., their traces evalu
 FeatureTrace - feature trace defined on the nodes in tn except for the nodes in delta
 v - The node of which we want to know if it can inherit the given formula
 -}
-willInherit :: (Show a, Eq a) => NonNullFeatureFormula -> AST a -> Set (Node a) -> FeatureTrace a -> Node a -> Bool
+willInherit :: (Grammar g, Show a, Eq a) => NonNullFeatureFormula -> AST g a -> Set (Node g a) -> FeatureTrace g a -> Node g a -> Bool
 willInherit formula t_new delta f v =
     let al = fromList $ fmap element $ legatorAncestors t_new $ tree t_new v in
     (not $ disjoint delta al) -- There is an edited node in tn above v from which v can inherit the formula
@@ -78,7 +78,7 @@ willInherit formula t_new delta f v =
             Just m -> taut $ pimplies m formula)
         (al \\ delta)) -- There is an old ancestor that already has the mapping
 
-willInherit2 :: (Show a, Eq a) => NonNullFeatureFormula -> AST a-> FeatureTrace a -> Node a -> Bool
+willInherit2 :: (Grammar g, Show a, Eq a) => NonNullFeatureFormula -> AST g a -> FeatureTrace g a -> Node g a -> Bool
 willInherit2 formula t_new f v =
     let al = fromList $ fmap element $ legatorAncestors t_new $ tree t_new v in
     any (\a -> case f a of

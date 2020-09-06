@@ -10,23 +10,23 @@ import Data.List
 import Data.Set
 
 data EditType = Identity | TraceOnly | Insert | Delete | Move | Update deriving (Eq, Show)
-data Edit a = Edit {
+data Edit g a = Edit {
     edittype :: EditType,
     name :: String,
-    run :: AST a -> AST a,
-    delta :: AST a -> Set (Node a)} -- inverse :: Edit a
-type EditScript a = [Edit a]
+    run :: AST g a -> AST g a,
+    delta :: AST g a -> Set (Node g a)} -- inverse :: Edit a
+type EditScript g a = [Edit g a]
 
-instance Show (Edit a) where
+instance Show (Edit g a) where
     show = name
 
 -- Turns an edit script into one single function
 -- The returned function will run the entire edit script on the given AST.
-foldEditScript :: EditScript a -> AST a -> AST a
+foldEditScript :: EditScript g a -> AST g a -> AST g a
 foldEditScript es = reversefoldr (.) id $ run <$> es
 
 -- The identity of edits
-edit_identity :: Edit a
+edit_identity :: Edit g a
 edit_identity = Edit {
     edittype = Identity,
     run = id,
@@ -38,7 +38,7 @@ An identity edit that will keep the given set of nodes as delta for the feature 
 Upon recording, all given nodes will have their feature trace changed to the feature context.
 This function assumes that the given set of nodes is a subset of the nodes in the future edited tree.
 -}
-edit_trace_only :: Set (Node a) -> Edit a
+edit_trace_only :: Set (Node g a) -> Edit g a
 edit_trace_only nodes = Edit {
     edittype = TraceOnly,
     run = id,
@@ -46,7 +46,7 @@ edit_trace_only nodes = Edit {
     name = "tracechange"}
 
 -- Add the tree s as the i-th child of node p
-edit_ins_tree :: (Eq a) => AST a -> UUID -> Int -> Edit a
+edit_ins_tree :: (Eq a) => AST g a -> UUID -> Int -> Edit g a
 edit_ins_tree stree p i = Edit {
     edittype = Insert,
     run = \t -> if any ((p==).uuid) t then manipulate ins t else error $ "The given parent node "++(show p)++" does not exist!",
@@ -64,7 +64,7 @@ If p = epsilon, root stree becomes the new root of T.
 -}
 -- TODO: Do we want to split ins_partial into two edits: one where p = epsilon and one where p != epsilon?
 -- ins_partial with p = epsilon will never occur if we have immutable root nodes such as "file" or an empty abstract project root node as in Ecco.
-edit_ins_partial :: (Eq a) => AST a -> UUID -> Int -> Int -> UUID -> Int -> Edit a 
+edit_ins_partial :: (Eq a) => AST g a -> UUID -> Int -> Int -> UUID -> Int -> Edit g a 
 edit_ins_partial stree p i j snode k = Edit {
     edittype = Insert,
     run = if p == epsilon
@@ -84,7 +84,7 @@ edit_ins_partial stree p i j snode k = Edit {
                                        else t
 
 -- delete the node v and move its children up
-edit_del_node :: (Eq a) => UUID -> Edit a
+edit_del_node :: (Eq a) => UUID -> Edit g a
 edit_del_node v = Edit {
     edittype = Delete,
     run = (filterNodes ((v /=) . uuidOf)), --(fmap $ increaseVersion 1).
@@ -94,7 +94,7 @@ edit_del_node v = Edit {
     name = "del_node("++(show v)++")"}
 
 -- delete the subtree rooted in v
-edit_del_tree :: (Eq a) => UUID -> Edit a
+edit_del_tree :: (Eq a) => UUID -> Edit g a
 edit_del_tree v = Edit {
     edittype = Delete,
     run = (filterTrees ((v /=) . uuidOf)), --(fmap $ increaseVersion 1).
@@ -106,7 +106,7 @@ edit_del_tree v = Edit {
 -- This commented out signature is the signature of move_tree in the paper.
 -- Actually, the given subtree should just be an index because the subtree is present in the given tree.
 -- edit_move_tree :: (Eq a) => AST a -> UUID -> Int -> Edit a
-edit_move_tree :: (Eq a, Show a) => UUID -> UUID -> Int -> Edit a
+edit_move_tree :: (Grammar g, Eq a, Show a) => UUID -> UUID -> Int -> Edit g a
 edit_move_tree s p i = Edit {
     edittype = Move,
     run = \t -> case streeIn t of

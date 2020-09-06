@@ -35,6 +35,7 @@ library:
     - src
     - src/feature
     - src/tree
+    - src/tree/grammars
     - src/propositions
 
 executables:

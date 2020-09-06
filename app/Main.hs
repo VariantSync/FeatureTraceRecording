@@ -62,7 +62,7 @@ runFTR = fst . flip runState 0 $ do
         trace0 = emptyTrace
         -- Some helper variables for edits
         id_reciprocal_body = uuidOf . fromJust $ find (\(Tree n _) -> value n == "body") tree0
-        id_return = uuidOf . fromJust $ find (\(Tree n _) -> valuetype n == ASTT_Return) tree0
+        id_return = uuidOf . fromJust $ find (\(Tree n _) -> value n == "return") tree0
         id_cond_body = uuidOf . fromJust $ find (\(Tree n _) -> value n == "body") tree_condition
         id_div_body = uuidOf . fromJust $ find (\(Tree n _) -> value n == "body") tree_div
         -- The edits "made by the developer"

@@ -2,13 +2,14 @@
 
 import FeatureTraceRecording
 import FeatureTrace
+import AST (Grammar)
 import Propositions
 import NullPropositions
 import Simplify
 import Edits
 import Data.Set
 
-builder :: (Show a, Eq a) => FTRecorderBuilder a
+builder :: (Grammar g, Show a, Eq a) => FTRecorderBuilder g a
 builder edit = removeTheRedundanciesWeIntroduced edit $ killplain $ record edit where
     record = case edittype edit of
         Identity -> ftr_id
@@ -18,13 +19,13 @@ builder edit = removeTheRedundanciesWeIntroduced edit $ killplain $ record edit 
         Move -> ftr_move
         Update -> ftr_up
 
-removeTheRedundanciesWeIntroduced :: (Eq a, Show a) => Edit a -> FTRecorder a -> FTRecorder a
+removeTheRedundanciesWeIntroduced :: (Grammar g, Eq a, Show a) => Edit g a -> FTRecorder g a -> FTRecorder g a
 removeTheRedundanciesWeIntroduced edit wrappee = \context f_old t_old ->
     let f_new = wrappee context f_old t_old
         t_new = run edit t_old in
         FeatureTrace.simplify f_new t_new
 
-ftr_ins :: (Show a, Eq a) => Edit a -> FTRecorder a
+ftr_ins :: (Show a, Eq a) => Edit g a -> FTRecorder g a
 ftr_ins e = \context f_old t_old ->
     let d = delta e t_old
         t_new = run e t_old in
@@ -33,7 +34,7 @@ ftr_ins e = \context f_old t_old ->
         then context
         else f_old v
 
-ftr_move :: (Show a, Eq a) => Edit a -> FTRecorder a
+ftr_move :: (Show a, Eq a) => Edit g a -> FTRecorder g a
 ftr_move e = \context f_old t_old ->
     let d = delta e t_old in
     \v ->
@@ -41,7 +42,7 @@ ftr_move e = \context f_old t_old ->
         then nullable_and [f_old v, context]
         else f_old v
 
-ftr_up :: (Eq a, Show a) => Edit a -> FTRecorder a
+ftr_up :: (Eq a, Show a) => Edit g a -> FTRecorder g a
 ftr_up e = \context f_old t_old ->
     let d = delta e t_old in
     \v ->
