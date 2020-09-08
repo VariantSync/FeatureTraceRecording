@@ -5,6 +5,10 @@
 import Propositions
 import SAT
 
+{-
+file:///C:/Users/Paul%20Bittner/Documents/Paper/Literature/Library/Rhein%20et%20al.%20ICSE%202015%20Presence-Condition%20Simplification%20in%20Highly%20Configurable%20Systems.pdf
+-}
+
 removeRedundancy :: (Ord a, Show a) => PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
 removeRedundancy axiom (PAnd cs) =
     if contradicts $ PAnd $ axiom:cs
