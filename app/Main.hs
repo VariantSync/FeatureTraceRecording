@@ -34,9 +34,9 @@ import System.Terminal
 -- import Prelude hiding ((<>))
 -----------------------------
 
-data CodePrintStyle = ShowAST | ShowCode
-data TraceDisplay = Trace | PC deriving Eq
-data TraceStyle = Text | Colour | None deriving Eq
+data CodePrintStyle = ShowAST | ShowCode deriving (Show)
+data TraceDisplay = Trace | PC deriving (Show, Eq)
+data TraceStyle = Text | Colour | None deriving (Show, Eq)
 
 main :: IO ()
 main = withTerminal $ runTerminalT printer
@@ -124,16 +124,25 @@ runFTR = fst . flip runState 0 $ do
                       else pretty $ genIndent i
                   paint formula = (annotate (foreground $ FeatureColour.colourOf featureColourPalette formula)).pretty
     return
-        $ flip foldr mempty (\(fc, edit, (trace, tree)) s ->
-        mconcat [
-            hardline,
-            hardline,
-            pretty $ concat ["==== Run ", show edit, " under context = "],
-            annotate (foreground $ FeatureColour.colourOf featureColourPalette fc) $ pretty $ NullPropositions.prettyPrint fc,
-            pretty $ " giving us ====",
-            hardline,
-            treePrint tree trace,
-            s])
+        $ mappend (pretty $ intercalate "\n  " [
+            "\nRunning Feature Trace Recording with",
+            "codeStyle      = "++show codeStyle,
+            "traceDisplay   = "++show traceDisplay,
+            "traceStyle     = "++show traceStyle,
+            "withTraceLines = "++show withTraceLines,
+            "abstractTrees  = "++show abstractTrees])
+        $ flip foldr
+            mempty
+            (\(fc, edit, (trace, tree)) s ->
+                mconcat [
+                    hardline,
+                    hardline,
+                    pretty $ concat ["==== Run ", show edit, " under context = "],
+                    annotate (foreground $ FeatureColour.colourOf featureColourPalette fc) $ pretty $ NullPropositions.prettyPrint fc,
+                    pretty $ " giving us ====",
+                    hardline,
+                    treePrint tree trace,
+                    s])
         $ zip3
             (Nothing:featureContexts) -- Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
             (edit_identity:editscript) -- Prepend identity edit here to show initial tree.
