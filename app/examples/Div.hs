@@ -5,6 +5,7 @@ import UUID
 import Tree
 import AST
 import FeatureTrace
+import FeatureColour
 import SimpleCXX
 import System.Terminal
 
@@ -17,8 +18,8 @@ feature_Reciprocal = toFeature "Reciprocal"
 feature_Division :: Feature
 feature_Division = toFeature "Division"
 
-colourOf :: (MonadColorPrinter m) => Feature -> Color m
-colourOf feature 
+featureColourPalette :: (MonadColorPrinter m) => FeatureColourPalette m
+featureColourPalette feature 
     | feature == feature_Debug = green
     | feature == feature_Reciprocal = yellow
     | feature == feature_Division = cyan

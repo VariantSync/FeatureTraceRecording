@@ -54,12 +54,12 @@ runFTR = fst . flip runState 0 $ do
     tree_reciprocal_return <- div_reciprocal_return
     let 
         -- Debug settings
-        codeStyle = ShowCode
-        traceDisplay = PC
-        traceStyle = Colour
+        codeStyle = ShowCode -- One of: ShowAST, ShowCode
+        traceDisplay = PC -- One of: Trace, PC
+        traceStyle = Colour -- One of: Text, Colour, None
         withTraceLines = True
         abstractTrees = False
-        featureColourPalette = Div.colourOf
+        featureColourPalette = Div.featureColourPalette
         -- The initial feature trace of the first tree.
         trace0 = emptyTrace
         -- Some helper variables for edits
