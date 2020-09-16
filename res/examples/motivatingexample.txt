@@ -1,0 +1,7 @@
+﻿- should contain insert, delete (must), move
+- insert as first because most easy?
+- deleting an already mapped artefact?
+- not more than 4 edits? space issues?
+- would be great if patterns of eval could be found here because these are hard to grasp
+- examples for constituent and legator
+- no spl techniques such as runtime parameters (too confusing)

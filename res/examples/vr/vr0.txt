@@ -1,0 +1,4 @@
+﻿void main() {
+    Game g = initGame();
+    g.start();
+}

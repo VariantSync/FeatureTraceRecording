@@ -1,0 +1,5 @@
+﻿void main(String[] args) {
+    bool vrdebug = args[0] == "--vrdebug";
+    initGame();
+    start();
+}
