@@ -111,23 +111,21 @@ simplify (PNot a) = case simplify a of
     PFalse -> PTrue
     (PNot x) -> x
     p -> PNot p
-simplify (PAnd []) = PTrue
-simplify (PAnd [p]) = simplify p
 simplify (PAnd cs) = case
     filter (not . isPTrue) -- Filter all Trues
     $ concat $ fmap (toCNFClauseList . simplify) cs -- simplify all children and flatten the formula
     of
         [] -> PTrue
+        [p] -> p
         clauses -> if any isPFalse clauses -- If any value in a disjunction is false, the disjunction becomes false.
                    then PFalse
                    else PAnd clauses
-simplify (POr []) = PFalse
-simplify (POr [p]) = simplify p
 simplify (POr cs) = case
     filter (not . isPFalse) -- Filter all Falses
     $ concat $ fmap (toDNFClauseList . simplify) cs -- simplify all children and flatten the formula
     of
         [] -> PFalse
+        [p] -> p
         clauses -> if any isPTrue clauses -- If any value in a disjunction is true, the disjunction becomes true.
                    then PTrue
                    else POr clauses

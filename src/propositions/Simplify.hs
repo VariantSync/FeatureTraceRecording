@@ -13,16 +13,17 @@ removeRedundancy :: (Ord a, Show a) => PropositionalFormula a -> PropositionalFo
 removeRedundancy axiom (PAnd cs) =
     if contradicts $ PAnd $ axiom:cs
     then PFalse
-    else simplify
-        $ PAnd
-        $ foldr (\elementToInspect b -> if taut $ pimplies (PAnd $ elementToInspect:b) axiom then b else elementToInspect:b) []
-        $ (removeRedundancy axiom) <$> cs
+    else
+        simplify $
+        PAnd $
+        foldr (\elementToInspect b -> if taut $ pimplies (PAnd $ elementToInspect:b) axiom then b else elementToInspect:b) [] $
+        (removeRedundancy axiom) <$> cs
 removeRedundancy axiom (POr cs) =
-      removeRedundancyBase axiom
-    $ simplify
-    $ POr
-    $ foldr (\elementToInspect b -> if contradicts $ PAnd [elementToInspect, axiom] then b else elementToInspect:b) []
-    $ (removeRedundancy axiom) <$> cs
+      removeRedundancyBase axiom $
+    --   simplify $
+      POr $
+      foldr (\elementToInspect b -> if contradicts $ PAnd [elementToInspect, axiom] then b else elementToInspect:b) [] $
+      (removeRedundancy axiom) <$> cs
 removeRedundancy axiom x =
     let y = removeRedundancyBase axiom x in
     if contradicts $ PAnd [y, axiom] then PFalse else y
