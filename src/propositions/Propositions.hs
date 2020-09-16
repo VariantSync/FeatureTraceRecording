@@ -111,6 +111,8 @@ simplify (PNot a) = case simplify a of
     PFalse -> PTrue
     (PNot x) -> x
     p -> PNot p
+simplify (PAnd []) = PTrue
+simplify (PAnd [p]) = simplify p
 simplify (PAnd cs) = case
     filter (not . isPTrue) -- Filter all Trues
     $ concat $ fmap (toCNFClauseList . simplify) cs -- simplify all children and flatten the formula
@@ -119,6 +121,8 @@ simplify (PAnd cs) = case
         clauses -> if any isPFalse clauses -- If any value in a disjunction is false, the disjunction becomes false.
                    then PFalse
                    else PAnd clauses
+simplify (POr []) = PFalse
+simplify (POr [p]) = simplify p
 simplify (POr cs) = case
     filter (not . isPFalse) -- Filter all Falses
     $ concat $ fmap (toDNFClauseList . simplify) cs -- simplify all children and flatten the formula
@@ -134,7 +138,11 @@ Assumes that the given formula is in CNF.
 The first argument is a functions resolving negation, i.e. it should take an 'a' and give its negated version.
 The second argument is a function creating the value of type a that should be associated with 'false' (PFalse).
 For example, 0 could represent False in propositional formulas over numerals.
-(Note, if no such value exists, the 'false' function can also produce an error.)
+(Note, if no such value exists, the 'false' function is free to produce an error.)
+The third argument is the function in CNF that should be clausified.
+If still confused, try the following call and look at the result:
+    show $ clausifyCNF (\x -> "not "++x) "false" (toCNF p)
+where p is a propositional formula over strings.
 -}
 clausifyCNF :: (Show a) => (a -> a) -> (() -> a) -> PropositionalFormula a -> [[a]]
 clausifyCNF _ _ PTrue  = [[]]
@@ -150,20 +158,29 @@ clausifyCNF negator false or@(POr literals) = if isCNF or
     then [concat $ concat $ fmap (clausifyCNF negator false) literals]
     else error $ "Given formula "++show or++" not in CNF!"
                             
-
+-- -- Default ASCII expressions
 -- instance Show a => Show (PropositionalFormula a) where
---     show PTrue = "⊤"
---     show PFalse = "⊥"
+--     show PTrue = "T"
+--     show PFalse = "F"
 --     show (PVariable v) = show v
 --     show (PNot p) = "¬"++show p
---     show (PAnd cs) = "("++(intercalate " ∧ " $ map show cs)++")"
---     show (POr cs) = "("++(intercalate " ∨ " $ map show cs)++")"
+--     show (PAnd cs) = parenIf (length cs > 1) (intercalate " ^ " $ map show cs)
+--     show (POr cs) = parenIf (length cs > 1) (intercalate " v " $ map show cs)
 
+-- Nice UTF8 styled expressions
 instance Show a => Show (PropositionalFormula a) where
-    show PTrue = "T"
-    show PFalse = "F"
+    show PTrue = "⊤"
+    show PFalse = "⊥"
     show (PVariable v) = show v
     show (PNot p) = "¬"++show p
-    show (PAnd cs) = parenIf (length cs > 1) (intercalate " ^ " $ map show cs)
-    show (POr cs) = parenIf (length cs > 1) (intercalate " v " $ map show cs)
+    show (PAnd cs) = "("++(intercalate " ∧ " $ map show cs)++")"
+    show (POr cs) = "("++(intercalate " ∨ " $ map show cs)++")"
 
+-- -- This visualisation is for debugging as it shows the exact expression tree.
+-- instance Show a => Show (PropositionalFormula a) where
+--     show PTrue = "(PTrue)"
+--     show PFalse = "(PFalse)"
+--     show (PVariable v) = "(PVariable "++show v++")"
+--     show (PNot p) = "(PNot "++show p++")"
+--     show (PAnd cs) = "(PAnd ["++(intercalate ", " $ map show cs)++"])"
+--     show (POr cs) = "(POr ["++(intercalate ", " $ map show cs)++"])"

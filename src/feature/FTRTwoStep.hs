@@ -10,7 +10,11 @@ import Edits
 import Data.Set
 
 builder :: (Grammar g, Show a, Eq a) => FTRecorderBuilder g a
-builder edit = removeTheRedundanciesWeIntroduced edit $ killplain $ record edit where
+builder edit =
+    removeTheRedundanciesWeIntroduced edit $
+    killplain $
+    record edit
+    where
     record = case edittype edit of
         Identity -> ftr_id
         TraceOnly -> ftr_trace

@@ -27,7 +27,11 @@ Combines a list of nullable formulas with the AND operator according where "Noth
 nullable_and :: [NullableFormula a] -> NullableFormula a
 nullable_and l = case catMaybes l of
     [] -> Nothing
+    [p] -> Just p
     justs -> Just $ PAnd justs
+
+nullable_simplify :: NullableFormula a -> NullableFormula a
+nullable_simplify = fmap Propositions.simplify
 
 prettyPrint :: (Show a) => NullableFormula a -> String
 prettyPrint Nothing = "null" -- null, nothing, empty, unknown
