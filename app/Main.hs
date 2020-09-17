@@ -16,9 +16,12 @@ import FeatureTraceRecording
 import FTRDirect
 import FTRTwoStep
 
+import Example
+
 import FeatureColour
 
 import Div
+import VR
 
 import Data.Maybe ( fromJust )
 import Data.List (intercalate)
@@ -46,62 +49,28 @@ printer = (putDoc $ runFTR <+> hardline) >> flush
     
 runFTR :: (MonadColorPrinter m) => Doc (Attribute m)
 runFTR = fst . flip runState 0 $ do
-    tree0 <- div0
-    tree_assert <- div_assert
-    tree_error <- div_error
-    tree_condition <- div_condition
-    tree_div <- div_div
-    tree_reciprocal_return <- div_reciprocal_return
-    let 
+    -- Example to run
+    example <- vrExample
+    let
         -- Debug settings
         codeStyle = ShowCode -- One of: ShowAST, ShowCode
-        traceDisplay = PC -- One of: Trace, PC
+        traceDisplay = Trace -- One of: Trace, PC
         traceStyle = Colour -- One of: Text, Colour, None
         withTraceLines = True
         abstractTrees = False
-        featureColourPalette = Div.featureColourPalette
-        -- The initial feature trace of the first tree.
-        trace0 = emptyTrace
-        -- Some helper variables for edits
-        id_reciprocal_body = uuidOf . fromJust $ find (\(Tree n _) -> value n == "body") tree0
-        tree_return = fromJust $ find (\(Tree n _) -> value n == "return") tree0
-        id_cond_body = uuidOf . fromJust $ find (\(Tree n _) -> value n == "body") tree_condition
-        id_div_body = uuidOf . fromJust $ find (\(Tree n _) -> value n == "body") tree_div
-        tree_x_condexpr = fromJust $ find (\(Tree n _) -> value n == "x") tree_condition
-        tree_x_return = fromJust $ find (\(Tree n _) -> value n == "x") tree_return
-        tree_1_return = fromJust $ find (\(Tree n _) -> value n == "1.0") tree_return
-        -- The edits "made by the developer"
-        editscript = [
-            edit_ins_tree tree_assert id_reciprocal_body 0
-          , edit_ins_partial tree_condition id_reciprocal_body 0 0 id_cond_body 0
-          , edit_del_tree (uuidOf tree_assert)
-          , edit_ins_tree tree_error id_cond_body 0
-          , edit_ins_tree tree_div (uuidOf tree0) 0
-          , edit_move_tree (uuidOf tree_condition) id_div_body 0
-          , edit_move_tree (uuidOf tree_return) id_div_body 1 -- now we are done with div5.txt
-          , edit_update (uuidOf tree_x_condexpr) (rule $ element $ tree_x_condexpr) "b"
-          , edit_update (uuidOf tree_x_return) (rule $ element $ tree_x_return) "b"
-          , edit_update (uuidOf tree_1_return) SCXX_VarRef "a"
-          , edit_ins_tree tree_reciprocal_return id_reciprocal_body 0
-            ]
-        -- The feature contexts assigned to each edit
-        featureContexts = [
-            Just $ PVariable feature_Debug
-          , Just $ PVariable feature_Reciprocal
-          , Just $ PVariable feature_Reciprocal -- Error by user. Should actually be PTrue
-          , Just $ PVariable feature_Reciprocal
-          , Just $ PVariable feature_Division
-          , Just $ PVariable feature_Division
-          , Just $ PVariable feature_Division
-          , Just $ PVariable feature_Division
-          , Just $ PVariable feature_Division
-          , Just $ PVariable feature_Division
-          , Just $ PVariable feature_Reciprocal
-            ]
+        -- Get necessary data from Example
+        editScript = editscript example
+        featureContexts = featurecontexts example
+        featureColourPalette = colours example
         -- Select the FeatureTraceRecording implementation to run
         recordBuilder = FTRTwoStep.builder
         -- Run the ftr
-        tracesAndTrees = featureTraceRecordingWithIntermediateSteps recordBuilder trace0 tree0 editscript featureContexts
+        tracesAndTrees = featureTraceRecordingWithIntermediateSteps
+            recordBuilder
+            (startTrace example)
+            (startTree example)
+            editScript
+            featureContexts
         -- tracesAndTrees = [featureTraceRecording recordBuilder trace0 tree0 editscript featureContexts]
         -- Some helper variables for output formatting
         toPC = \trace tree -> if traceDisplay == PC then pc tree trace else trace
@@ -145,5 +114,5 @@ runFTR = fst . flip runState 0 $ do
                     s])
         $ zip3
             (Nothing:featureContexts) -- Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
-            (edit_identity:editscript) -- Prepend identity edit here to show initial tree.
+            (edit_identity:editScript) -- Prepend identity edit here to show initial tree.
             ((\(trace, tree) -> (toPC trace tree, treeAbstract tree)) <$> tracesAndTrees)

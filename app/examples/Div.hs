@@ -1,13 +1,17 @@
 ﻿module Div where
 
+import Example
 import Control.Monad.State
 import UUID
 import Tree
 import AST
+import Edits
+import Propositions
 import FeatureTrace
 import FeatureColour
 import SimpleCXX
 import System.Terminal
+import Data.Maybe ( fromJust )
 
 type SSCXXAST = SCXXAST String
 
@@ -123,3 +127,52 @@ div_reciprocal_return = sequence
             ])
         ])
     ])
+
+divExample :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+divExample =
+    do
+        tree0 <- div0
+        tree_assert <- div_assert
+        tree_error <- div_error
+        tree_condition <- div_condition
+        tree_div <- div_div
+        tree_reciprocal_return <- div_reciprocal_return
+        let
+            id_reciprocal_body = uuidOf . fromJust $ findWithValue "body" tree0
+            tree_return = fromJust $ findWithValue "return" tree0
+            id_cond_body = uuidOf . fromJust $ findWithValue "body" tree_condition
+            id_div_body = uuidOf . fromJust $ findWithValue "body" tree_div
+            tree_x_condexpr = fromJust $ findWithValue "x" tree_condition
+            tree_x_return = fromJust $ findWithValue "x" tree_return
+            tree_1_return = fromJust $ findWithValue "1.0" tree_return
+        return Example {
+            startTrace = emptyTrace,
+            startTree = tree0,
+            colours = featureColourPalette,
+            editscript = [
+                edit_ins_tree tree_assert id_reciprocal_body 0
+              , edit_ins_partial tree_condition id_reciprocal_body 0 0 id_cond_body 0
+              , edit_del_tree (uuidOf tree_assert)
+              , edit_ins_tree tree_error id_cond_body 0
+              , edit_ins_tree tree_div (uuidOf tree0) 0
+              , edit_move_tree (uuidOf tree_condition) id_div_body 0
+              , edit_move_tree (uuidOf tree_return) id_div_body 1 -- now we are done with div5.txt
+              , edit_update (uuidOf tree_x_condexpr) (rule $ element $ tree_x_condexpr) "b"
+              , edit_update (uuidOf tree_x_return) (rule $ element $ tree_x_return) "b"
+              , edit_update (uuidOf tree_1_return) SCXX_VarRef "a"
+              , edit_ins_tree tree_reciprocal_return id_reciprocal_body 0
+            ],
+            featurecontexts = [
+                Just $ PVariable feature_Debug
+              , Just $ PVariable feature_Reciprocal
+              , Just $ PVariable feature_Reciprocal -- Error by user. Should actually be PTrue
+              , Just $ PVariable feature_Reciprocal
+              , Just $ PVariable feature_Division
+              , Just $ PVariable feature_Division
+              , Just $ PVariable feature_Division
+              , Just $ PVariable feature_Division
+              , Just $ PVariable feature_Division
+              , Just $ PVariable feature_Division
+              , Just $ PVariable feature_Reciprocal
+            ]
+        }

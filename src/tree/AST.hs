@@ -49,6 +49,9 @@ abstract = filterNodes (\(Tree n _) -> ntype n /= Plain)
 legatorAncestors :: (Eq a, Grammar g) => AST g a -> AST g a -> [AST g a]
 legatorAncestors root = (filter (\(Tree n _) -> ntype n == Legator)).(ancestors root)
 
+findWithValue :: (Eq a) => a -> AST g a -> Maybe (AST g a)
+findWithValue v = findWithNode (\n -> value n == v)
+
 showCode :: (Show a, Grammar g) => AST g a -> String
 showCode = showCodeAs "" (\_ i -> genIndent i) (\_ s -> s) show
 

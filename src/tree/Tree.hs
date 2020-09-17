@@ -67,6 +67,9 @@ find predicate x@(Tree _ children) = case predicate x of
   True -> Just x
   False -> safehead $ catMaybes $ fmap (\t -> Tree.find predicate t) children
 
+findWithNode :: (a -> Bool) -> Tree a -> Maybe(Tree a)
+findWithNode p = Tree.find (\(Tree n _) -> p n)
+
 parent :: Eq a => Tree a -> Tree a -> Maybe(Tree a)
 parent root t = Tree.find (\(Tree _ children) -> elem t children) root
 
