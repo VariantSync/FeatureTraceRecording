@@ -1,0 +1,38 @@
+﻿void push(T x) {
+    ++head;
+    storage[head] = x;
+}
+
+=== insert under context SafeStack ===>
+
+void push(T x) {
+    ++head;
+    if (head < capacity) {
+
+    } else {
+        
+    }
+    storage[head] = x;
+}
+
+===  move under context null  ===>
+
+void push(T x) {
+    ++head;
+    if (head < capacity) {
+        storage[head] = x;
+    } else {
+
+    }
+}
+
+===  insert under context Log ==>
+
+void push(T x) {
+    ++head;
+    if (head < capacity) {
+        storage[head] = x;
+    } else {
+
+    }
+}

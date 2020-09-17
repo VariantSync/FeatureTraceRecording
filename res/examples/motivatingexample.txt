@@ -1,7 +1,8 @@
 ﻿- should contain insert, delete (must), move
 - insert as first because most easy?
 - deleting an already mapped artefact?
-- not more than 4 edits? space issues?
-- would be great if patterns of eval could be found here because these are hard to grasp
-- examples for constituent and legator
+- not more than 3 edits? space issues?
+- would be great if patterns of eval could be found here because these are hard to grasp (Especially AddIfdefWrapElse would be nice)
+- examples for constituent and legator (but could also be in an extra figure)
 - no spl techniques such as runtime parameters (too confusing)
+- Das Beispiel sollte zeigen warum ASTs hilfreich sind und reine Zeilen doof sind.

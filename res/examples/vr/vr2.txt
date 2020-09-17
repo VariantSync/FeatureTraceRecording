@@ -1,4 +1,0 @@
-﻿void main() {
-    Game g = initVR(); // inserted under context vr so it is mapped to VR now
-    g.start();
-}

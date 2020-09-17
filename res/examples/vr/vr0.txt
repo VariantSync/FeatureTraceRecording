@@ -1,4 +1,27 @@
-﻿void main() {
-    Game g = initGame();
-    g.start();
+﻿void main(String[] args) {
+    initGame();
+    runGame();
+}
+
+=== insert under context Log ===>
+
+void main(String[] args) {
+    initGame();
+    log("Start");
+    runGame();
+}
+
+=== delete under context VR ===>
+
+void main(String[] args) {
+    log("Start");
+    runGame();
+}
+
+=== insert under context VR ===>
+
+void main(String[] args) {
+    initVR();
+    log("Start");
+    runGame();
 }
