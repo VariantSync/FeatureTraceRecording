@@ -53,3 +53,6 @@ ftr_up e = \context f_old t_old ->
         if (notnull context) && (member v d)
         then context
         else f_old v
+        -- if (notnull context) && (member v d)
+        -- then nullable_and [context, nullable_not $ f_old v]
+        -- else f_old v

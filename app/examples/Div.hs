@@ -13,8 +13,6 @@ import SimpleCXX
 import System.Terminal
 import Data.Maybe ( fromJust )
 
-type SSCXXAST = SCXXAST String
-
 feature_Debug :: Feature
 feature_Debug = toFeature "Debug"
 feature_Reciprocal :: Feature
@@ -34,7 +32,7 @@ div0 = sequence
     (Tree (node "Divider9000.cpp" SCXX_File) [
         (Tree (node "reciprocal" SCXX_FuncDef) [
             (Tree (node "double" SCXX_Type) []),
-            (Tree (node "params" SCXX_Parameters) [
+            (Tree (node "params" SCXX_ParametersDef) [
                 (Tree (node "param" SCXX_VarDecl) [
                     (Tree (node "double" SCXX_Type) []),
                     (Tree (node "x" SCXX_Literal) [])
@@ -57,7 +55,7 @@ div_assert :: State UUID SSCXXAST
 div_assert = sequence
     (Tree (node mempty SCXX_ExprStatement) [
         (Tree (node "assert" SCXX_FuncCall) [
-            (Tree (node "params" SCXX_Parameters) [
+            (Tree (node "params" SCXX_Args) [
                 (Tree (node "param" SCXX_Expression) [
                     (Tree (node "!=" SCXX_BinaryOp) [
                         (Tree (node "x" SCXX_VarRef) []),
@@ -72,7 +70,7 @@ div_error :: State UUID SSCXXAST
 div_error = sequence
     (Tree (node mempty SCXX_ExprStatement) [
         (Tree (node "error" SCXX_FuncCall) [
-            (Tree (node "params" SCXX_Parameters) [
+            (Tree (node "params" SCXX_Args) [
                 (Tree (node "param" SCXX_Expression) [
                     (Tree (node "\"Cannot divide by 0!\"" SCXX_Literal) [])
                 ])
@@ -98,7 +96,7 @@ div_div :: State UUID SSCXXAST
 div_div = sequence
     (Tree (node "div" SCXX_FuncDef) [
         (Tree (node "double" SCXX_Type) []),
-        (Tree (node "params" SCXX_Parameters) [
+        (Tree (node "params" SCXX_ParametersDef) [
             (Tree (node "param" SCXX_VarDecl) [
                 (Tree (node "double" SCXX_Type) []),
                 (Tree (node "a" SCXX_Literal) [])
@@ -116,7 +114,7 @@ div_reciprocal_return = sequence
     (Tree (node "return" SCXX_Return) [
         (Tree (node "Expression" SCXX_Expression) [
             (Tree (node "div" SCXX_FuncCall) [
-                (Tree (node "params" SCXX_Parameters) [
+                (Tree (node "params" SCXX_Args) [
                     (Tree (node "param" SCXX_Expression) [
                         (Tree (node "1.0" SCXX_Literal) [])
                     ]),

@@ -21,7 +21,8 @@ import Example
 import FeatureColour
 
 import Div
-import VR
+import VR ( vrExample )
+import StackPop (example)
 
 import Data.Maybe ( fromJust )
 import Data.List (intercalate)
@@ -50,11 +51,11 @@ printer = (putDoc $ runFTR <+> hardline) >> flush
 runFTR :: (MonadColorPrinter m) => Doc (Attribute m)
 runFTR = fst . flip runState 0 $ do
     -- Example to run
-    example <- vrExample
+    example <- StackPop.example
     let
         -- Debug settings
         codeStyle = ShowCode -- One of: ShowAST, ShowCode
-        traceDisplay = Trace -- One of: Trace, PC
+        traceDisplay = PC -- One of: Trace, PC
         traceStyle = Colour -- One of: Text, Colour, None
         withTraceLines = True
         abstractTrees = False
@@ -67,8 +68,8 @@ runFTR = fst . flip runState 0 $ do
         -- Run the ftr
         tracesAndTrees = featureTraceRecordingWithIntermediateSteps
             recordBuilder
-            (startTrace example)
-            (startTree example)
+            (Example.startTrace example)
+            (Example.startTree example)
             editScript
             featureContexts
         -- tracesAndTrees = [featureTraceRecording recordBuilder trace0 tree0 editscript featureContexts]

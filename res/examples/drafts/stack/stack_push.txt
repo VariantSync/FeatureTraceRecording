@@ -1,0 +1,56 @@
+﻿Stack (or group)
+ - SAFESTACK
+ - IMMUTABLESTACK
+
+==============================
+
+void push(T x) {
+    storage[++head] = x;
+}
+
+=== insert under context SAFESTACK ===>
+
+void push(T x) {
+    if (head + 1 < capacity) {
+
+    }
+    storage[++head] = x;
+}
+
+===  move under context STACK  ===>
+
+void push(T x) {
+    if (head + 1 < capacity) {
+        storage[++head] = x;
+    }
+}
+
+=== delete under context IMMUTABLESTACK ===>
+
+void push(T x) {
+
+}
+
+=== insert under context IMMUTABLESTACK ===>
+
+void push(T x) {
+    Stack<T> clone = this.clone();
+    return clone;
+}
+
+=== update under context IMMUTABLESTACK ===>
+
+Stack<T> push(T x) {
+    Stack<T> clone = this.clone();
+    return clone;
+}
+
+=== insert under context SAFESTACK AND IMMUTABLESTACK ===>
+
+Stack<T> push(T x) {
+    Stack<T> clone = this.clone();
+    if (clone.head + 1 < clone.capacity) {
+        clone.storage[++clone.head] = x;
+    }
+    return clone;
+}

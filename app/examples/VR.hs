@@ -13,8 +13,6 @@ import Example
 import System.Terminal
 import Data.Maybe ( fromJust )
 
-type SSCXXAST = SCXXAST String
-
 feature_Setup :: Feature
 feature_Setup = toFeature "Setup"
 feature_VR :: Feature
@@ -27,55 +25,23 @@ featureColourPalette feature
     | otherwise = red
 
 vr0 :: State UUID SSCXXAST
-vr0 = sequence
-    (Tree (node "main" SCXX_FuncDef) [
-        (Tree (node "void" SCXX_Type) []),
-        (Tree (node "params" SCXX_Parameters) [
-            (Tree (node "param" SCXX_VarDecl) [
-                (Tree (node "String[]" SCXX_Type) []),
-                (Tree (node "args" SCXX_Literal) [])
-            ])
-        ]),
-        (Tree (node "body" SCXX_Statements) [
-            (Tree (node mempty SCXX_ExprStatement) [
-                (Tree (node "runGame" SCXX_FuncCall) [
-                    (Tree (node "params" SCXX_Parameters) [])
-                ])
-            ])
-        ])
-    ])
+vr0 = sequence $
+    scxx_funcdef "void" "main" [("String[]", "args")] [
+        scxx_exprstatement $ scxx_funccall "runGame" []
+    ]
 
-vr_setupCall = sequence
-    (Tree (node mempty SCXX_ExprStatement) [
-        (Tree (node "setup" SCXX_FuncCall) [
-            (Tree (node "params" SCXX_Parameters) [
-                (Tree (node "param" SCXX_Expression) [
-                    (Tree (node "args" SCXX_VarRef) [])
-                ])
-            ])
-        ])
-    ])
+vr_setupCall :: State UUID SSCXXAST
+vr_setupCall = sequence $
+    scxx_exprstatement $ 
+    scxx_assignment (scxx_vardecl "bool" "success") "=" (scxx_funccall "setup" [scxx_varref "args"])
 
-vr_cond = sequence
-    (Tree (node "if" SCXX_Condition) [
-        (Tree (node "cond" SCXX_Expression) [
-            (Tree (node "success" SCXX_VarRef) [])
-        ]),
-        (Tree (node "body" SCXX_Statements) [
-            -- Here, other statements have to be entered later.
-        ])
-    ])
+vr_cond :: State UUID SSCXXAST
+vr_cond = sequence $ scxx_condition (scxx_varref "success") []
 
-vr_vrsetupCall = sequence
-    (Tree (node mempty SCXX_ExprStatement) [
-        (Tree (node "vr_setup" SCXX_FuncCall) [
-            (Tree (node "params" SCXX_Parameters) [
-                (Tree (node "param" SCXX_Expression) [
-                    (Tree (node "args" SCXX_VarRef) [])
-                ])
-            ])
-        ])
-    ])
+vr_vrsetupCall :: State UUID SSCXXAST
+vr_vrsetupCall = sequence $
+    scxx_exprstatement $ 
+    scxx_assignment (scxx_vardecl "bool" "success") "=" (scxx_funccall "vr_setup" [scxx_varref "args"])
 
 vrExample :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
 vrExample =

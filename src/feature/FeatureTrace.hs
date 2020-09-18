@@ -49,7 +49,7 @@ Crashes when the given node is not in the given tree.
 pc_parentpart :: (Grammar g, Show a, Eq a) => AST g a -> FeatureTrace g a -> Node g a -> FeatureFormula
 pc_parentpart root trace v
   | ntype v == Plain = parent root t >>= \p -> pc root trace $ element p
-  | otherwise = nullable_and $ trace.element <$> (legatorAncestors root t) --(\() -> Tree node [])
+  | otherwise = nullable_and $ trace.element <$> (legatorAncestors root t)
   where t = tree root v
 
 augmentWithTrace :: (Node g a -> FeatureFormula) -> AST g a -> Tree (FeatureFormula, Node g a)
