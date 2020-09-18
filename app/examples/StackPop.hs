@@ -38,13 +38,13 @@ condTree :: State UUID SSCXXAST
 condTree = sequence $ scxx_condition (scxx_unaryop "!" $ scxx_funccall "empty" []) []
 
 cloneDef :: State UUID SSCXXAST
-cloneDef = sequence $ scxx_exprstatement $ scxx_assignment (scxx_vardecl "Stack<T>" "clone") "=" (scxx_funccall "clone" [])
+cloneDef = sequence $ scxx_exprstatement $ scxx_assignment (scxx_vardecl "Stack<T>" "c") "=" (scxx_funccall "clone" [])
 
 cloneStorage :: State UUID SSCXXAST
-cloneStorage = sequence $ scxx_exprstatement $ scxx_assignment (scxx_varref "clone.storage[clone.head--]") "=" (scxx_literal "null")
+cloneStorage = sequence $ scxx_exprstatement $ scxx_assignment (scxx_varref "c.storage[c.head--]") "=" (scxx_literal "null")
 
 cloneRetStatement :: State UUID SSCXXAST
-cloneRetStatement = sequence $ scxx_return $ scxx_varref "clone"
+cloneRetStatement = sequence $ scxx_return $ scxx_varref "c"
 
 newReturnType :: String
 newReturnType = "Stack<T>"
