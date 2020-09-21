@@ -19,10 +19,12 @@ import FTRTwoStep
 import Example
 
 import FeatureColour
+import TikzExport
 
 import Div
 import VR ( vrExample )
 import StackPop (example)
+import StackPopBob 
 
 import Data.Maybe ( fromJust )
 import Data.List (intercalate)
@@ -38,7 +40,7 @@ import System.Terminal
 -- import Prelude hiding ((<>))
 -----------------------------
 
-data CodePrintStyle = ShowAST | ShowCode deriving (Show)
+data CodePrintStyle = ShowAST | ShowCode | ShowTikz deriving (Show)
 data TraceDisplay = Trace | PC deriving (Show, Eq)
 data TraceStyle = Text | Colour | None deriving (Show, Eq)
 
@@ -54,7 +56,7 @@ runFTR = fst . flip runState 0 $ do
     example <- StackPop.example
     let
         -- Debug settings
-        codeStyle = ShowCode -- One of: ShowAST, ShowCode
+        codeStyle = ShowTikz -- One of: ShowAST, ShowCode
         traceDisplay = PC -- One of: Trace, PC
         traceStyle = Colour -- One of: Text, Colour, None
         withTraceLines = True
@@ -81,6 +83,7 @@ runFTR = fst . flip runState 0 $ do
                 None -> pretty.show
                 Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace n) $ show n)
                 Text -> pretty.(FeatureTrace.prettyPrint).(augmentWithTrace trace)) tree
+            ShowTikz -> pretty $ astToTikzWithTraceDefault trace tree
             ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
             where nodePrint trace n = case traceStyle of
                       None -> pretty $ value n

@@ -24,3 +24,6 @@ nothingIf :: (a -> Bool) -> a -> Maybe a
 nothingIf p a
     | p a = Nothing
     | otherwise = Just a
+
+removeQuotes :: String -> String
+removeQuotes = filter (/='\"')
