@@ -55,6 +55,8 @@ vrExample =
             id_runGame = uuidOf . fromJust $ findWithNode ((SCXX_ExprStatement==).rule) tree0
             id_vr_cond_body = uuidOf . fromJust $ findWithNode ((SCXX_Statements==).rule) tree_vr_cond
         return Example {
+            Example.name = "VR",
+            colours = featureColourPalette,
             startTrace = emptyTrace,
             startTree = tree0,
             editscript = [
@@ -70,6 +72,5 @@ vrExample =
               , Nothing
               , Just $ PVariable feature_VR
               , Just $ PVariable feature_VR
-            ],
-            colours = featureColourPalette
+            ]
         }

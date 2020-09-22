@@ -11,8 +11,8 @@ import SAT
 import Data.Set
 import Util
 
-build :: (Grammar g, Eq a, Show a) => FTRecorderBuilder g a
-build edit = killplain $ record edit where
+builder :: (Grammar g, Eq a, Show a) => FTRecorderBuilder g a
+builder edit = killplain $ record edit where
     record = case edittype edit of
         Identity -> ftr_id
         TraceOnly -> ftr_trace

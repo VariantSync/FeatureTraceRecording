@@ -1,4 +1,4 @@
-﻿module StackPop where
+﻿module StackPopAlice where
 
 import Control.Monad.State ( State )
 import UUID ( UUID )
@@ -9,10 +9,11 @@ import Propositions
 import FeatureTrace
 import FeatureColour
 import SimpleCXX
-import Example ( Example(..) )
 import System.Terminal
     ( MonadColorPrinter(..) )
 import Data.Maybe ( fromJust )
+
+import Example
 
 feature_Stack :: Feature
 feature_Stack = toFeature "Stack"
@@ -21,7 +22,7 @@ feature_SafeStack = toFeature "SafeStack"
 feature_ImmutableStack :: Feature
 feature_ImmutableStack = toFeature "ImmutableStack"
 
-featureColourPalette :: (MonadColorPrinter m) => FeatureColourPalette m
+-- featureColourPalette :: (MonadColorPrinter m) => FeatureColourPalette m
 featureColourPalette feature 
     | feature == feature_Stack = yellow
     | feature == feature_SafeStack = green
@@ -52,17 +53,19 @@ newReturnType = "Stack<T>"
 example :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
 example =
     do
-        tree_start <- StackPop.startTree
-        tree_cond <- StackPop.condTree
-        tree_clonedef <- StackPop.cloneDef
-        tree_clonestorage <- StackPop.cloneStorage
-        tree_cloneretstatement <- StackPop.cloneRetStatement
+        tree_start <- StackPopAlice.startTree
+        tree_cond <- StackPopAlice.condTree
+        tree_clonedef <- StackPopAlice.cloneDef
+        tree_clonestorage <- StackPopAlice.cloneStorage
+        tree_cloneretstatement <- StackPopAlice.cloneRetStatement
         let
             id_tree_start_body = uuidOf . fromJust $ findWithValue "body" tree_start
             id_tree_start_storage = uuidOf . fromJust $ findWithNode ((SCXX_ExprStatement==).rule) tree_start
             id_tree_cond_body = uuidOf . fromJust $ findWithValue "body" tree_cond
             id_tree_start_ret = uuidOf . fromJust $ findWithNode ((SCXX_Type==).rule) tree_start
         return Example {
+            Example.name = "Motivating Example: Alice works on Stack.pop",
+            Example.colours = featureColourPalette,
             Example.startTrace = emptyTrace,
             Example.startTree = tree_start,
             editscript = [
@@ -82,6 +85,5 @@ example =
               , Just $ PVariable feature_ImmutableStack
               , Just $ PVariable feature_ImmutableStack
               , Just $ PVariable feature_ImmutableStack
-            ],
-            colours = featureColourPalette
+            ]
         }

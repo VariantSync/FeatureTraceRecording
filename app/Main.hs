@@ -1,109 +1,167 @@
 module Main where
 
-import Control.Monad.State
+import Control.Monad.State ( State, runState )
 
-import UUID
-import Util
-import Tree
+import UUID ( UUID )
+import Util ( genIndent )
+import Tree ( prettyPrint )
 import AST
-import SimpleCXX
-import Edits
-import Propositions
-import NullPropositions
-import SAT
-import FeatureTrace
-import FeatureTraceRecording
-import FTRDirect
-import FTRTwoStep
+import Edits ( edit_identity )
+import NullPropositions ( prettyPrint )
+import FeatureTrace (FeatureTrace,  augmentWithTrace, pc, prettyPrint )
+import FeatureTraceRecording 
+import FTRDirect ( builder )
+import FTRTwoStep ( builder )
 
 import Example
 
-import FeatureColour
-import TikzExport
+import FeatureColour ( colourOf )
+import TikzExport ( astToTikzWithTraceDefault )
 
-import Div
+import Div (divExample)
 import VR ( vrExample )
-import StackPop (example)
-import StackPopBob 
+import StackPopAlice (example)
+import StackPopBob (example)
 
 import Data.Maybe ( fromJust )
 import Data.List (intercalate)
 
 -- Terminal printing ---------
 import Control.Concurrent ()
-import Control.Monad
-import Control.Monad.IO.Class
 
 import Data.Text.Prettyprint.Doc
+    ( Doc, (<+>), annotate, hardline, Pretty(pretty) )
 import System.Terminal
+    ( MonadColorPrinter(foreground),
+      withTerminal,
+      putDoc,
+      runTerminalT,
+      MonadMarkupPrinter(Attribute),
+      MonadPrinter(flush) )
+import System.Terminal.Internal (LocalTerminal)
 
--- import Prelude hiding ((<>))
------------------------------
-
+data OutputFormat = OutputFormat {codeStyle :: CodePrintStyle, traceDisplay :: TraceDisplay, traceStyle :: TraceStyle, withTraceLines :: Bool, hidePlainNodes :: Bool}
 data CodePrintStyle = ShowAST | ShowCode | ShowTikz deriving (Show)
 data TraceDisplay = Trace | PC deriving (Show, Eq)
 data TraceStyle = Text | Colour | None deriving (Show, Eq)
 
-main :: IO ()
-main = withTerminal $ runTerminalT printer
+-- Some presets for output formats:
 
-printer :: (MonadColorPrinter m) => m ()
-printer = (putDoc $ runFTR <+> hardline) >> flush
-    
-runFTR :: (MonadColorPrinter m) => Doc (Attribute m)
-runFTR = fst . flip runState 0 $ do
-    -- Example to run
-    example <- StackPop.example
+{-
+The perspective of the developer who is editing code while traces are recorded in the background
+This is the format used in the figures in the paper.
+-}
+userFormat :: OutputFormat
+userFormat = OutputFormat {
+    codeStyle = ShowCode,
+    traceDisplay = PC,
+    traceStyle = Colour,
+    withTraceLines = False,
+    hidePlainNodes = False
+}
+
+{-
+A variation of 'userFormat' where traces and presence conditions can be investigated seperately at the same time.
+Code is coloured in the colour of its trace while presence conditions are indicated by coloured lines on the left.
+-}
+userFormatDetailed :: OutputFormat
+userFormatDetailed = OutputFormat {
+    codeStyle = ShowCode,
+    traceDisplay = Trace,
+    traceStyle = Colour,
+    withTraceLines = True,
+    hidePlainNodes = False
+}
+
+{-
+Shows the AST with trace formulas.
+-}
+debugFormat :: OutputFormat
+debugFormat = OutputFormat {
+    codeStyle = ShowAST,
+    traceDisplay = Trace,
+    traceStyle = Text,
+    withTraceLines = False,
+    hidePlainNodes = False
+}
+
+{-
+Tikz export of AST with traces.
+Used for figures in the paper.
+-}
+tikzFormat :: OutputFormat
+tikzFormat = OutputFormat {
+    codeStyle = ShowTikz,
+    traceDisplay = Trace,
+    traceStyle = None,
+    withTraceLines = False,
+    hidePlainNodes = False
+}
+
+main :: IO ()
+main = withTerminal $ runTerminalT $
+    -- select your OutputFormat here. Above, there is a list of presets you can choose from.
+    let format = userFormat in
+    do
+        printer format StackPopAlice.example
+        printer format StackPopBob.example
+
+printer :: (MonadColorPrinter m, Grammar g) => OutputFormat -> State UUID (Example m g String) -> m ()
+printer format ex =
+    let example = finalizeExample ex
+        result = printTraces format example (runFTR example) in
+    (putDoc $ result <+> hardline) >> flush
+
+finalizeExample :: State UUID (Example m g a) -> Example m g a
+finalizeExample ex = fst $ runState ex 0
+
+runFTR :: Grammar g => Example m g String -> [(FeatureTrace g String, AST g String)]
+runFTR example = featureTraceRecordingWithIntermediateSteps
+        FTRTwoStep.builder
+        (Example.startTrace example)
+        (Example.startTree example)
+        (Example.editscript example)
+        (Example.featurecontexts example)
+
+printTraces :: (MonadColorPrinter m, Grammar g) => OutputFormat -> Example m g String -> [(FeatureTrace g String, AST g String)] -> Doc (Attribute m)
+printTraces format example tracesAndTrees = 
     let
-        -- Debug settings
-        codeStyle = ShowTikz -- One of: ShowAST, ShowCode
-        traceDisplay = PC -- One of: Trace, PC
-        traceStyle = Colour -- One of: Text, Colour, None
-        withTraceLines = True
-        abstractTrees = False
-        -- Get necessary data from Example
-        editScript = editscript example
-        featureContexts = featurecontexts example
         featureColourPalette = colours example
-        -- Select the FeatureTraceRecording implementation to run
-        recordBuilder = FTRTwoStep.builder
-        -- Run the ftr
-        tracesAndTrees = featureTraceRecordingWithIntermediateSteps
-            recordBuilder
-            (Example.startTrace example)
-            (Example.startTree example)
-            editScript
-            featureContexts
-        -- tracesAndTrees = [featureTraceRecording recordBuilder trace0 tree0 editscript featureContexts]
-        -- Some helper variables for output formatting
-        toPC = \trace tree -> if traceDisplay == PC then pc tree trace else trace
-        treeAbstract = if abstractTrees then abstract else id
-        treePrint = \tree trace -> case codeStyle of
-            ShowAST -> (case traceStyle of
+        codestyle = codeStyle format
+        tracestyle = traceStyle format
+        tracedisplay = traceDisplay format
+        withtracelines = withTraceLines format
+        hideplain = hidePlainNodes format
+        -- Some helper functions for output formatting
+        toPC = \trace tree -> if tracedisplay == PC then pc tree trace else trace
+        treeAbstract = if hideplain then abstract else id
+        treePrint = \tree trace -> case codestyle of
+            ShowAST -> (case tracestyle of
                 None -> pretty.show
                 Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace n) $ show n)
                 Text -> pretty.(FeatureTrace.prettyPrint).(augmentWithTrace trace)) tree
             ShowTikz -> pretty $ astToTikzWithTraceDefault trace tree
             ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
-            where nodePrint trace n = case traceStyle of
+            where nodePrint trace n = case tracestyle of
                       None -> pretty $ value n
                       Colour -> paint (trace n) $ value n
                       Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ trace n, ">", value n]
-                  stringPrint trace n s = case traceStyle of
+                  stringPrint trace n s = case tracestyle of
                       Colour -> paint (trace n) s
                       _ -> pretty s
-                  indentGenerator trace n i = if traceStyle == Colour && traceDisplay == Trace && withTraceLines && ntype n == Legator
+                  indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && ntype n == Legator
                       then mappend (paint (trace n) "|") (pretty $ genIndent (i-1))
                       else pretty $ genIndent i
                   paint formula = (annotate (foreground $ FeatureColour.colourOf featureColourPalette formula)).pretty
-    return
-        $ mappend (pretty $ intercalate "\n  " [
-            "\nRunning Feature Trace Recording with",
-            "codeStyle      = "++show codeStyle,
-            "traceDisplay   = "++show traceDisplay,
-            "traceStyle     = "++show traceStyle,
-            "withTraceLines = "++show withTraceLines,
-            "abstractTrees  = "++show abstractTrees])
+        in
+        mappend (pretty $ intercalate "\n  " [
+            "\nRunning Feature Trace Recording:",
+            "example        = "++name example,
+            "codeStyle      = "++show codestyle,
+            "traceDisplay   = "++show tracedisplay,
+            "traceStyle     = "++show tracestyle,
+            "withTraceLines = "++show withtracelines,
+            "hidePlainNodes  = "++show hideplain])
         $ flip foldr
             mempty
             (\(fc, edit, (trace, tree)) s ->
@@ -117,6 +175,6 @@ runFTR = fst . flip runState 0 $ do
                     treePrint tree trace,
                     s])
         $ zip3
-            (Nothing:featureContexts) -- Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
-            (edit_identity:editScript) -- Prepend identity edit here to show initial tree.
+            (Nothing:(featurecontexts example)) -- Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
+            (edit_identity:(editscript example)) -- Prepend identity edit here to show initial tree.
             ((\(trace, tree) -> (toPC trace tree, treeAbstract tree)) <$> tracesAndTrees)

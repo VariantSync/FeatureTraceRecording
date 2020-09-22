@@ -144,9 +144,10 @@ divExample =
             tree_x_return = fromJust $ findWithValue "x" tree_return
             tree_1_return = fromJust $ findWithValue "1.0" tree_return
         return Example {
+            Example.name = "Div",
+            colours = featureColourPalette,
             startTrace = emptyTrace,
             startTree = tree0,
-            colours = featureColourPalette,
             editscript = [
                 edit_ins_tree tree_assert id_reciprocal_body 0
               , edit_ins_partial tree_condition id_reciprocal_body 0 0 id_cond_body 0

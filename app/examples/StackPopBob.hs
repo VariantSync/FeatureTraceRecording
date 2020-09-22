@@ -1,27 +1,32 @@
 ﻿module StackPopBob where
 
-import StackPop
+import StackPopAlice ( feature_ImmutableStack, example )
 
-import UUID
+import UUID ( UUID )
 import Example
-import SimpleCXX
-import FeatureColour
+import SimpleCXX ( SimpleCXXGrammar )
+import FeatureColour ( FeatureColourPalette )
 
 import System.Terminal ( MonadColorPrinter(yellow) )
-import Control.Monad.State (State)
+import Control.Monad.State ( State ) 
 
-featureColourPalette :: (MonadColorPrinter m) => FeatureColourPalette m
-featureColourPalette feature 
+featureColourPalette :: (MonadColorPrinter m) => FeatureColourPalette m -> FeatureColourPalette m
+featureColourPalette fallback feature 
     | feature == feature_ImmutableStack = yellow
-    | otherwise = StackPop.featureColourPalette feature
+    | otherwise = fallback feature
 
--- example :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
--- example = StackPop.example >>= \alice ->
---         let numEdits = 3 in
---         return Example {
---             Example.startTrace = {-take numEdits $-} Example.startTrace alice,
---             Example.startTree = Example.startTree alice,
---             editscript = Example.editscript alice,
---             featurecontexts = Example.featurecontexts alice,
---             colours = StackPopBob.featureColourPalette
---         }
+example :: MonadColorPrinter m => State UUID (Example m SimpleCXXGrammar String)
+example =
+    StackPopAlice.example
+    >>= \alice ->
+        let numEditsToSynchronise = 2 in
+        return Example {
+            name = "Simulating synchronisation of Alice's edits on Stack.pop to Bob's clone",
+            colours = StackPopBob.featureColourPalette $ colours alice,
+            startTrace = Example.startTrace alice,
+            startTree = Example.startTree alice,
+            editscript = 
+                (take numEditsToSynchronise $ Example.editscript alice),
+            featurecontexts =
+                (take numEditsToSynchronise $ Example.featurecontexts alice)
+        }
