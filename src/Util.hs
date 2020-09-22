@@ -25,5 +25,13 @@ nothingIf p a
     | p a = Nothing
     | otherwise = Just a
 
+removeFirstAndLast :: [a] -> [a]
+removeFirstAndLast [] = []
+removeFirstAndLast [x] = []
+removeFirstAndLast xs = tail $ init xs
+
 removeQuotes :: String -> String
-removeQuotes = filter (/='\"')
+removeQuotes s =
+    if head s == '\"' && last s == '\"'
+    then removeFirstAndLast s
+    else s
