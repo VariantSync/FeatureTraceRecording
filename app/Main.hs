@@ -161,7 +161,7 @@ printTraces format example tracesAndTrees =
             "traceDisplay   = "++show tracedisplay,
             "traceStyle     = "++show tracestyle,
             "withTraceLines = "++show withtracelines,
-            "hidePlainNodes  = "++show hideplain])
+            "hidePlainNodes = "++show hideplain])
         $ flip foldr
             mempty
             (\(fc, edit, (trace, tree)) s ->
