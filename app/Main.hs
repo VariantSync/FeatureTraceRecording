@@ -3,7 +3,7 @@ module Main where
 import Control.Monad.State ( State, runState )
 
 import UUID ( UUID )
-import Util ( genIndent )
+import Util (removeQuotes,  genIndent )
 import Tree ( prettyPrint )
 import AST
 import Edits ( edit_identity )
@@ -115,7 +115,7 @@ printer format ex =
 finalizeExample :: State UUID (Example m g a) -> Example m g a
 finalizeExample ex = fst $ runState ex 0
 
-runFTR :: Grammar g => Example m g String -> [(FeatureTrace g String, AST g String)]
+runFTR :: (Grammar g, Show a, Eq a) => Example m g a -> [(FeatureTrace g a, AST g a)]
 runFTR example = featureTraceRecordingWithIntermediateSteps
         FTRTwoStep.builder
         (Example.startTrace example)
@@ -123,7 +123,7 @@ runFTR example = featureTraceRecordingWithIntermediateSteps
         (Example.editscript example)
         (Example.featurecontexts example)
 
-printTraces :: (MonadColorPrinter m, Grammar g) => OutputFormat -> Example m g String -> [(FeatureTrace g String, AST g String)] -> Doc (Attribute m)
+printTraces :: (MonadColorPrinter m, Grammar g, Show a, Eq a) => OutputFormat -> Example m g a -> [(FeatureTrace g a, AST g a)] -> Doc (Attribute m)
 printTraces format example tracesAndTrees = 
     let
         featureColourPalette = colours example
@@ -143,9 +143,9 @@ printTraces format example tracesAndTrees =
             ShowTikz -> pretty $ astToTikzWithTraceDefault trace tree
             ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
             where nodePrint trace n = case tracestyle of
-                      None -> pretty $ value n
-                      Colour -> paint (trace n) $ value n
-                      Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ trace n, ">", value n]
+                      None -> pretty.removeQuotes.show $ value n
+                      Colour -> paint (trace n) $ removeQuotes.show $ value n
+                      Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ trace n, ">", removeQuotes.show $ value n]
                   stringPrint trace n s = case tracestyle of
                       Colour -> paint (trace n) s
                       _ -> pretty s
