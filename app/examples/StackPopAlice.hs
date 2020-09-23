@@ -59,10 +59,10 @@ example =
         tree_clonestorage <- StackPopAlice.cloneStorage
         tree_cloneretstatement <- StackPopAlice.cloneRetStatement
         let
-            id_tree_start_body = uuidOf . fromJust $ findWithValue "body" tree_start
-            id_tree_start_storage = uuidOf . fromJust $ findWithNode ((SCXX_ExprStatement==).rule) tree_start
-            id_tree_cond_body = uuidOf . fromJust $ findWithValue "body" tree_cond
-            id_tree_start_ret = uuidOf . fromJust $ findWithNode ((SCXX_Type==).rule) tree_start
+            id_tree_start_body = uuidOf . fromJust $ findByRule SCXX_Statements tree_start
+            id_tree_start_storage = uuidOf . fromJust $ findByRule SCXX_ExprStatement tree_start
+            id_tree_cond_body = uuidOf . fromJust $ findByRule SCXX_Statements tree_cond
+            id_tree_start_ret = uuidOf . fromJust $ findByRule SCXX_Type tree_start
         return Example {
             Example.name = "Motivating Example: Alice works on Stack.pop",
             Example.colours = featureColourPalette,

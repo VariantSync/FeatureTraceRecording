@@ -40,26 +40,26 @@ scxx_funcdef rettype name params content =
     ])
 
 scxx_parametersdef :: [(String, String)] -> SCXXState
-scxx_parametersdef params = Tree (node "parameters" SCXX_ParametersDef) $ scxx_expr.(uncurry scxx_vardecl) <$> params
+scxx_parametersdef params = Tree (node mempty SCXX_ParametersDef) $ scxx_expr.(uncurry scxx_vardecl) <$> params
 
 scxx_args :: [SCXXState] -> SCXXState
-scxx_args params = Tree (node "arguments" SCXX_Args) $ scxx_expr.scxx_expr <$> params
+scxx_args params = Tree (node mempty SCXX_Args) $ scxx_expr.scxx_expr <$> params
 
 scxx_statements :: [SCXXState] -> SCXXState
-scxx_statements statements = Tree (node "body" SCXX_Statements) statements
+scxx_statements statements = Tree (node mempty SCXX_Statements) statements
 
 scxx_exprstatement :: SCXXState -> SCXXState
-scxx_exprstatement expression = Tree (node "expr_statement" SCXX_ExprStatement) [scxx_expr expression]
+scxx_exprstatement expression = Tree (node mempty SCXX_ExprStatement) [scxx_expr expression]
 
 scxx_assignment :: SCXXState -> String -> SCXXState -> SCXXState
 scxx_assignment lhs op expr = Tree (node op SCXX_Assignment) [lhs, scxx_expr expr]
 
 scxx_return :: SCXXState -> SCXXState
-scxx_return expr = Tree (node "return" SCXX_Return) [scxx_expr expr]
+scxx_return expr = Tree (node mempty SCXX_Return) [scxx_expr expr]
 
 scxx_condition :: SCXXState -> [SCXXState] -> SCXXState
 scxx_condition cond block =
-    Tree (node "if" SCXX_Condition) [
+    Tree (node mempty SCXX_Condition) [
         scxx_expr cond,
         scxx_statements block
     ]

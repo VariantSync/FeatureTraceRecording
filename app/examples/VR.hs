@@ -51,9 +51,9 @@ vrExample =
         tree_vr_cond <- vr_cond
         tree_vr_vrsetupCall <- vr_vrsetupCall
         let
-            id_tree0_body = uuidOf . fromJust $ findWithValue "body" tree0
-            id_runGame = uuidOf . fromJust $ findWithNode ((SCXX_ExprStatement==).rule) tree0
-            id_vr_cond_body = uuidOf . fromJust $ findWithNode ((SCXX_Statements==).rule) tree_vr_cond
+            id_tree0_body = uuidOf . fromJust $ findByRule SCXX_Statements tree0
+            id_runGame = uuidOf . fromJust $ findByRule SCXX_ExprStatement tree0
+            id_vr_cond_body = uuidOf . fromJust $ findByRule SCXX_Statements tree_vr_cond
         return Example {
             Example.name = "VR",
             colours = featureColourPalette,

@@ -136,13 +136,13 @@ divExample =
         tree_div <- div_div
         tree_reciprocal_return <- div_reciprocal_return
         let
-            id_reciprocal_body = uuidOf . fromJust $ findWithValue "body" tree0
-            tree_return = fromJust $ findWithValue "return" tree0
-            id_cond_body = uuidOf . fromJust $ findWithValue "body" tree_condition
-            id_div_body = uuidOf . fromJust $ findWithValue "body" tree_div
-            tree_x_condexpr = fromJust $ findWithValue "x" tree_condition
-            tree_x_return = fromJust $ findWithValue "x" tree_return
-            tree_1_return = fromJust $ findWithValue "1.0" tree_return
+            id_reciprocal_body = uuidOf . fromJust $ findByRule SCXX_Statements tree0
+            tree_return = fromJust $ findByRule SCXX_Return tree0
+            id_cond_body = uuidOf . fromJust $ findByRule SCXX_Statements tree_condition
+            id_div_body = uuidOf . fromJust $ findByRule SCXX_Statements tree_div
+            tree_x_condexpr = fromJust $ findByValue "x" tree_condition
+            tree_x_return = fromJust $ findByValue "x" tree_return
+            tree_1_return = fromJust $ findByValue "1.0" tree_return
         return Example {
             Example.name = "Div",
             colours = featureColourPalette,

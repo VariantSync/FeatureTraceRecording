@@ -3,7 +3,10 @@
 ) where
 
 import Propositions
-import SAT
+    ( pimplies,
+      simplify,
+      PropositionalFormula(..) )
+import SAT ( contradicts, taut )
 
 {-
 file:///C:/Users/Paul%20Bittner/Documents/Paper/Literature/Library/Rhein%20et%20al.%20ICSE%202015%20Presence-Condition%20Simplification%20in%20Highly%20Configurable%20Systems.pdf
