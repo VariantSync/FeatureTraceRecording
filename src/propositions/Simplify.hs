@@ -19,7 +19,7 @@ removeRedundancy axiom (PAnd cs) =
     else
         simplify $
         PAnd $
-        foldr (\elementToInspect b -> if taut $ pimplies (PAnd $ elementToInspect:b) axiom then b else elementToInspect:b) [] $
+        foldr (\elementToInspect b -> if taut $ pimplies axiom (PAnd $ elementToInspect:b) then b else elementToInspect:b) [] $
         (removeRedundancy axiom) <$> cs
 removeRedundancy axiom (POr cs) =
       removeRedundancyBase axiom $
