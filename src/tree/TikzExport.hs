@@ -19,8 +19,8 @@ astToTikzWithTraceDefault =
             ruleStr++(if valStr /= mempty && valStr /= ruleStr then "\\linebreak\\code{"++valStr++"}" else ""))
         .element)
     (\tree node trace -> intercalate ", " [
+        tikzifyName.(\s -> s++if ntype node == Plain then "Inherited" else "").featuresToTikzClass $ pc tree trace node,
         show $ ntype node
-      , tikzifyName.(\s -> s++if ntype node == Plain then "Inherited" else "").featuresToTikzClass $ pc tree trace node
       ])
 
 featuresToTikzClass :: FeatureFormula -> String

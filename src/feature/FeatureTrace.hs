@@ -1,13 +1,11 @@
 module FeatureTrace where
 
-import UUID
 import Tree
 import AST
-import Data.Maybe
 import Propositions
 import NullPropositions
-import Simplify
-import Util
+import Simplify ( removeRedundancy )
+import Util ( nothingIf )
 
 type Feature = String
 toFeature :: String -> Feature
@@ -22,8 +20,11 @@ emptyTrace = \_ -> Nothing
 
 simplify :: (Grammar g, Show a, Eq a) => FeatureTrace g a -> AST g a -> FeatureTrace g a
 simplify f t v = case (pc_parentpart t f v, f v) of
-  (Just p, Just f) -> nothingIf (==PTrue) (removeRedundancy p f)
+  (Just p, Just f') -> nothingIf (==PTrue) (removeRedundancy p f')
   _ -> Propositions.simplify <$> f v
+-- simplify f t v = case f v of
+--   Just f' -> nothingIf (==PTrue) (removeRedundancy (fromJust $ nullable_and [pc_parentpart t f v, featuremodel]) f')
+--   _ -> Propositions.simplify <$> f v
 
 {-
 Combine two feature traces in the same notion as for functions:
