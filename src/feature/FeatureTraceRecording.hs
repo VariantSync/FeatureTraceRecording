@@ -32,9 +32,9 @@ zipRecordingScript recordings contexts
 fromEditScript :: (Show a, Eq a) => FTRecorderBuilder g a -> EditScript g a -> FTRecordingScript g a
 fromEditScript = fmap
 
-killplain :: (Grammar g) => FTRecorder g a -> FTRecorder g a
-killplain wrappee = \context f t_old -> \v ->
-    if ntype v == Plain
+killmandatory :: (Grammar g) => FTRecorder g a -> FTRecorder g a
+killmandatory wrappee = \context f t_old -> \v ->
+    if ntype v == Mandatory
     then Nothing
     else wrappee context f t_old v
 

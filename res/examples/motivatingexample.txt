@@ -4,7 +4,7 @@
 - variability must be reasonable
 - not more than 3 edits? space issues?
 - would be great if patterns of eval could be found here because these are hard to grasp (Especially AddIfdefWrapElse would be nice)
-- examples for constituent and legator (but could also be in an extra figure)
+- examples for optional and treeoptional (but could also be in an extra figure)
 - no spl techniques such as runtime parameters (too confusing)
 - Show why ASTs are useful
 

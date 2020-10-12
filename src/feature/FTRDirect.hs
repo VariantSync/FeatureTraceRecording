@@ -12,7 +12,7 @@ import Data.Set
 import Util
 
 builder :: (Grammar g, Eq a, Show a) => FTRecorderBuilder g a
-builder edit = killplain $ record edit where
+builder edit = killmandatory $ record edit where
     record = case edittype edit of
         Identity -> ftr_id
         TraceOnly -> ftr_trace
@@ -70,7 +70,7 @@ v - The node of which we want to know if it can inherit the given formula
 -}
 willInherit :: (Grammar g, Show a, Eq a) => NonNullFeatureFormula -> AST g a -> Set (Node g a) -> FeatureTrace g a -> Node g a -> Bool
 willInherit formula t_new delta f v =
-    let al = fromList $ fmap element $ legatorAncestors t_new $ tree t_new v in
+    let al = fromList $ fmap element $ treeoptionalAncestors t_new $ tree t_new v in
     (not $ disjoint delta al) -- There is an edited node in tn above v from which v can inherit the formula
     || (any
         (\a -> case f a of
@@ -80,7 +80,7 @@ willInherit formula t_new delta f v =
 
 willInherit2 :: (Grammar g, Show a, Eq a) => NonNullFeatureFormula -> AST g a -> FeatureTrace g a -> Node g a -> Bool
 willInherit2 formula t_new f v =
-    let al = fromList $ fmap element $ legatorAncestors t_new $ tree t_new v in
+    let al = fromList $ fmap element $ treeoptionalAncestors t_new $ tree t_new v in
     any (\a -> case f a of
         Nothing -> False
         Just m -> taut $ pimplies m formula) al

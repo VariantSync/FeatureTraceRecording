@@ -10,7 +10,7 @@ import Data.Set ( member )
 builder :: (Grammar g, Show a, Eq a) => FTRecorderBuilder g a
 builder edit =
     removeTheRedundanciesWeIntroduced edit $
-    killplain $
+    killmandatory $
     record edit
     where
     record = case edittype edit of

@@ -40,7 +40,7 @@ import System.Terminal
       MonadPrinter(flush) )
 import System.Terminal.Internal (LocalTerminal)
 
-data OutputFormat = OutputFormat {codeStyle :: CodePrintStyle, traceDisplay :: TraceDisplay, traceStyle :: TraceStyle, withTraceLines :: Bool, hidePlainNodes :: Bool}
+data OutputFormat = OutputFormat {codeStyle :: CodePrintStyle, traceDisplay :: TraceDisplay, traceStyle :: TraceStyle, withTraceLines :: Bool, hideMandatoryNodes :: Bool}
 data CodePrintStyle = ShowAST | ShowCode | ShowTikz deriving (Show)
 data TraceDisplay = Trace | PC deriving (Show, Eq)
 data TraceStyle = Text | Colour | None deriving (Show, Eq)
@@ -57,7 +57,7 @@ userFormat = OutputFormat {
     traceDisplay = PC,
     traceStyle = Colour,
     withTraceLines = False,
-    hidePlainNodes = False
+    hideMandatoryNodes = False
 }
 
 {-
@@ -70,7 +70,7 @@ userFormatDetailed = OutputFormat {
     traceDisplay = Trace,
     traceStyle = Colour,
     withTraceLines = True,
-    hidePlainNodes = False
+    hideMandatoryNodes = False
 }
 
 {-
@@ -82,7 +82,7 @@ debugFormat = OutputFormat {
     traceDisplay = Trace,
     traceStyle = Text,
     withTraceLines = False,
-    hidePlainNodes = False
+    hideMandatoryNodes = False
 }
 
 {-
@@ -95,13 +95,13 @@ tikzFormat = OutputFormat {
     traceDisplay = Trace,
     traceStyle = None,
     withTraceLines = False,
-    hidePlainNodes = False
+    hideMandatoryNodes = False
 }
 
 main :: IO ()
 main = withTerminal $ runTerminalT $
     -- select your OutputFormat here. Above, there is a list of presets you can choose from.
-    let format = userFormat in
+    let format = tikzFormat in
     do
         printer format StackPopAlice.example
         printer format StackPopBob.example
@@ -131,10 +131,10 @@ printTraces format example tracesAndTrees =
         tracestyle = traceStyle format
         tracedisplay = traceDisplay format
         withtracelines = withTraceLines format
-        hideplain = hidePlainNodes format
+        hidemandatory = hideMandatoryNodes format
         -- Some helper functions for output formatting
         toPC = \trace tree -> if tracedisplay == PC then pc tree trace else trace
-        treeAbstract = if hideplain then abstract else id
+        treeAbstract = if hidemandatory then abstract else id
         treePrint = \tree trace -> case codestyle of
             ShowAST -> (case tracestyle of
                 None -> pretty.show
@@ -149,7 +149,7 @@ printTraces format example tracesAndTrees =
                   stringPrint trace n s = case tracestyle of
                       Colour -> paint (trace n) s
                       _ -> pretty s
-                  indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && ntype n == Legator
+                  indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && ntype n == Treeoptional
                       then mappend (paint (trace n) "|") (pretty $ genIndent (i-1))
                       else pretty $ genIndent i
                   paint formula = (annotate (foreground $ FeatureColour.colourOf featureColourPalette formula)).pretty
@@ -161,7 +161,7 @@ printTraces format example tracesAndTrees =
             "traceDisplay   = "++show tracedisplay,
             "traceStyle     = "++show tracestyle,
             "withTraceLines = "++show withtracelines,
-            "hidePlainNodes = "++show hideplain])
+            "hideMandatoryNodes = "++show hidemandatory])
         $ flip foldr
             mempty
             (\(fc, edit, (trace, tree)) s ->

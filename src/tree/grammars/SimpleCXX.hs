@@ -103,23 +103,23 @@ scxx_file :: String -> [SCXXState] -> SCXXState
 scxx_file name content = Tree (node name SCXX_File) content
 
 instance Grammar SimpleCXXGrammar where
-    nodetypeof SCXX_FuncDef = Legator
-    nodetypeof SCXX_Return = Legator
-    nodetypeof SCXX_File = Legator
-    nodetypeof SCXX_ExprStatement = Legator
-    nodetypeof SCXX_VarDecl = Plain
-    nodetypeof SCXX_Condition = Constituent
-    nodetypeof SCXX_UnaryOp = Constituent --Plain
-    nodetypeof SCXX_Type = Constituent
-    nodetypeof SCXX_Expression = Plain -- Virtual
-    nodetypeof SCXX_ParametersDef = Plain
-    nodetypeof SCXX_Args = Plain
-    nodetypeof SCXX_Statements = Plain
-    nodetypeof SCXX_BinaryOp = Constituent
-    nodetypeof SCXX_FuncCall = Constituent
-    nodetypeof SCXX_VarRef = Constituent -- leaf type
-    nodetypeof SCXX_Literal = Constituent -- leaf type
-    nodetypeof SCXX_Assignment = Plain
+    nodetypeof SCXX_FuncDef = Treeoptional
+    nodetypeof SCXX_Return = Treeoptional
+    nodetypeof SCXX_File = Treeoptional
+    nodetypeof SCXX_ExprStatement = Treeoptional
+    nodetypeof SCXX_VarDecl = Mandatory
+    nodetypeof SCXX_Condition = Optional
+    nodetypeof SCXX_UnaryOp = Optional --Mandatory
+    nodetypeof SCXX_Type = Optional
+    nodetypeof SCXX_Expression = Mandatory -- Virtual
+    nodetypeof SCXX_ParametersDef = Mandatory
+    nodetypeof SCXX_Args = Mandatory
+    nodetypeof SCXX_Statements = Mandatory
+    nodetypeof SCXX_BinaryOp = Optional
+    nodetypeof SCXX_FuncCall = Optional
+    nodetypeof SCXX_VarRef = Optional -- leaf type
+    nodetypeof SCXX_Literal = Optional -- leaf type
+    nodetypeof SCXX_Assignment = Mandatory
 
     prettyPrint i indentGenerator prtStrWithContext prtNode (Tree n children) =
         mconcat $

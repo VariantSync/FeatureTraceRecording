@@ -9,7 +9,7 @@ import Control.Monad.State
 Classification for Feature Traces and Presence Condition
 There should be a unique mapping ASTTypeAlphabet -> NodeType.
 -}
-data NodeType = Plain | Constituent | Legator deriving (Show, Eq)
+data NodeType = Mandatory | Optional | Treeoptional deriving (Show, Eq)
 
 class Show g => Grammar g where
   nodetypeof :: g -> NodeType
@@ -50,10 +50,10 @@ findByRule :: (Eq g) => g -> AST g a -> Maybe (AST g a)
 findByRule r = findByNode ((r==).rule)
 
 abstract :: Grammar g => AST g a -> AST g a
-abstract = filterNodes (\(Tree n _) -> ntype n /= Plain)
+abstract = filterNodes (\(Tree n _) -> ntype n /= Mandatory)
 
-legatorAncestors :: (Eq a, Grammar g) => AST g a -> AST g a -> [AST g a]
-legatorAncestors root = (filter (\(Tree n _) -> ntype n == Legator)).(ancestors root)
+treeoptionalAncestors :: (Eq a, Grammar g) => AST g a -> AST g a -> [AST g a]
+treeoptionalAncestors root = (filter (\(Tree n _) -> ntype n == Treeoptional)).(ancestors root)
 
 showCode :: (Show a, Grammar g) => AST g a -> String
 showCode = showCodeAs "" (\_ i -> genIndent i) (\_ s -> s) show

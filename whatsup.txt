@@ -1,25 +1,25 @@
-﻿- Plain nodes should not have presence conditions at all. These nodes need to be exactly present in those variants in which their parent has to be present.
+﻿- Mandatory nodes should not have presence conditions at all. These nodes need to be exactly present in those variants in which their parent has to be present.
   - Nothing vs (pc of parent)
-- How to remove redundancies in ftr: For each node v in delta: F(v) <- Simplify.removeRedundancy (PC of nearest ancestor legator) F(v)
+- How to remove redundancies in ftr: For each node v in delta: F(v) <- Simplify.removeRedundancy (PC of nearest ancestor treeoptional) F(v)
 - Können wir immer und überall mit PCs rechnen statt der Traces, wo wir jetzt Redundanzen entfernen koennen?
 - Look at ASTT_BinaryOp:
-    - It is NOT constituent because it cannot be removed without invalidating its parent (which is always of type Expression).
+    - It is NOT optional because it cannot be removed without invalidating its parent (which is always of type Expression).
     - BUT it could be replaced in another clone with another ASTT_BinaryOp. For instance, "==" in one variant and "!=" in another variant.
     - Questions:
-      - Do we need a better classification of nodes apart from Plain | Constituent | Legator?
+      - Do we need a better classification of nodes apart from Mandatory | Optional | Treeoptional?
       - Which other node types are there with these problems?
       - If we allow such a node to be traced, how can we ensure that one instance of this type of node will be present in each variant?
       - If we do not allow such a node to be traced, how can we ensure it to have the correct presence condition?
-        For example, given "if (a == 0)", then "==" has no trace because its plain.
+        For example, given "if (a == 0)", then "==" has no trace because its mandatory.
         It should be present in all variants where the condition "if" is present though. So we need:
           PC ("if") => PC ("==") because if cannot exist without a valid expression.
           PC ("==") => PC ("if") because an expression cannot exist in the void.
         This gives us the requirement PC ("==") = PC ("if").
-        But, "if" is constituent. So "==" does not inherit the trace of the if!
+        But, "if" is optional. So "==" does not inherit the trace of the if!
         How to handle this issue?
-- plain -> virtual? (Meint bei Ecco aber vllt doch was anderes) / Muttersöhnchen
+- mandatory -> virtual? (Meint bei Ecco aber vllt doch was anderes) / Muttersöhnchen
 - is "null" the best name?
-- Bedingung fürLegator aufweichen: Es gibt vs fuer alle. Sbald es einen Fall geben kann, in dem ein Kind nicht invalidiert wird, dann ist es auch kein Legator. Sieht Rust:
+- Bedingung für Treeoptional aufweichen: Es gibt vs fuer alle. Sbald es einen Fall geben kann, in dem ein Kind nicht invalidiert wird, dann ist es auch kein Treeoptional. Sieht Rust:
 
 struct Test {
     x: i32
