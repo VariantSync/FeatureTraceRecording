@@ -1,7 +1,6 @@
 module Propositions where
 
-import Data.List
-import Util
+import Data.List ( intercalate )
 
 data PropositionalFormula a =
       PTrue
@@ -97,6 +96,14 @@ toCNFClauseList p = [p]
 toDNFClauseList :: PropositionalFormula a -> [PropositionalFormula a]
 toDNFClauseList (POr cs') = cs'
 toDNFClauseList p = [p]
+
+toNNF :: PropositionalFormula a -> PropositionalFormula a
+toNNF (PNot (POr cs)) = PAnd $ toNNF.PNot <$> cs
+toNNF (PNot (PAnd cs)) = POr $ toNNF.PNot <$> cs
+toNNF (PNot (PNot x)) = toNNF x
+toNNF (POr cs) = POr $ toNNF <$> cs
+toNNF (PAnd cs) = PAnd $ toNNF <$> cs
+toNNF p = p
 
 {-
 Returns a list of disjunctions such that all possible combinations of the formulas in the input lists are considered.

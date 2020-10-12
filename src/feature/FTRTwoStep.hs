@@ -3,11 +3,9 @@
 import FeatureTraceRecording
 import FeatureTrace
 import AST (Grammar)
-import Propositions
-import NullPropositions
-import Simplify
+import NullPropositions ( notnull, nullable_and )
 import Edits
-import Data.Set
+import Data.Set ( member )
 
 builder :: (Grammar g, Show a, Eq a) => FTRecorderBuilder g a
 builder edit =
@@ -31,26 +29,22 @@ removeTheRedundanciesWeIntroduced edit wrappee = \context f_old t_old ->
 
 ftr_ins :: (Show a, Eq a) => Edit g a -> FTRecorder g a
 ftr_ins e = \context f_old t_old ->
-    let d = delta e t_old
-        t_new = run e t_old in
     \v ->
-        if member v d
+        if member v $ delta e t_old
         then context
         else f_old v
 
 ftr_move :: (Show a, Eq a) => Edit g a -> FTRecorder g a
 ftr_move e = \context f_old t_old ->
-    let d = delta e t_old in
     \v ->
-        if member v d
+        if member v $ delta e t_old
         then nullable_and [f_old v, context]
         else f_old v
 
 ftr_up :: (Eq a, Show a) => Edit g a -> FTRecorder g a
 ftr_up e = \context f_old t_old ->
-    let d = delta e t_old in
     \v ->
-        if (notnull context) && (member v d)
+        if (notnull context) && (member v $ delta e t_old)
         then context
         else f_old v
         -- if (notnull context) && (member v d)

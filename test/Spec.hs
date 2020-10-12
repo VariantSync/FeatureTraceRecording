@@ -3,17 +3,20 @@ import SAT
 import Util
 import Simplify
 
+
+{-Test CNF conversion-}
+
 -- testImpl :: PropositionalFormula String
--- testImpl = pimplies (PAnd [PVariable "A", PVariable "B"]) (PVariable "C")
+-- testImpl = pimplies (PAnd [varA, varB]) (PVariable "C")
 
 -- testDNF :: PropositionalFormula String
--- testDNF = POr [PAnd [PVariable "A", PVariable "B"], PAnd [PVariable "C", PNot (POr [PVariable "A", PVariable "B"])]]
+-- testDNF = POr [PAnd [varA, varB], PAnd [PVariable "C", PNot (POr [varA, varB])]]
 
 -- testNot :: PropositionalFormula String
 -- testNot = PNot testImpl
 
 -- testCNF :: PropositionalFormula String
--- testCNF = PAnd [POr [PVariable "A", PVariable "B"], POr [PNot (PVariable "A"), PVariable "D"]]
+-- testCNF = PAnd [POr [varA, varB], POr [PNot (varA), PVariable "D"]]
 
 -- testTrue :: PropositionalFormula String
 -- testTrue = PAnd [PTrue, POr [PFalse, pimplies PFalse PTrue]]
@@ -21,7 +24,6 @@ import Simplify
 -- testFalse :: PropositionalFormula String
 -- testFalse = PAnd [PAnd [PFalse, PTrue], POr [PFalse, pimplies PFalse PTrue]]
 
--- {-Test CNF conversion-}
 -- main :: IO ()
 -- main = putStrLn $ 
 --     foldr (\a b -> a++"\n"++b) "" $
@@ -38,25 +40,41 @@ import Simplify
 
 -- -- main = putStrLn . show $ getRange 2 4 ['a'..'f']
 
+{-Test PC simplification-}
+
+varA :: PropositionalFormula String
+varA = PVariable "A"
+varB :: PropositionalFormula String
+varB = PVariable "B"
+varX :: PropositionalFormula String
+varX = PVariable "X"
+
 testCases :: [(PropositionalFormula [Char], PropositionalFormula [Char])]
 testCases = [
-    (PAnd [PVariable "A", PVariable "B"], PVariable "A"),
-    (PVariable "A", PAnd [PVariable "A", PVariable "B"]),
-    (PVariable "A", PAnd [PVariable "B", PVariable "A"]),
-    (PVariable "A", PAnd [POr [PVariable "X", PVariable "A"], PVariable "B"]),
-    (PAnd [PVariable "A", PVariable "B"], PAnd [PVariable "B", PVariable "A"]),
-    (POr [PVariable "A", PVariable "B"], PAnd [POr [PVariable "B", PVariable "A"], PVariable "X"]),
-    (POr [PVariable "A", PVariable "B"], PAnd [PVariable "X", POr [PVariable "B", PVariable "A"]]),
-    (PVariable "A", POr [PVariable "A", PVariable "B"]),
-    (POr [PVariable "A", PVariable "B"], PVariable "A"),
-    (PNot $ PVariable "A", POr [PVariable "A", PVariable "B"]),
-    (PAnd [PNot $ PVariable "A", PVariable "X"], POr [PVariable "A", PVariable "B"]),
-    (PNot $ PVariable "A", POr [PAnd [PVariable "A", PVariable "X"], PVariable "B"]),
-    (PNot $ PVariable "A", PVariable "A"),
-    (POr [PVariable "A", PVariable "B"], POr [PVariable "B", PVariable "A"]),
-    (PVariable "A", POr [PVariable "B", PVariable "A"]),
-    (PNot $ PVariable "A", PAnd [PVariable "B", PVariable "A"]),
-    (PAnd [PNot $ PVariable "A", PVariable "A"], PVariable "X")
+    (PAnd [varA, varB], varA),
+    (varA, PAnd [varA, varB]),
+    (varA, PAnd [varB, varA]),
+    (varA, PAnd [POr [varX, varA], varB]),
+    (PAnd [varA, varB], PAnd [varB, varA]),
+    (POr [varA, varB], PAnd [POr [varB, varA], varX]),
+    (POr [varA, varB], PAnd [varX, POr [varB, varA]]),
+    (varA, POr [varA, varB]),
+    (POr [varA, varB], varA),
+    (PNot $ varA, POr [varA, varB]),
+    (PAnd [PNot $ varA, varX], POr [varA, varB]),
+    (PNot $ varA, POr [PAnd [varA, varX], varB]),
+    (PNot $ varA, varA),
+    (POr [varA, varB], POr [varB, varA]),
+    (varA, POr [varB, varA]),
+    (PNot $ varA, PAnd [varB, varA]),
+    (PAnd [PNot $ varA, varA], varX),
+    (PTrue, varA),
+    (PTrue, PNot $ PAnd [varA, varB]),
+    (PTrue, PAnd [varA, varB]),
+    (PTrue, PAnd [varA, PNot varB]),
+    (PTrue, PAnd [varA, PAnd [varA, varB]]), -- buggy case
+    (PTrue, PAnd [varA, PNot $ PAnd [varA, varB]]), -- buggy case
+    (varA, PAnd [varA, PNot $ PAnd [varA, varB]])
     ]
 
 main :: IO ()
@@ -65,4 +83,17 @@ main = putStrLn $
     map (\(axiom, formula) -> concat [
         "             axiom = ", show axiom, "\n",
         "           formula = ", show formula, "\n",
-        "simplified formula = ", show $ removeRedundancy axiom formula, "\n"]) testCases
+        "simplified formula = ", show $ removeRedundancy axiom (toNNF formula), "\n"]) testCases
+
+{-Test NNF conversion-}
+-- main :: IO ()
+-- main = putStrLn $
+--     foldr (\a b -> a++"\n"++b) mempty $
+--     (\formula -> concat [
+--         "formula = ", show formula, "\n",
+--         "    NNF = ", show.toNNF $ formula, "\n"]) <$>
+--     [
+--         PNot $ PAnd [varA, varB],
+--         PNot $ PNot varA,
+--         PNot $ PAnd [varA, PNot varB, PNot $ POr [varX, PNot varB]]
+--     ]
