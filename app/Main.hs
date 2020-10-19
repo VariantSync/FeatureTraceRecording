@@ -15,7 +15,6 @@ import FTRTwoStep ( builder )
 
 import Example
 
-import FeatureColour ( colourOf )
 import TikzExport ( astToTikzWithTraceDefault )
 
 import Div (divExample)
@@ -32,12 +31,7 @@ import Control.Concurrent ()
 import Data.Text.Prettyprint.Doc
     ( Doc, (<+>), annotate, hardline, Pretty(pretty) )
 import System.Terminal
-    (cyan, red, background,  MonadColorPrinter(foreground),
-      withTerminal,
-      putDoc,
-      runTerminalT,
-      MonadMarkupPrinter(Attribute),
-      MonadPrinter(flush) )
+
 
 data OutputFormat = OutputFormat {codeStyle :: CodePrintStyle, traceDisplay :: TraceDisplay, traceStyle :: TraceStyle, withTraceLines :: Bool, hideMandatoryNodes :: Bool}
 data CodePrintStyle = ShowAST | ShowCode | ShowTikz deriving (Show)
@@ -107,6 +101,7 @@ main = withTerminal $ runTerminalT $
     do
         putDoc hardline
         headline "Running Feature Trace Recording Prototype"
+        
         headline ">>> [Motivating Example] <<<"
         printer format StackPopAlice.example
         printer format StackPopBob.example
@@ -180,7 +175,7 @@ printTraces format example tracesAndTrees =
                   indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && ntype n == Treeoptional
                       then mappend (paint (trace n) "|") (pretty $ genIndent (i-1))
                       else pretty $ genIndent i
-                  paint formula = (annotate (foreground $ FeatureColour.colourOf featureColourPalette formula)).pretty
+                  paint formula = (annotate (foreground $ featureColourPalette formula)).pretty
         in
         mappend (annotate (background red) $ pretty $ intercalate "\n  " [
             "\nRunning "++name example
@@ -197,7 +192,7 @@ printTraces format example tracesAndTrees =
                     hardline,
                     hardline,
                     pretty $ concat ["==== Run ", show edit, " under context = "],
-                    annotate (foreground $ FeatureColour.colourOf featureColourPalette fc) $ pretty $ NullPropositions.prettyPrint fc,
+                    annotate (foreground $ featureColourPalette fc) $ pretty $ NullPropositions.prettyPrint fc,
                     pretty $ " giving us ====",
                     hardline,
                     treePrint tree trace,

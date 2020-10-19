@@ -2,9 +2,8 @@
 
 import AST ( AST )
 import Edits ( EditScript )
-import FeatureColour ( FeatureColourPalette )
-import FeatureTrace ( FeatureTrace, FeatureFormula ) 
-import System.Terminal ( MonadColorPrinter )
+import FeatureTrace
+import FeatureColour (FeatureFormulaColourPalette)
 
 data Example m g a = Example {
     name :: String,
@@ -12,5 +11,5 @@ data Example m g a = Example {
     startTree :: AST g a,
     editscript :: EditScript g a,
     featurecontexts :: [FeatureFormula],
-    colours :: FeatureColourPalette m
+    colours :: FeatureFormulaColourPalette m
 }

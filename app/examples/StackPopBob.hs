@@ -7,15 +7,16 @@ import Example ( Example(..) )
 import Edits ( Edit(delta), foldEditScript, edit_trace_only )
 import Propositions ( PropositionalFormula(..) )
 import SimpleCXX ( SimpleCXXGrammar )
-import FeatureColour ( FeatureColourPalette )
+import FeatureColour
+import FeatureTrace
 
-import System.Terminal (MonadColorPrinter(yellow) )
+import System.Terminal
 import Control.Monad.State ( State ) 
 
-featureColourPalette :: (MonadColorPrinter m) => FeatureColourPalette m -> FeatureColourPalette m
-featureColourPalette fallback feature 
-    | feature == feature_ImmutableStack = yellow
-    | otherwise = fallback feature
+featureColourPalette :: (MonadColorPrinter m) => FeatureFormulaColourPalette m -> FeatureFormulaColourPalette m
+featureColourPalette fallback formula 
+    | formula == (Just $ PVariable $ feature_ImmutableStack) = magenta
+    | otherwise = fallback formula
 
 example :: MonadColorPrinter m => State UUID (Example m SimpleCXXGrammar String)
 example =

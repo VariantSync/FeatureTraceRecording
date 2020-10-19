@@ -15,19 +15,26 @@ import Data.Maybe ( fromJust )
 
 import Example
 
-feature_Stack :: Feature
-feature_Stack = toFeature "Stack"
+-- feature_Stack :: Feature
+-- feature_Stack = toFeature "Stack"
 feature_SafeStack :: Feature
 feature_SafeStack = toFeature "SafeStack"
 feature_ImmutableStack :: Feature
 feature_ImmutableStack = toFeature "ImmutableStack"
 
-featureColourPalette :: MonadColorPrinter m => Feature -> Color m
-featureColourPalette feature 
-    | feature == feature_Stack = yellow
-    | feature == feature_SafeStack = green
-    | feature == feature_ImmutableStack = cyan
-    | otherwise = red
+-- featureColourPalette :: MonadColorPrinter m => Feature -> Color m
+-- featureColourPalette feature 
+--     -- | feature == feature_Stack = yellow
+--     | feature == feature_SafeStack = green
+--     | feature == feature_ImmutableStack = yellow
+--     | otherwise = red
+
+featurecolours :: MonadColorPrinter m => FeatureFormulaColourPalette m
+featurecolours p
+    | p == (Just $ PNot $ PVariable $ feature_ImmutableStack) = magenta
+    | p == (Just $ PVariable $ feature_SafeStack) = green
+    | p == (Just $ PVariable $ feature_ImmutableStack) = yellow
+    | otherwise = white
 
 startTree :: State UUID SSCXXAST
 startTree = sequence $
@@ -65,7 +72,7 @@ example =
             id_tree_start_ret = uuidOf . fromJust $ findByRule SCXX_Type tree_start
         return Example {
             Example.name = "Motivating Example: Alice works on Stack.pop",
-            Example.colours = featureColourPalette,
+            Example.colours = featurecolours,
             Example.startTrace = emptyTrace,
             Example.startTree = tree_start,
             editscript = [

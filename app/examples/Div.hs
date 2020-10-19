@@ -145,7 +145,7 @@ divExample =
             tree_1_return = fromJust $ findByValue "1.0" tree_return
         return Example {
             Example.name = "Div",
-            colours = featureColourPalette,
+            colours = defaultFeatureFormulaColouring featureColourPalette,
             startTrace = emptyTrace,
             startTree = tree0,
             editscript = [

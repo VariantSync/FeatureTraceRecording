@@ -4,8 +4,9 @@ import Example
 import SimpleCXX
 import UUID ( UUID )
 import Control.Monad.State ( State )
-import System.Terminal (yellow, Color, black, green, MonadColorPrinter)
+import System.Terminal
 import FeatureTrace
+import FeatureColour
 import Edits
 import AST
 import Propositions
@@ -18,10 +19,12 @@ feature_ULTRA_LCD = toFeature "ULTRA_LCD"
 feature_FOO :: Feature
 feature_FOO = toFeature "FOO"
 
-featureColourPalette :: MonadColorPrinter m => Feature -> Color m
-featureColourPalette f | f == feature_ULTRA_LCD = green
-                       | f == feature_FOO = yellow
-                       | otherwise = black
+featurecolours :: MonadColorPrinter m => FeatureFormulaColourPalette m
+featurecolours p
+    | p == (Just $ PNot $ PVariable $ feature_ULTRA_LCD) = magenta
+    | p == (Just $ PVariable $ feature_ULTRA_LCD) = green
+    | p == (Just $ PVariable $ feature_FOO) = yellow
+    | otherwise = white
 
 
 emptyfile :: State UUID SSCXXAST
@@ -40,7 +43,7 @@ createPatternExample :: (MonadColorPrinter m) => String -> SSCXXAST -> EditScrip
 createPatternExample name start edits contexts =
     Example {
         Example.name = name,
-        colours = featureColourPalette,
+        colours = featurecolours,
         startTrace = emptyTrace,
         startTree = start,
         editscript = edits,

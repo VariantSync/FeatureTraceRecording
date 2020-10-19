@@ -56,7 +56,7 @@ vrExample =
             id_vr_cond_body = uuidOf . fromJust $ findByRule SCXX_Statements tree_vr_cond
         return Example {
             Example.name = "VR",
-            colours = featureColourPalette,
+            colours = defaultFeatureFormulaColouring featureColourPalette,
             startTrace = emptyTrace,
             startTree = tree0,
             editscript = [
