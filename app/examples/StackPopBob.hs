@@ -29,7 +29,7 @@ example =
             popVersion3 = foldEditScript alicesEditsToSyncDirectly startTree
             in
         return Example {
-            Example.name = "Simulating synchronisation of Alice's edits on Stack.pop to Bob's clone",
+            Example.name = "Motivating Example: Simulating synchronisation of Alice's edits on Stack.pop to Bob's clone",
             Example.colours = StackPopBob.featureColourPalette $ colours alice,
             Example.startTrace = Example.startTrace alice,
             Example.startTree = startTree,

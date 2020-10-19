@@ -30,7 +30,7 @@ edit_identity :: Edit g a
 edit_identity = Edit {
     edittype = Identity,
     run = id,
-    delta = \t -> empty,
+    delta = \_ -> empty,
     name = "identity"}
 
 {-
@@ -42,7 +42,7 @@ edit_trace_only :: Set (Node g a) -> Edit g a
 edit_trace_only nodes = Edit {
     edittype = TraceOnly,
     run = id,
-    delta = \t -> nodes,
+    delta = \_ -> nodes,
     name = "tracechange"}
 
 -- Add the tree s as the i-th child of node p

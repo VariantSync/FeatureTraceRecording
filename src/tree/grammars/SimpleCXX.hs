@@ -136,8 +136,9 @@ instance Grammar SimpleCXXGrammar where
                 SCXX_ParametersDef -> [prtStr "(", showList ", " children, prtStr ")"]
                 SCXX_Args -> [prtStr "(", showList ", " children, prtStr ")"]
                 SCXX_Statements -> [
-                    prtStr "\n",
-                    i, prtStr "{\n",
+                    -- prtStr "\n",
+                    -- i,
+                    prtStr "{\n",
                     if null children
                     then mempty
                     else (mappend (showListNoIndentIncrease "\n" children) (prtStr "\n")),
@@ -145,7 +146,7 @@ instance Grammar SimpleCXXGrammar where
                 SCXX_ExprStatement -> [indent, showList " " children, prtStr ";"]
                 SCXX_Assignment -> [showList' (mconcat [prtStr" ",me,prtStr" "]) children]
                 SCXX_Return -> [indent, prtStr "return ", showList " " children, prtStr ";"]
-                SCXX_Condition -> [indent, prtStr "if (", showHead, prtStr ")", showList " " $ tail children]
+                SCXX_Condition -> [indent, prtStr "if (", showHead, prtStr ") ", showList " " $ tail children]
                 SCXX_FuncCall -> [me, showList ", " children]
                 SCXX_Expression -> return $ if length children == 1 then showHead else error "Expressios can only have one child"
                 SCXX_UnaryOp -> return $ if length children == 1 then mappend me showHead else error "Unary operations can only have one child"

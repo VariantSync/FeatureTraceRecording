@@ -22,8 +22,8 @@ import Div (divExample)
 import VR ( vrExample )
 import StackPopAlice (example)
 import StackPopBob (example)
+import CodeChangePatterns
 
-import Data.Maybe ( fromJust )
 import Data.List (intercalate)
 
 -- Terminal printing ---------
@@ -32,13 +32,12 @@ import Control.Concurrent ()
 import Data.Text.Prettyprint.Doc
     ( Doc, (<+>), annotate, hardline, Pretty(pretty) )
 import System.Terminal
-    ( MonadColorPrinter(foreground),
+    (cyan, red, background,  MonadColorPrinter(foreground),
       withTerminal,
       putDoc,
       runTerminalT,
       MonadMarkupPrinter(Attribute),
       MonadPrinter(flush) )
-import System.Terminal.Internal (LocalTerminal)
 
 data OutputFormat = OutputFormat {codeStyle :: CodePrintStyle, traceDisplay :: TraceDisplay, traceStyle :: TraceStyle, withTraceLines :: Bool, hideMandatoryNodes :: Bool}
 data CodePrintStyle = ShowAST | ShowCode | ShowTikz deriving (Show)
@@ -100,11 +99,40 @@ tikzFormat = OutputFormat {
 
 main :: IO ()
 main = withTerminal $ runTerminalT $
-    -- select your OutputFormat here. Above, there is a list of presets you can choose from.
-    let format = tikzFormat in
+    {-
+    Select your OutputFormat here.
+    Above, there is a list of presets you can choose from.
+    -}
+    let format = userFormat in
     do
+        putDoc hardline
+        headline "Running Feature Trace Recording Prototype"
+        headline ">>> [Motivating Example] <<<"
         printer format StackPopAlice.example
         printer format StackPopBob.example
+        
+        headline ">>> [Code Change Patterns] <<<"
+        printer format CodeChangePatterns.addIfdef
+        -- We omitted AddIfdef* as it is just a repitition of the previous pattern with arbitrary contexts and code fragments.
+        -- AddIfDefElse has to be reproduced using two variants.
+        -- Hence, we need two different examples here, one for the if-branch and one for the else-branch.
+        printer format CodeChangePatterns.addIfdefElse_IfBranch
+        printer format CodeChangePatterns.addIfdefElse_ElseBranch
+        printer format CodeChangePatterns.addIfdefWrapElse
+        printer format CodeChangePatterns.addIfdefWrapThen
+        -- Adding non-variational code (code that belongs to all clones)
+        printer format CodeChangePatterns.addNormalCode_nonvariational
+        -- Adding code without any associated trace into a tree-optional scope that is already traced.
+        printer format CodeChangePatterns.addNormalCode_outerpc
+        -- Removing code that does not have a presence condition
+        printer format CodeChangePatterns.remNormalCode_null
+        -- Removing code that has a feature trace and thereby a presence condition
+        printer format CodeChangePatterns.remNormalCode_notnull
+        -- Removing code that has a feature trace
+        printer format CodeChangePatterns.remIfdef
+
+headline :: (MonadColorPrinter m) => String -> m()
+headline text = putDoc $ hardline <+> (annotate (background red) $ pretty text) <+> hardline <+> hardline
 
 printer :: (MonadColorPrinter m, Grammar g) => OutputFormat -> State UUID (Example m g String) -> m ()
 printer format ex =
@@ -154,14 +182,14 @@ printTraces format example tracesAndTrees =
                       else pretty $ genIndent i
                   paint formula = (annotate (foreground $ FeatureColour.colourOf featureColourPalette formula)).pretty
         in
-        mappend (pretty $ intercalate "\n  " [
-            "\nRunning Feature Trace Recording:",
-            "example        = "++name example,
-            "codeStyle      = "++show codestyle,
-            "traceDisplay   = "++show tracedisplay,
-            "traceStyle     = "++show tracestyle,
-            "withTraceLines = "++show withtracelines,
-            "hideMandatoryNodes = "++show hidemandatory])
+        mappend (annotate (background red) $ pretty $ intercalate "\n  " [
+            "\nRunning "++name example
+            -- "codeStyle      = "++show codestyle,
+            -- "traceDisplay   = "++show tracedisplay,
+            -- "traceStyle     = "++show tracestyle,
+            -- "withTraceLines = "++show withtracelines,
+            -- "hideMandatory  = "++show hidemandatory
+            ])
         $ flip foldr
             mempty
             (\(fc, edit, (trace, tree)) s ->

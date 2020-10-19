@@ -22,7 +22,7 @@ feature_SafeStack = toFeature "SafeStack"
 feature_ImmutableStack :: Feature
 feature_ImmutableStack = toFeature "ImmutableStack"
 
--- featureColourPalette :: (MonadColorPrinter m) => FeatureColourPalette m
+featureColourPalette :: MonadColorPrinter m => Feature -> Color m
 featureColourPalette feature 
     | feature == feature_Stack = yellow
     | feature == feature_SafeStack = green
