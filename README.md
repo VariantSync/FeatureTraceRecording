@@ -6,7 +6,7 @@ This code is supplementary material for the submission _Feature Trace Recording_
 This prototype is written in Haskell and uses the Stack build system.
 Instructions for installing stack can be found [here](https://docs.haskellstack.org/en/stable/README/).
 On linux, `sudo apt-get install haskell-stack` (or `sudo pacman -S stack` if you are using pacman) should do the job.
-When you installed stack, please open a terminal and navigate to the repositories directory (the directory containing this `README.md`).
+After you installed stack, please open a terminal and navigate to the repositorie's directory (the directory containing this `README.md`).
 Our prototype prints coloured text to the terminal, so it might not be compatible with every terminal.
 We tested it within the Windows Terminal, Windows Powershell, Windows Subsystem for Linux (WSL) and the default terminal on Manjaro. (It does not work with Git Bash.)
 You can then run the prototype as follows:
@@ -23,7 +23,7 @@ For each edit, we first show its type and the feature context under which that e
 
 where an abstract syntax tree (AST) whose root has ID 11 is inserted below node 4 in the current AST at index 0 under feature context "SafeStack".
 (The first edit will always be `identity` under context `null`. This is a technical detail necessary to show the initial state of the example.)
-Afterwards, the code after this edit is shown, similar to Figure 2 in the paper:
+Afterwards, the code that is a result of this edit is shown (similar to Figure 2 in the paper):
 
     void pop() {
         if (!empty()) {
