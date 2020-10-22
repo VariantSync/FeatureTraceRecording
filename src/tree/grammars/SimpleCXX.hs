@@ -9,6 +9,7 @@ import Data.List ( intersperse )
 type SCXXAST a = AST SimpleCXXGrammar a
 type SSCXXAST = SCXXAST String
 
+{- Simplified grammer for pseudo C++ -}
 data SimpleCXXGrammar = 
     SCXX_FuncDef
   | SCXX_ParametersDef
@@ -30,6 +31,8 @@ data SimpleCXXGrammar =
   deriving (Eq, Show)
 
 type SCXXState = Tree (State UUID (Node SimpleCXXGrammar String))
+
+{- Grammar rules to build the AST -}
 
 scxx_funcdef :: String -> String -> [(String, String)] -> [SCXXState] -> SCXXState
 scxx_funcdef rettype name params content =
@@ -102,6 +105,7 @@ scxx_type val = Tree (node val SCXX_Type) []
 scxx_file :: String -> [SCXXState] -> SCXXState
 scxx_file name content = Tree (node name SCXX_File) content
 
+{- Define optionality for all node types in our C++ grammar. -}
 instance Grammar SimpleCXXGrammar where
     nodetypeof SCXX_FuncDef = Treeoptional
     nodetypeof SCXX_Return = Treeoptional
@@ -109,18 +113,19 @@ instance Grammar SimpleCXXGrammar where
     nodetypeof SCXX_ExprStatement = Treeoptional
     nodetypeof SCXX_VarDecl = Mandatory
     nodetypeof SCXX_Condition = Optional
-    nodetypeof SCXX_UnaryOp = Optional --Mandatory
+    nodetypeof SCXX_UnaryOp = Optional
     nodetypeof SCXX_Type = Optional
-    nodetypeof SCXX_Expression = Mandatory -- Virtual
+    nodetypeof SCXX_Expression = Mandatory
     nodetypeof SCXX_ParametersDef = Mandatory
     nodetypeof SCXX_Args = Mandatory
     nodetypeof SCXX_Statements = Mandatory
     nodetypeof SCXX_BinaryOp = Optional
     nodetypeof SCXX_FuncCall = Optional
-    nodetypeof SCXX_VarRef = Optional -- leaf type
-    nodetypeof SCXX_Literal = Optional -- leaf type
+    nodetypeof SCXX_VarRef = Optional
+    nodetypeof SCXX_Literal = Optional
     nodetypeof SCXX_Assignment = Mandatory
 
+    {- print AST as source code -}
     prettyPrint i indentGenerator prtStrWithContext prtNode (Tree n children) =
         mconcat $
         let indentLen = 2
@@ -131,7 +136,7 @@ instance Grammar SimpleCXXGrammar where
             showList' sep l = mconcat $ intersperse sep $ (showCodeAs indent indentGenerator prtStrWithContext prtNode) <$> l
             showListNoIndentIncrease sep l = mconcat $ intersperse (prtStr sep) $ showCodeAs i indentGenerator prtStrWithContext prtNode <$> l
             showHead = showCodeAs indent indentGenerator prtStrWithContext prtNode $ head children
-            in case rule n of
+            in case grammartype n of
                 SCXX_FuncDef -> [indent, showHead, prtStr " ", me, showList " " $ tail children]
                 SCXX_ParametersDef -> [prtStr "(", showList ", " children, prtStr ")"]
                 SCXX_Args -> [prtStr "(", showList ", " children, prtStr ")"]

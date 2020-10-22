@@ -11,16 +11,28 @@ type RecordingFunction g a = FeatureFormula -> FeatureTrace g a -> AST g a -> Fe
 type FeatureTraceRecordingAlgorithm g a = Edit g a -> RecordingFunction g a
 
 {-
-Runs the given editscript on the given AST producing the returned AST.
+Runs the given feature trace recording algorithm.
+Arguments are:
+1. chosen feature trace recording algorithm (for example defaultFeatureTraceRecording)
+2. initial feature trace (for example FeatureTrace.emptyTrace)
+3. initial source code as AST
+4. edit script (i.e., the sequence of edits applied to the initial AST upon which feature traces should be recorded)
+5. lost of feature contexts, one feature context for each edit
 -}
 featureTraceRecording :: (Show a, Eq a) => FeatureTraceRecordingAlgorithm g a -> FeatureTrace g a -> AST g a -> EditScript g a -> [FeatureFormula] -> (FeatureTrace g a, AST g a)
 featureTraceRecording algorithm f0 t0 editscript contexts = last $ featureTraceRecordingWithIntermediateSteps algorithm f0 t0 editscript contexts
 
+{-
+The same as featureTraceRecording but also returns all intermediate results.
+-}
 featureTraceRecordingWithIntermediateSteps :: (Show a, Eq a) => FeatureTraceRecordingAlgorithm g a -> FeatureTrace g a -> AST g a -> EditScript g a -> [FeatureFormula] -> [(FeatureTrace g a, AST g a)]
 featureTraceRecordingWithIntermediateSteps algorithm f0 t0 editscript contexts =
     scanl record (f0, t0) $ zip editscript $ zipWith ($) (algorithm <$> editscript) contexts
     where record = \(f_old, t_old) (edit, recorder) -> (recorder f_old t_old, run edit t_old)
 
+{-
+Algorithm 1 from the paper.
+-}
 defaultFeatureTraceRecording :: (Grammar g, Show a, Eq a) => FeatureTraceRecordingAlgorithm g a
 defaultFeatureTraceRecording edit =
     removeTheRedundanciesWeIntroduced edit $
@@ -35,9 +47,12 @@ defaultFeatureTraceRecording edit =
         Move -> ftr_move
         Update -> ftr_up
 
+{-
+Sets the feature trace of all mandatory AST nodes to null.
+-}
 nullifyMandatory :: (Grammar g) => RecordingFunction g a -> RecordingFunction g a
 nullifyMandatory wrappee = \context f_old t_old -> \v ->
-    if ntype v == Mandatory
+    if optionaltype v == Mandatory
     then Nothing
     else wrappee context f_old t_old v
 
@@ -48,9 +63,18 @@ removeTheRedundanciesWeIntroduced edit wrappee = \context f_old t_old ->
         t_new = run edit t_old in
         FeatureTrace.simplify f_new t_new
 
+{-
+Feature trace recording for identity edit:
+When nothing is changed, nothing has to be recorded.
+-}
 ftr_id :: Edit g a -> RecordingFunction g a
 ftr_id e = \_ trace _ -> trace
 
+{-
+Feature trace recording on an identity edit with non-empty delta.
+This function allows changing feature traces manually (i.e., without actual code changes).
+Please have a look at the function Edits.edit_trace_only in src/tree/Edits.hs.
+-}
 ftr_trace :: (Eq a) => Edit g a -> RecordingFunction g a
 ftr_trace e = \context f_old t_old ->
     let d = delta e t_old in
@@ -58,6 +82,8 @@ ftr_trace e = \context f_old t_old ->
         if member v d
         then context
         else f_old v
+
+{- The recording functions from Section 5 in the paper. -}
 
 ftr_ins :: (Show a, Eq a) => Edit g a -> RecordingFunction g a
 ftr_ins e = \context f_old t_old ->
@@ -73,7 +99,12 @@ ftr_del e = \context f_old t_old ->
         then f_old v
         else (if isnull context && not (isnull $ pc t_old f_old v)
               then Just PFalse
-              else nullable_and [f_old v, nullable_not context]
+              {-
+              Due to our logical operators with null,
+              three of the cases of R_del in the paper can actually be collapsed
+              into this single formula.
+              -}
+              else nullable_and [f_old v, nullable_not context] 
         )
 
 ftr_move :: (Show a, Eq a) => Edit g a -> RecordingFunction g a

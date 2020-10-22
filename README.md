@@ -27,6 +27,7 @@ For each example we first show which edit is performed under which feature conte
     ==== Run ins_tree(11, 4, 0) under context = "SafeStack" giving us ====
 
 where an AST whose root has ID 11 is inserted below node 4 in the current AST at index 0 under feature context "SafeStack".
+(The first edit will always be `identity` under context `null`. This is technical detail necessary to show the initial state of the example.)
 Afterwards, the code after this edit is shown, similar to the figure in the paper:
 
     void pop() {

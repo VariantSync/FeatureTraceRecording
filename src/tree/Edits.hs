@@ -121,14 +121,14 @@ edit_move_tree s p i = Edit {
           ins t = run $ edit_ins_tree t p i
 
 edit_update :: (Grammar g, Show a, Eq a) => UUID -> g -> a -> Edit g a
-edit_update id newRule newVal = Edit {
+edit_update id newGrammarType newVal = Edit {
     edittype = Update,
     run = \t -> (\n ->
         if uuid n == id
-        then Node {value = newVal, rule = newRule, uuid = uuid n}
+        then Node {value = newVal, grammartype = newGrammarType, uuid = uuid n}
         else n) <$> t,
     delta = \t -> case findById id t of
         Nothing -> empty
         Just x -> toset x,
-    name = "update("++(intercalate ", " $ [show id, show newRule, show newVal])++")"
+    name = "update("++(intercalate ", " $ [show id, show newGrammarType, show newVal])++")"
 }

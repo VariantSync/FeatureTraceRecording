@@ -119,7 +119,7 @@ addNormalCode_outerpc = do
     let
         outer_pc = Just $ PVariable feature_FOO
         start = (run $ edit_ins_tree foo (uuidOf file) 0) file
-        statementsOfFoo = uuidOf . fromJust $ findByRule SCXX_Statements foo
+        statementsOfFoo = uuidOf . fromJust $ findByGrammarType SCXX_Statements foo
         in
         return $
             (createPatternExample "AddNormalCode (with outer PC)" start

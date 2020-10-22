@@ -136,10 +136,10 @@ divExample =
         tree_div <- div_div
         tree_reciprocal_return <- div_reciprocal_return
         let
-            id_reciprocal_body = uuidOf . fromJust $ findByRule SCXX_Statements tree0
-            tree_return = fromJust $ findByRule SCXX_Return tree0
-            id_cond_body = uuidOf . fromJust $ findByRule SCXX_Statements tree_condition
-            id_div_body = uuidOf . fromJust $ findByRule SCXX_Statements tree_div
+            id_reciprocal_body = uuidOf . fromJust $ findByGrammarType SCXX_Statements tree0
+            tree_return = fromJust $ findByGrammarType SCXX_Return tree0
+            id_cond_body = uuidOf . fromJust $ findByGrammarType SCXX_Statements tree_condition
+            id_div_body = uuidOf . fromJust $ findByGrammarType SCXX_Statements tree_div
             tree_x_condexpr = fromJust $ findByValue "x" tree_condition
             tree_x_return = fromJust $ findByValue "x" tree_return
             tree_1_return = fromJust $ findByValue "1.0" tree_return
@@ -156,8 +156,8 @@ divExample =
               , edit_ins_tree tree_div (uuidOf tree0) 0
               , edit_move_tree (uuidOf tree_condition) id_div_body 0
               , edit_move_tree (uuidOf tree_return) id_div_body 1 -- now we are done with div5.txt
-              , edit_update (uuidOf tree_x_condexpr) (rule $ element $ tree_x_condexpr) "b"
-              , edit_update (uuidOf tree_x_return) (rule $ element $ tree_x_return) "b"
+              , edit_update (uuidOf tree_x_condexpr) (grammartype $ element $ tree_x_condexpr) "b"
+              , edit_update (uuidOf tree_x_return) (grammartype $ element $ tree_x_return) "b"
               , edit_update (uuidOf tree_1_return) SCXX_VarRef "a"
               , edit_ins_tree tree_reciprocal_return id_reciprocal_body 0
             ],

@@ -170,7 +170,7 @@ printTraces format example tracesAndTrees =
                   stringPrint trace n s = case tracestyle of
                       Colour -> paint (trace n) s
                       _ -> pretty s
-                  indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && ntype n == Treeoptional
+                  indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && optionaltype n == Treeoptional
                       then mappend (paint (trace n) "|") (pretty $ genIndent (i-1))
                       else pretty $ genIndent i
                   paint formula = (annotate (foreground $ featureColourPalette formula)).pretty

@@ -14,13 +14,13 @@ astToTikzWithTraceDefault =
     astToTikzWithTrace
     (tikzifyName
         .(\n ->
-            let ruleStr = (drop 5).removeQuotes.show.rule $ n -- TODO: Fix the hacky "drop 5" that only works for SCXX_Grammar
+            let ruleStr = (drop 5).removeQuotes.show.grammartype $ n -- TODO: Fix the hacky "drop 5" that only works for SCXX_Grammar
                 valStr  = removeQuotes.show.value $ n in
             ruleStr++(if valStr /= mempty && valStr /= ruleStr then "\\linebreak\\code{"++valStr++"}" else ""))
         .element)
     (\tree node trace -> intercalate ", " [
-        tikzifyName.(\s -> s++if ntype node == Mandatory then "Inherited" else "").featuresToTikzClass $ pc tree trace node,
-        show $ ntype node
+        tikzifyName.(\s -> s++if optionaltype node == Mandatory then "Inherited" else "").featuresToTikzClass $ pc tree trace node,
+        show $ optionaltype node
       ])
 
 featuresToTikzClass :: FeatureFormula -> String
