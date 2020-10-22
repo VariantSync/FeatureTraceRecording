@@ -56,33 +56,6 @@ edit_ins_tree stree p i = Edit {
                              then Tree n (ListUtil.insertAtIndex i stree c)
                              else x
 
-{-
-Replaces the children of node p \in T in range [i, j] (i <= j)
-with the new tree stree nosubtreeof T, then located at index i.
-The replaced children are added as children of snode \in stree at index k preserving their order.
-If p = epsilon, root stree becomes the new root of T.
--}
--- TODO: Do we want to split ins_partial into two edits: one where p = epsilon and one where p != epsilon?
--- ins_partial with p = epsilon will never occur if we have immutable root nodes such as "file" or an empty abstract project root node as in Ecco.
-edit_ins_partial :: (Eq a) => AST g a -> UUID -> Int -> Int -> UUID -> Int -> Edit g a 
-edit_ins_partial stree p i j snode k = Edit {
-    edittype = Insert,
-    run = if p == epsilon
-          then \t -> manipulate (insertMovedChildren [t]) stree
-          else manipulate insp,
-    delta = \t -> if p == epsilon || any ((p==).uuid) t
-                  then toset stree
-                  else empty,
-    name = "ins_partial("++(intercalate ", " $ show <$> [uuidOf stree, p, i, j, snode, k])++")"}
-    where insp t@(Tree n c) = if uuid n == p
-                              then Tree n (insertAtIndex i (newSubTreeWith $ getRange i j c) $ removeRange i j c)
-                              else t
-          newSubTreeWith children = manipulate (insertMovedChildren children) stree
-          insertMovedChildren children t@(Tree n c) = 
-                                       if uuid n == snode
-                                       then Tree n (insertListAtIndex k children c)
-                                       else t
-
 -- delete the node v and move its children up
 edit_del_node :: (Eq a) => UUID -> Edit g a
 edit_del_node v = Edit {
