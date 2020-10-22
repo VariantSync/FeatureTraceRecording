@@ -9,9 +9,7 @@ import AST
 import Edits ( edit_identity )
 import NullPropositions ( prettyPrint )
 import FeatureTrace (FeatureTrace,  augmentWithTrace, pc, prettyPrint )
-import FeatureTraceRecording 
-import FTRDirect ( builder )
-import FTRTwoStep ( builder )
+import FeatureTraceRecording
 
 import Example
 
@@ -67,10 +65,10 @@ userFormatDetailed = OutputFormat {
 }
 
 {-
-Shows the AST with trace formulas.
+Shows the Abstract Syntax Tree of the source code with feature traces as formulas.
 -}
-debugFormat :: OutputFormat
-debugFormat = OutputFormat {
+astFormat :: OutputFormat
+astFormat = OutputFormat {
     codeStyle = ShowAST,
     traceDisplay = Trace,
     traceStyle = Text,
@@ -140,7 +138,7 @@ finalizeExample ex = fst $ runState ex 0
 
 runFTR :: (Grammar g, Show a, Eq a) => Example m g a -> [(FeatureTrace g a, AST g a)]
 runFTR example = featureTraceRecordingWithIntermediateSteps
-        FTRTwoStep.builder
+        defaultFeatureTraceRecording
         (Example.startTrace example)
         (Example.startTree example)
         (Example.editscript example)
