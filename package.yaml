@@ -1,10 +1,10 @@
 name:                ftr
 version:             0.1.0.0
-github:              "git@github.com:PaulAtTUBS/FeatureTraceRecording.git"
+github:              "anonymous"
 license:             BSD3
-author:              "Paul Bittner"
-maintainer:          "paul.bittner@uni-ulm.de"
-copyright:           "2020 Paul Bittner"
+author:              "Anonymous"
+maintainer:          "anonymous@email.com"
+copyright:           "authors of corresponding paper"
 
 extra-source-files:
 - README.md
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/PaulAtTUBS/FeatureTraceRecording#readme>
+description:         Please see the README on GitHub at <anonym>
 
 dependencies:
 - base >= 4.7 && < 5
