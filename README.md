@@ -1,10 +1,69 @@
-# ftr
+# Prototype of Feature Trace Recording
 
-##GHCI COMMANDS
-- go to ghci with: stack ghci
-- In ghci:
-- to get info: ":i NAME"
-- to exit: ":q"
-- to reload: ":r"
-- autobuild: "stack build --file-watch"
-- autorun main: "stack build --file-watch --exec "stack run ftr""
+This code is supplementary material to the submission _Feature Trace Recording_ at the _28th IEEE International Conference on Software Analysis, Evolution and Reengineering (SANER), 2021_.
+
+# WHAT IS LEFT TODO
+- remove semantic edits (partial)
+- finish readme
+- Add Comments to FTR_TwoStep
+
+## How to Run the Project
+This prototype is written in Haskell and uses the Stack build system.
+Instructions for installing stack can be found [here](https://docs.haskellstack.org/en/stable/README/).
+On linux, `sudo apt-get install haskell-stack` (or `sudo pacman -S stack` if you are using pacman) should do the job.
+When you installed stack, please open a terminal and navigate to the repositories directory (the directory containing this README.md).
+Our prototype prints coloured text to the terminal, so it might not be compatible with every terminal.
+We tested it within the Windows Terminal, Windows Powershell, Windows Subsystem for Linux (WSL) and the default terminal on Manjaro. (It does not work with Git Bash.)
+You can then run the prototype as follows:
+
+    cd <path/to/this/repository>
+    stack run
+
+## What Is There to See
+Our prototype runs several independent examples.
+Each example is separated by a red headline.
+For each example we first show which edit is performed under which feature context:
+
+    ==== Run ins_tree(11, 4, 0) under context = "SafeStack" giving us ====
+
+where an AST whose root has ID 11 is inserted below node 4 in the current AST at index 0 under feature context "SafeStack".
+Afterwards, the code after this edit is shown, similar to the figure in the paper:
+
+    void pop() {
+        if (!empty()) {
+        }
+        storage[head--] = null;
+    }
+
+By default, the following examples are executed in this order:
+
+1. Motivating Example
+    - Alice's part of the motivating example shown in Figure 2 in the paper.
+    - Bob's part of the motivating example shown in Figure 3 in the paper. As the synchronisation of code and feature traces across clones is subject to future work, this examples simulates how we envision the synchronisation.
+2. Code Change Patterns from the Evaluation (Section 6). As there are sometimes several ways for reproducing a pattern (e.g., depending if an outer presence condition is present or not), some patterns are shown multiple times. We omitted AddIfdef* as it is just a repitition of AddIfdef with arbitrary contexts and code fragments. As AddIfDefElse has to be reproduced using two variants, we need two different examples here, one for the if-branch and one for the else-branch.
+    - _AddIfdef_
+    - _AddIfdefElse_IfBranch_
+    - _AddIfdefElse_ElseBranch_
+    - _AddIfdefWrapElse_
+    - _AddIfdefWrapThen_
+    - _AddNormalCode_nonvariational_ (Adding code that belongs to all clones.)
+    - _AddNormalCode_outerpc_ (Adding code without any associated trace into a tree-optional scope that is already traced.)
+    - _RemNormalCode_null_ (Removing code that does not have a presence condition)
+    - _RemNormalCode_notnull_ (Removing code that has a feature trace and thereby a presence condition)
+    - _RemIfdef_
+
+## Interesting Code Locations
+
+- `main` function in `app/Main.hs`: Here you can choose which examples to run and in which format code should be displayed. Choose from:
+    - `userFormat` (default): The perspective of the developer who is editing source code while traces are recorded in the background. This is the format used in the figures in the paper. Feature traces as indicated by colours.
+    - `userFormatDetailed`: A variation of `userFormat` where traces and presence conditions can be investigated seperately at the same time. Code is coloured in the colour of its feature trace while presence conditions are indicated by coloured lines on the left.
+    - `astFormat`: Shows the Abstract Syntax Tree of the source code with feature traces as formulas.
+    - `tikzFormat`: Tikz export of AST with traces. Used for figures in the paper.
+
+- `src/feature/FeatureTraceRecording.hs`: The implementation of the feature trace recording itself. Here you can find Algorithm 1 from the paper (`defaultFeatureTraceRecording`) and the recording functions for insertions, deletions, moves, and updates.
+
+- `src/feature/FeatureTrace.hs`: Here you can find definitions for feature traces and presence conditions.
+
+- `src/tree/grammers/SimpleCXX.hs`: Example implementation for a simplified C++ grammar used for the examples in our paper. Here you can see the different rules of the grammar as well as the classifiation of terminal symbols (node types) as _mandatory_, _optional_, or _tree-optional_.
+
+- `src/propositions/NullPropositions.hs`: Operators for our ternary logic with `null`, based on our implementation of propositional logic in `src/propositions/Propositions.hs`.

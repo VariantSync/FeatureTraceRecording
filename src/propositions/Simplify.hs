@@ -10,7 +10,13 @@ import SAT ( contradicts, taut )
 import Data.List
 
 {-
-file:///C:/Users/Paul%20Bittner/Documents/Paper/Literature/Library/Rhein%20et%20al.%20ICSE%202015%20Presence-Condition%20Simplification%20in%20Highly%20Configurable%20Systems.pdf
+  This is a naive implementation for presence condition implementation as described in
+    A. von Rhein, A. Grebhahn, S. Apel, N. Siegmund, D. Beyer, and T. Berger.
+    Presence-Condition Simplification in Highly Configurable Systems.
+    In Proceedings of the IEEE/ACM International Conference on Software Engineering (ICSE), pages 178–188.
+    IEEE Computer Society, May 2015.
+  As our tool is just a proof-of-concept we implemented an own naive algorithm for presence condition simplification.
+  Normally, one should adopt one of the algorithms described in the paper above.
 -}
 removeRedundancy :: (Ord a, Show a) => PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
 removeRedundancy axiom (PAnd cs) =

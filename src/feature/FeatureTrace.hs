@@ -22,19 +22,6 @@ simplify :: (Grammar g, Show a, Eq a) => FeatureTrace g a -> AST g a -> FeatureT
 simplify f t v = case (pc_parentpart t f v, f v) of
   (Just p, Just f') -> nothingIf (==PTrue) (removeRedundancy p f')
   _ -> Propositions.simplify <$> f v
--- simplify f t v = case f v of
---   Just f' -> nothingIf (==PTrue) (removeRedundancy (fromJust $ nullable_and [pc_parentpart t f v, featuremodel]) f')
---   _ -> Propositions.simplify <$> f v
-
-{-
-Combine two feature traces in the same notion as for functions:
-  t1.t2 means t1 'after' t2, i.e. if t2 is undefined on a node, t1 will be used.
-  t1 will not overwrite the traces that are already defined by t2.
--}
-combine :: FeatureTrace g a -> FeatureTrace g a -> FeatureTrace g a
-combine t1 t2 = \n -> case t2 n of
-    Nothing -> t1 n
-    Just x -> Just x
 
 {-
 Calculates the presence condition of a node (third argument) in the given tree (first argument) with the given feature traces (second argument).

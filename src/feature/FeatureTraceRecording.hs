@@ -68,9 +68,8 @@ ftr_ins e = \context f_old t_old ->
 
 ftr_del :: (Grammar g, Eq a, Show a) => Edit g a -> RecordingFunction g a
 ftr_del e = \context f_old t_old ->
-    let d = delta e t_old in
     \v ->
-        if not $ member v d
+        if not $ member v $ delta e t_old
         then f_old v
         else (if isnull context && not (isnull $ pc t_old f_old v)
               then Just PFalse
