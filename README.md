@@ -16,14 +16,14 @@ You can then run the prototype as follows:
 
 ## What Is There to See
 Our prototype runs several independent examples.
-Each example is separated by a red headline.
-For each example we first show which edit is performed under which feature context:
+Each example is separated by a red headline and consists of a series of edits applied to a source code fragment.
+For each edit, we first show its type and the feature context under which that edit was made:
 
     ==== Run ins_tree(11, 4, 0) under context = "SafeStack" giving us ====
 
-where an AST whose root has ID 11 is inserted below node 4 in the current AST at index 0 under feature context "SafeStack".
-(The first edit will always be `identity` under context `null`. This is technical detail necessary to show the initial state of the example.)
-Afterwards, the code after this edit is shown, similar to the figure in the paper:
+where an abstract syntax tree (AST) whose root has ID 11 is inserted below node 4 in the current AST at index 0 under feature context "SafeStack".
+(The first edit will always be `identity` under context `null`. This is a technical detail necessary to show the initial state of the example.)
+Afterwards, the code after this edit is shown, similar to Figure 2 in the paper:
 
     void pop() {
         if (!empty()) {
@@ -35,8 +35,8 @@ By default, the following examples are executed in this order:
 
 1. Motivating Example
     - Alice's part of the motivating example shown in Figure 2 in the paper.
-    - Bob's part of the motivating example shown in Figure 3 in the paper. As the synchronisation of code and feature traces across clones is subject to future work, this examples simulates how we envision the synchronisation.
-2. Code Change Patterns from the Evaluation (Section 6). As there are sometimes several ways for reproducing a pattern (e.g., depending if an outer presence condition is present or not), some patterns are shown multiple times. We omitted AddIfdef* as it is just a repitition of AddIfdef with arbitrary contexts and code fragments. As AddIfDefElse has to be reproduced using two variants, we need two different examples here, one for the if-branch and one for the else-branch.
+    - Bob's part of the motivating example shown in Figure 3 in the paper. As the synchronisation of code and feature traces across clones is subject to future work, this example simulates how we envision the synchronisation.
+2. Code Change Patterns from the Evaluation (Section 6): As there are sometimes several ways for reproducing a pattern (e.g., depending on the presence of an outer presence condition), some patterns are shown multiple times. We omitted AddIfdef* as it is just a repitition of AddIfdef with arbitrary contexts and code fragments. As AddIfdefElse has to be reproduced using two variants, we need two different examples here, one for the if-branch and one for the else-branch.
     - _AddIfdef_
     - _AddIfdefElse_IfBranch_
     - _AddIfdefElse_ElseBranch_
@@ -50,11 +50,11 @@ By default, the following examples are executed in this order:
 
 ## Interesting Code Locations
 
-- `main` function in `app/Main.hs`: Here you can choose which examples to run and in which format code should be displayed. Choose from:
-    - `userFormat` (default): The perspective of the developer who is editing source code while traces are recorded in the background. This is the format used in the figures in the paper. Feature traces as indicated by colours.
+- `main` function in `app/Main.hs`: Here you can choose which examples to run and in which format the source code should be displayed. Choose from:
+    - `userFormat` (default): The perspective of the developer who is editing source code while traces are recorded in the background. This is the format used in the figures in the paper. Feature traces are indicated by colours.
     - `userFormatDetailed`: A variation of `userFormat` where traces and presence conditions can be investigated seperately at the same time. Code is coloured in the colour of its feature trace while presence conditions are indicated by coloured lines on the left.
-    - `astFormat`: Shows the Abstract Syntax Tree of the source code with feature traces as formulas.
-    - `tikzFormat`: Tikz export of AST with traces. Used for figures in the paper.
+    - `astFormat`: Shows the abstract syntax tree of the source code with feature traces as formulas.
+    - `tikzFormat`: Tikz export of abstract syntax trees with traces. Used for figures in the paper.
 
 - `src/feature/FeatureTraceRecording.hs`: The implementation of the feature trace recording itself. Here you can find Algorithm 1 from the paper (`defaultFeatureTraceRecording`) and the recording functions for insertions, deletions, moves, and updates.
 
