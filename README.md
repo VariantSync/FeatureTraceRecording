@@ -1,12 +1,12 @@
 # Prototype of Feature Trace Recording
 
-This code is supplementary material to the submission _Feature Trace Recording_ at the _28th IEEE International Conference on Software Analysis, Evolution and Reengineering (SANER), 2021_.
+This code is supplementary material for the submission _Feature Trace Recording_ at the _28th IEEE International Conference on Software Analysis, Evolution and Reengineering (SANER), 2021_.
 
 ## How to Run the Project
 This prototype is written in Haskell and uses the Stack build system.
 Instructions for installing stack can be found [here](https://docs.haskellstack.org/en/stable/README/).
 On linux, `sudo apt-get install haskell-stack` (or `sudo pacman -S stack` if you are using pacman) should do the job.
-When you installed stack, please open a terminal and navigate to the repositories directory (the directory containing this README.md).
+When you installed stack, please open a terminal and navigate to the repositories directory (the directory containing this `README.md`).
 Our prototype prints coloured text to the terminal, so it might not be compatible with every terminal.
 We tested it within the Windows Terminal, Windows Powershell, Windows Subsystem for Linux (WSL) and the default terminal on Manjaro. (It does not work with Git Bash.)
 You can then run the prototype as follows:
