@@ -2,11 +2,6 @@
 
 This code is supplementary material to the submission _Feature Trace Recording_ at the _28th IEEE International Conference on Software Analysis, Evolution and Reengineering (SANER), 2021_.
 
-# WHAT IS LEFT TODO
-- remove semantic edits (partial)
-- finish readme
-- Add Comments to FTR_TwoStep
-
 ## How to Run the Project
 This prototype is written in Haskell and uses the Stack build system.
 Instructions for installing stack can be found [here](https://docs.haskellstack.org/en/stable/README/).
@@ -66,5 +61,7 @@ By default, the following examples are executed in this order:
 - `src/feature/FeatureTrace.hs`: Here you can find definitions for feature traces and presence conditions.
 
 - `src/tree/grammers/SimpleCXX.hs`: Example implementation for a simplified C++ grammar used for the examples in our paper. Here you can see the different rules of the grammar as well as the classifiation of terminal symbols (node types) as _mandatory_, _optional_, or _tree-optional_.
+
+- `app/examples/`: In this directory, the source code for the examples can be found. The motivating example from the paper is implemented in `StackPopAlice.hs` and `StackPopBob.hs`. The reproduction of the code change patterns used in our evaluation can be found in `CodeChangePatterns.hs`.
 
 - `src/propositions/NullPropositions.hs`: Operators for our ternary logic with `null`, based on our implementation of propositional logic in `src/propositions/Propositions.hs`.
