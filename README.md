@@ -50,18 +50,18 @@ By default, the following examples are executed in this order:
 
 ## Interesting Code Locations
 
-- `main` function in `app/Main.hs`: Here you can choose which examples to run and in which format the source code should be displayed. Choose from:
+- `main` function in [`app/Main.hs`](app/Main.hs): Here you can choose which examples to run and in which format the source code should be displayed. Choose from:
     - `userFormat` (default): The perspective of the developer who is editing source code while traces are recorded in the background. This is the format used in the figures in the paper. Feature traces are indicated by colours.
     - `userFormatDetailed`: A variation of `userFormat` where traces and presence conditions can be investigated seperately at the same time. Code is coloured in the colour of its feature trace while presence conditions are indicated by coloured lines on the left.
     - `astFormat`: Shows the abstract syntax tree of the source code with feature traces as formulas.
     - `tikzFormat`: Tikz export of abstract syntax trees with traces. Used for figures in the paper.
 
-- `src/feature/FeatureTraceRecording.hs`: The implementation of the feature trace recording itself. Here you can find Algorithm 1 from the paper (`defaultFeatureTraceRecording`) and the recording functions for insertions, deletions, moves, and updates.
+- [`src/feature/FeatureTraceRecording.hs`](src/feature/FeatureTraceRecording.hs): The implementation of the feature trace recording itself. Here you can find Algorithm 1 from the paper (`defaultFeatureTraceRecording`) and the recording functions for insertions, deletions, moves, and updates.
 
-- `src/feature/FeatureTrace.hs`: Here you can find definitions for feature traces and presence conditions.
+- [`src/feature/FeatureTrace.hs`](src/feature/FeatureTrace.hs): Here you can find definitions for feature traces and presence conditions.
 
-- `src/tree/grammers/SimpleCXX.hs`: Example implementation for a simplified C++ grammar used for the examples in our paper. Here you can see the different rules of the grammar as well as the classifiation of terminal symbols (node types) as _mandatory_, _optional_, or _tree-optional_.
+- [`src/tree/grammars/SimpleCXX.hs`](src/tree/grammars/SimpleCXX.hs): Example implementation for a simplified C++ grammar used for the examples in our paper. Here you can see the different rules of the grammar as well as the classifiation of terminal symbols (node types) as _mandatory_, _optional_, or _tree-optional_.
 
-- `app/examples/`: In this directory, the source code for the examples can be found. The motivating example from the paper is implemented in `StackPopAlice.hs` and `StackPopBob.hs`. The reproduction of the code change patterns used in our evaluation can be found in `CodeChangePatterns.hs`.
+- [`app/examples/`](app/examples/): In this directory, the source code for the examples can be found. The motivating example from the paper is implemented in [`StackPopAlice.hs`](app/examples/StackPopAlice.hs) and [`StackPopBob.hs`](app/examples/StackPopBob.hs). The reproduction of the code change patterns used in our evaluation can be found in [`CodeChangePatterns.hs`](app/examples/CodeChangePatterns.hs).
 
-- `src/propositions/NullPropositions.hs`: Operators for our ternary logic with `null`, based on our implementation of propositional logic in `src/propositions/Propositions.hs`.
+- [`src/propositions/NullPropositions.hs`](src/propositions/NullPropositions.hs): Operators for our ternary logic with `null`, based on our implementation of propositional logic in [`src/propositions/Propositions.hs`](src/propositions/Propositions.hs).
