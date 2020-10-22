@@ -15,8 +15,6 @@ import Example
 
 import TikzExport ( astToTikzWithTraceDefault )
 
-import Div (divExample)
-import VR ( vrExample )
 import StackPopAlice (example)
 import StackPopBob (example)
 import CodeChangePatterns
