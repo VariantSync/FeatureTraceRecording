@@ -5,7 +5,9 @@ import SimpleCXX
 import UUID ( UUID )
 import Control.Monad.State ( State )
 import System.Terminal
+import Feature
 import FeatureTrace
+import FeatureTraceRecording
 import FeatureColour
 import Edits
 import AST
@@ -39,15 +41,14 @@ alertstatuspgm = sequence $ scxx_exprstatement $ scxx_funccall "alertstatuspgm" 
 somefunction :: State UUID SSCXXAST
 somefunction = sequence $ scxx_funcdef "void" "foo" [] []
 
-createPatternExample :: (MonadColorPrinter m) => String -> SSCXXAST -> EditScript SimpleCXXGrammar String -> [FeatureFormula] -> Example m SimpleCXXGrammar String
-createPatternExample name start edits contexts =
+createPatternExample :: (MonadColorPrinter m) => String -> SSCXXAST -> RecordedEditScript SimpleCXXGrammar String -> Example m SimpleCXXGrammar String
+createPatternExample name start edits =
     Example {
         Example.name = name,
         colours = featurecolours,
         startTrace = emptyTrace,
         startTree = start,
-        editscript = edits,
-        featurecontexts = contexts
+        editscript = edits
     }
 
 addIfdef :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
@@ -55,8 +56,7 @@ addIfdef = do
     start <- emptyfile
     lcd <- lcd_setstatusalertpgm
     return $ createPatternExample "AddIfdef" start
-        [edit_ins_tree lcd (uuidOf start) 0]
-        [Just $ PVariable feature_ULTRA_LCD]
+        [(edit_ins_tree lcd (uuidOf start) 0, Just $ PVariable feature_ULTRA_LCD)]
 
 addIfdefElse_IfBranch :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
 addIfdefElse_IfBranch = addIfdef >>= \ifbranch -> return ifbranch {Example.name = "AddIfdefElse (if branch)"}
@@ -66,8 +66,7 @@ addIfdefElse_ElseBranch = do
     start <- emptyfile
     alert <- alertstatuspgm
     return $ createPatternExample "AddIfdefElse (else branch)" start
-        [edit_ins_tree alert (uuidOf start) 0]
-        [Just $ PNot $ PVariable feature_ULTRA_LCD]
+        [(edit_ins_tree alert (uuidOf start) 0, Just $ PNot $ PVariable feature_ULTRA_LCD)]
 
 addIfdefWrapElse :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
 addIfdefWrapElse = do
@@ -77,7 +76,7 @@ addIfdefWrapElse = do
     -- The start tree already has the alert line in it.
     let start = (run $ edit_ins_tree alert (uuidOf file) 0) file in
         return $ createPatternExample "AddIfdefWrapElse" start
-        [
+        $ zip [
             edit_del_tree $ uuidOf alert,
             edit_ins_tree lcd (uuidOf file) 0
         ]
@@ -94,7 +93,7 @@ addIfdefWrapThen = do
     -- The start tree already has the alert line in it.
     let start = (run $ edit_ins_tree lcd (uuidOf file) 0) file in
         return $ createPatternExample "AddIfdefWrapThen" start
-        [
+        $ zip [
             edit_del_tree $ uuidOf lcd,
             edit_ins_tree alert (uuidOf file) 0
         ]
@@ -108,8 +107,7 @@ addNormalCode_nonvariational = do
     start <- emptyfile
     lcd <- lcd_setstatusalertpgm
     return $ createPatternExample "AddNormalCode (non-variational)" start
-        [edit_ins_tree lcd (uuidOf start) 0]
-        [Just PTrue]
+        [(edit_ins_tree lcd (uuidOf start) 0, Just PTrue)]
 
 addNormalCode_outerpc :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
 addNormalCode_outerpc = do
@@ -123,9 +121,9 @@ addNormalCode_outerpc = do
         in
         return $
             (createPatternExample "AddNormalCode (with outer PC)" start
-                [edit_ins_tree lcd statementsOfFoo 0]
+                [(edit_ins_tree lcd statementsOfFoo 0, 
                 -- Here, any feature context would be feasible that is weaker than outer_pc (e.g., outer_pc itself).
-                [Just PTrue])
+                 Just PTrue)])
             -- change the start trace so that there is already a trace
             {startTrace = \n -> if n == element foo then outer_pc else Nothing}
 
@@ -135,8 +133,7 @@ remNormalCode_null = do
     lcd <- lcd_setstatusalertpgm
     let start = (run $ edit_ins_tree lcd (uuidOf file) 0) file in
         return $ createPatternExample "RemNormalCode (without traces)" start
-            [edit_del_tree (uuidOf lcd)]
-            [Just PTrue]
+            [(edit_del_tree (uuidOf lcd), Just PTrue)]
 
 remNormalCode_notnull :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
 remNormalCode_notnull = do
@@ -148,8 +145,7 @@ remNormalCode_notnull = do
         in
         return $
             (createPatternExample "RemNormalCode (with trace)" start
-            [edit_del_tree (uuidOf lcd)]
-            [Nothing {-null-}])
+            [(edit_del_tree (uuidOf lcd), Nothing {-null-})])
             {startTrace = \n -> if n == element lcd then existingtrace else Nothing}
 
 {- This behaves the same as remNormalCode_notnull. -}

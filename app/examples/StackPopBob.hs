@@ -27,7 +27,7 @@ example =
             startTree = Example.startTree alice
             alicesEdits = editscript alice
             alicesEditsToSyncDirectly = take numEditsToSynchronise alicesEdits
-            popVersion3 = foldEditScript alicesEditsToSyncDirectly startTree
+            popVersion3 = foldEditScript (fst <$> alicesEditsToSyncDirectly) startTree
             in
         return Example {
             Example.name = "Motivating Example: Simulating synchronisation of Alice's edits on Stack.pop to Bob's clone",
@@ -36,8 +36,5 @@ example =
             Example.startTree = startTree,
             Example.editscript = 
                 alicesEditsToSyncDirectly++
-                [edit_trace_only $ delta (alicesEdits !! deleteThatUpdatesBobsTrace) popVersion3],
-            Example.featurecontexts =
-                (take numEditsToSynchronise $ Example.featurecontexts alice)++
-                [Just $ PNot $ PVariable feature_ImmutableStack]
+                [(edit_trace_only $ delta (fst $ alicesEdits !! deleteThatUpdatesBobsTrace) popVersion3, Just $ PNot $ PVariable feature_ImmutableStack)]
         }

@@ -144,7 +144,6 @@ runFTR example = featureTraceRecordingWithIntermediateSteps
         (Example.startTrace example)
         (Example.startTree example)
         (Example.editscript example)
-        (Example.featurecontexts example)
 
 printTraces :: (MonadColorPrinter m, Grammar g, Show a, Eq a) => OutputFormat -> Example m g a -> [(FeatureTrace g a, AST g a)] -> Doc (Attribute m)
 printTraces format example tracesAndTrees = 
@@ -187,7 +186,7 @@ printTraces format example tracesAndTrees =
             ])
         $ flip foldr
             mempty
-            (\(fc, edit, (trace, tree)) s ->
+            (\((edit, fc), (trace, tree)) s ->
                 mconcat [
                     hardline,
                     hardline,
@@ -197,9 +196,8 @@ printTraces format example tracesAndTrees =
                     hardline,
                     treePrint tree trace,
                     s])
-        $ zip3
-            (Nothing:(featurecontexts example)) -- Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
-            (edit_identity:(editscript example)) -- Prepend identity edit here to show initial tree.
+        $ zip
+            ((edit_identity, Nothing):(editscript example)) -- Prepend identity edit here to show initial tree. Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
             ((\(trace, tree) -> (toPC trace tree, treeAbstract tree)) <$> tracesAndTrees)
 
 

@@ -5,7 +5,7 @@
     defaultFeatureFormulaColouring
 ) where
 
-import FeatureTrace
+import Feature
 import Propositions
 import System.Terminal
 

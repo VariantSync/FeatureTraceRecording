@@ -3,6 +3,7 @@
 import Tree (element,  Tree(Tree) )
 import AST 
 import Propositions
+import Feature
 import FeatureTrace
 import Util
 import Data.List ( intercalate )

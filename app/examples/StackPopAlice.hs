@@ -6,6 +6,7 @@ import Tree
 import AST
 import Edits
 import Propositions
+import Feature
 import FeatureTrace
 import FeatureColour
 import SimpleCXX
@@ -75,7 +76,7 @@ example =
             Example.colours = featurecolours,
             Example.startTrace = emptyTrace,
             Example.startTree = tree_start,
-            editscript = [
+            editscript = zip [
                 edit_ins_tree tree_cond id_tree_start_body 0
               , edit_move_tree id_tree_start_storage id_tree_cond_body 0
               , edit_del_tree id_tree_start_storage
@@ -83,8 +84,7 @@ example =
               , edit_ins_tree tree_clonedef id_tree_start_body 0
               , edit_ins_tree tree_cloneretstatement id_tree_start_body 2
               , edit_update id_tree_start_ret SCXX_Type newReturnType
-            ],
-            featurecontexts = [
+            ] [
                 Just $ PVariable feature_SafeStack
               , Nothing
               , Just $ PVariable feature_ImmutableStack

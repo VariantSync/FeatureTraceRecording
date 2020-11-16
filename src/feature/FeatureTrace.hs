@@ -1,5 +1,6 @@
 module FeatureTrace where
 
+import Feature
 import Tree
 import AST
 import Logic
@@ -8,12 +9,6 @@ import NullPropositions
 import Simplify ( removeRedundancy )
 import Util ( nothingIf )
 
-type Feature = String
-toFeature :: String -> Feature
-toFeature = id
-
-type NonNullFeatureFormula = PropositionalFormula Feature
-type FeatureFormula = NullableFormula Feature
 type FeatureTrace g a = Node g a -> FeatureFormula
 
 emptyTrace :: FeatureTrace g a
