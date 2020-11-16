@@ -7,7 +7,10 @@ import Util (removeQuotes,  genIndent )
 import Tree ( prettyPrint )
 import AST
 import Edits ( edit_identity )
-import NullPropositions ( prettyPrint )
+import Logic
+import Propositions
+import NullPropositions 
+import Truthtable
 import FeatureTrace (FeatureTrace,  augmentWithTrace, pc, prettyPrint )
 import FeatureTraceRecording
 
@@ -27,6 +30,7 @@ import Control.Concurrent ()
 import Data.Text.Prettyprint.Doc
     ( Doc, (<+>), annotate, hardline, Pretty(pretty) )
 import System.Terminal
+import Truthtable (generatetruthtablesfor)
 
 
 data OutputFormat = OutputFormat {codeStyle :: CodePrintStyle, traceDisplay :: TraceDisplay, traceStyle :: TraceStyle, withTraceLines :: Bool, hideMandatoryNodes :: Bool}
@@ -86,8 +90,9 @@ tikzFormat = OutputFormat {
     withTraceLines = False,
     hideMandatoryNodes = False
 }
-
+        
 main :: IO ()
+-- main = showTruthtables
 main = withTerminal $ runTerminalT $
     {-
     Select your OutputFormat here.
@@ -197,3 +202,19 @@ printTraces format example tracesAndTrees =
             (Nothing:(featurecontexts example)) -- Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
             (edit_identity:(editscript example)) -- Prepend identity edit here to show initial tree.
             ((\(trace, tree) -> (toPC trace tree, treeAbstract tree)) <$> tracesAndTrees)
+
+
+propositional_values :: [PropositionalFormula String]
+propositional_values = lvalues
+
+nullableFormula_values :: [NullableFormula String]
+nullableFormula_values = lvalues
+
+showTruthtables :: IO()
+showTruthtables = withTerminal $ runTerminalT $
+    do
+        headline "Propositional Logic"
+        putDoc.pretty $ generatetruthtablesfor propositional_values
+        putDoc $ hardline <+> hardline
+        headline "VariantSync Logic"
+        putDoc.pretty $ generatetruthtablesfor nullableFormula_values

@@ -1,9 +1,9 @@
 module NullPropositions where
 
+import Logic
 import Propositions
-import Util
-import Data.List
-import Data.Maybe (isNothing, isJust, fromJust, catMaybes)
+import Defunctor ( Defunctor(demap) )
+import Data.Maybe (catMaybes, fromJust, isNothing)
 
 -- The Nothing case represents null
 type NullableFormula a = Maybe (PropositionalFormula a)
@@ -36,3 +36,17 @@ nullable_simplify = fmap Propositions.simplify
 prettyPrint :: (Show a) => NullableFormula a -> String
 prettyPrint Nothing = "null" -- null, nothing, empty, unknown
 prettyPrint (Just p) = show p
+
+instance Logic a => Logic (Maybe a) where
+    ltrue = Just ltrue
+    lfalse = Just lfalse
+    lvalues = [lfalse, Nothing, ltrue]
+    
+    lnot = fmap lnot
+    land Nothing Nothing = Nothing
+    land Nothing (Just q) = Just q
+    land (Just p) Nothing = Just p
+    land (Just p) (Just q) = Just $ land p q
+
+    leval config (Just p) = Just $ leval (demap config) p
+    leval _ Nothing = Nothing

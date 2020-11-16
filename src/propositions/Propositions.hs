@@ -1,5 +1,6 @@
 module Propositions where
 
+import Logic
 import Data.List ( intercalate )
 
 data PropositionalFormula a =
@@ -10,6 +11,24 @@ data PropositionalFormula a =
     | PAnd [PropositionalFormula a]
     | POr [PropositionalFormula a]
     deriving (Eq)
+
+instance (Eq a) => Logic (PropositionalFormula a) where
+    ltrue = PTrue
+    lfalse = PFalse
+    lvalues = [lfalse, ltrue]
+
+    lnot = pnegate
+    land p q = PAnd [p, q]
+    lor p q = POr [p, q]
+    limplies = pimplies
+    
+    leval config v@(PVariable x) = config v
+    leval config (PNot x) = case leval config x of
+        PTrue -> PFalse
+        PFalse -> PTrue
+    leval config (PAnd cs) = if (any (==PFalse) $ fmap (leval config) cs) then PFalse else PTrue
+    leval config (POr cs) = if (any (==PTrue) $ fmap (leval config) cs) then PTrue else PFalse
+    leval _ p = p
 
 instance Functor PropositionalFormula where
     fmap f PTrue = PTrue
@@ -40,7 +59,7 @@ isLiteral (PNot f) = isLiteral f
 isLiteral _ = False
 
 pimplies :: PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
-pimplies a b = POr [(PNot a), b]
+pimplies a b = POr [PNot a, b]
 
 pequiv :: PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
 pequiv a b = PAnd [pimplies a b, pimplies b a]
