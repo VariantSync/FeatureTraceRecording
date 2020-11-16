@@ -27,7 +27,7 @@ prettyPrint (Just p) = show p
 instance Logic a => Logic (Maybe a) where
     ltrue = Just ltrue
     lfalse = Just lfalse
-    lvalues = [lfalse, Nothing, ltrue]
+    lvalues = Nothing:(Just <$> lvalues)
     
     lnot = fmap lnot
     land l = case catMaybes l of
