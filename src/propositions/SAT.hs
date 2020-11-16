@@ -28,10 +28,10 @@ satAssignment p =
         unsafePerformIO $ do -- TODO: Remove this hack
             res <- solve cnf
             case res of
-                Solution s -> return $ Just (Assignment
+                Solution s -> return $ Just
                     (\x -> case find (\i -> abs i == m ! x) s of
                         Nothing -> error $ (show x)++" is not a variable in this configuration!"
-                        Just i -> i >= 0))
+                        Just i -> i >= 0)
                 Unsatisfiable -> return Nothing
                 Unknown -> return Nothing
 

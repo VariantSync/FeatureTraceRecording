@@ -7,14 +7,14 @@ class Logic l where
 
     lnot :: l -> l
     lnot q = limplies q lfalse
-    land :: l -> l -> l
-    land p q = lnot $ lor (lnot p) (lnot q)
-    lor :: l -> l -> l
+    land :: [l] -> l
+    land = lnot.lor.map lnot
+    lor :: [l] -> l
     -- lor p q = limplies (limplies p q) q
-    lor p q = lnot $ land (lnot p) (lnot q)
+    lor = lnot.land.map lnot
     limplies :: l -> l -> l
-    limplies p q = lor (lnot p) q
+    limplies p q = lor [lnot p, q]
     lequals :: l -> l -> l
-    lequals p q = land (limplies p q) (limplies q p)
+    lequals p q = land [limplies p q, limplies q p]
 
     leval :: (l -> l) -> l -> l

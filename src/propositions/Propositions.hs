@@ -12,23 +12,25 @@ data PropositionalFormula a =
     | POr [PropositionalFormula a]
     deriving (Eq)
 
-instance (Eq a) => Logic (PropositionalFormula a) where
+instance Logic (PropositionalFormula a) where
     ltrue = PTrue
     lfalse = PFalse
     lvalues = [lfalse, ltrue]
 
-    lnot = pnegate
-    land p q = PAnd [p, q]
-    lor p q = POr [p, q]
-    limplies = pimplies
+    lnot PTrue = PFalse
+    lnot PFalse = PTrue
+    lnot p = PNot p
     
-    leval config v@(PVariable x) = config v
-    leval config (PNot x) = case leval config x of
-        PTrue -> PFalse
-        PFalse -> PTrue
-    leval config (PAnd cs) = if (any (==PFalse) $ fmap (leval config) cs) then PFalse else PTrue
-    leval config (POr cs) = if (any (==PTrue) $ fmap (leval config) cs) then PTrue else PFalse
-    leval _ p = p
+    land [] = PTrue
+    land l = PAnd l
+
+    lor [] = PFalse
+    lor l = POr l
+    
+    leval config (PNot x) = lnot $ leval config x -- This should evaluate as config should only map to lvalues and lnot directly inverts PTrue and PFalse.
+    leval config (PAnd cs) = liftBool.not $ any isPFalse $ fmap (leval config) cs
+    leval config (POr cs) = liftBool $ any isPTrue $ fmap (leval config) cs
+    leval config p = config p
 
 instance Functor PropositionalFormula where
     fmap f PTrue = PTrue
@@ -39,9 +41,19 @@ instance Functor PropositionalFormula where
     fmap f (POr c) = POr (fmap (fmap f) c)
 
 -- Maybe this should better be implemented as a map as an Assignment always is a partial function.
-data Assignment a = Assignment (a -> Bool)
+type Assignment a = a -> Bool
 
--- type CNF a = CNF (PAnd [POr a])
+eval :: Assignment a -> PropositionalFormula a -> Bool
+eval _ PTrue = True
+eval _ PFalse = False
+eval config v@(PVariable x) = config x
+eval config (PNot x) = not $ eval config x
+eval config (PAnd cs) = and $ fmap (eval config) cs
+eval config (POr cs) = or $ fmap (eval config) cs
+
+liftBool :: Bool -> PropositionalFormula a
+liftBool True = PTrue
+liftBool False = PFalse
 
 isPTrue :: PropositionalFormula a -> Bool
 isPTrue PTrue = True
@@ -58,29 +70,6 @@ isLiteral (PVariable x) = True
 isLiteral (PNot f) = isLiteral f
 isLiteral _ = False
 
-pimplies :: PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
-pimplies a b = POr [PNot a, b]
-
-pequiv :: PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
-pequiv a b = PAnd [pimplies a b, pimplies b a]
-
-pand :: [PropositionalFormula a] -> PropositionalFormula a
-pand [] = PTrue
-pand l = PAnd l
-
-pnegate :: PropositionalFormula a -> PropositionalFormula a
-pnegate PTrue = PFalse
-pnegate PFalse = PTrue
-pnegate p = PNot p
-
-eval :: Assignment a -> PropositionalFormula a -> Bool
-eval _ PTrue = True
-eval _ PFalse = False
-eval (Assignment c) v@(PVariable x) = c x
-eval config (PNot x) = not $ eval config x
-eval config (PAnd cs) = and $ fmap (eval config) cs
-eval config (POr cs) = or $ fmap (eval config) cs
-
 isCNF :: PropositionalFormula a -> Bool
 isCNF (PAnd cs) = all isCNF cs
 isCNF (POr cs) = all isLiteral cs
@@ -92,8 +81,8 @@ toCNF n@(PNot a) = case a of
     PFalse -> PTrue
     (PVariable x) -> n
     (PNot x) -> toCNF x
-    (PAnd cs) -> toCNF $ POr $ fmap pnegate cs
-    (POr cs) -> toCNF $ PAnd $ fmap pnegate cs
+    (PAnd cs) -> toCNF $ POr $ fmap lnot cs
+    (POr cs) -> toCNF $ PAnd $ fmap lnot cs
 toCNF a@(PAnd cs) = simplify $ PAnd $ fmap toCNF cs
 toCNF o@(POr cs) = simplify $ PAnd $ foldr cartesianOr [PFalse] $ fmap toCNFClauseList $ fmap toCNF cs -- TODO
 toCNF p = p

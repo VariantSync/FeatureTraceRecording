@@ -10,7 +10,6 @@ import Edits ( edit_identity )
 import Logic
 import Propositions
 import NullPropositions 
-import Truthtable
 import FeatureTrace (FeatureTrace,  augmentWithTrace, pc, prettyPrint )
 import FeatureTraceRecording
 
@@ -93,7 +92,7 @@ tikzFormat = OutputFormat {
         
 main :: IO ()
 -- main = showTruthtables
-main = withTerminal $ runTerminalT $
+main = (<>showTruthtables) $ withTerminal $ runTerminalT $
     {-
     Select your OutputFormat here.
     Above, there is a list of presets you can choose from.
@@ -104,34 +103,34 @@ main = withTerminal $ runTerminalT $
         headline "Running Feature Trace Recording Prototype"
         
         headline ">>> [Motivating Example] <<<"
-        printer format StackPopAlice.example
-        printer format StackPopBob.example
+        runExample format StackPopAlice.example
+        runExample format StackPopBob.example
         
         headline ">>> [Code Change Patterns] <<<"
-        printer format CodeChangePatterns.addIfdef
+        runExample format CodeChangePatterns.addIfdef
         -- We omitted AddIfdef* as it is just a repitition of the previous pattern with arbitrary contexts and code fragments.
         -- AddIfDefElse has to be reproduced using two variants.
         -- Hence, we need two different examples here, one for the if-branch and one for the else-branch.
-        printer format CodeChangePatterns.addIfdefElse_IfBranch
-        printer format CodeChangePatterns.addIfdefElse_ElseBranch
-        printer format CodeChangePatterns.addIfdefWrapElse
-        printer format CodeChangePatterns.addIfdefWrapThen
+        runExample format CodeChangePatterns.addIfdefElse_IfBranch
+        runExample format CodeChangePatterns.addIfdefElse_ElseBranch
+        runExample format CodeChangePatterns.addIfdefWrapElse
+        runExample format CodeChangePatterns.addIfdefWrapThen
         -- Adding non-variational code (code that belongs to all clones)
-        printer format CodeChangePatterns.addNormalCode_nonvariational
+        runExample format CodeChangePatterns.addNormalCode_nonvariational
         -- Adding code without any associated trace into a tree-optional scope that is already traced.
-        printer format CodeChangePatterns.addNormalCode_outerpc
+        runExample format CodeChangePatterns.addNormalCode_outerpc
         -- Removing code that does not have a presence condition
-        printer format CodeChangePatterns.remNormalCode_null
+        runExample format CodeChangePatterns.remNormalCode_null
         -- Removing code that has a feature trace and thereby a presence condition
-        printer format CodeChangePatterns.remNormalCode_notnull
+        runExample format CodeChangePatterns.remNormalCode_notnull
         -- Removing code that has a feature trace
-        printer format CodeChangePatterns.remIfdef
+        runExample format CodeChangePatterns.remIfdef
 
 headline :: (MonadColorPrinter m) => String -> m()
 headline text = putDoc $ hardline <+> (annotate (background red) $ pretty text) <+> hardline <+> hardline
 
-printer :: (MonadColorPrinter m, Grammar g) => OutputFormat -> State UUID (Example m g String) -> m ()
-printer format ex =
+runExample :: (MonadColorPrinter m, Grammar g) => OutputFormat -> State UUID (Example m g String) -> m ()
+runExample format ex =
     let example = finalizeExample ex
         result = printTraces format example (runFTR example) in
     (putDoc $ result <+> hardline) >> flush

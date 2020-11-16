@@ -11,6 +11,9 @@ cartesian x y = (,) <$> x <*> y
 binarytable :: Logic a => (a -> a -> a) -> [a] -> [a]
 binarytable op values = leval id . uncurry op <$> cartesian values values
 
+binarify :: ([a] -> b) -> (a -> a -> b)
+binarify f = \x -> \y -> f [x, y]
+
 hfillto :: Int -> String -> String
 hfillto i s
     | missingspace > 0 = (s++) $ replicate missingspace ' '
@@ -43,8 +46,8 @@ generatetruthtablesfor values =
     ++"\n"
     ++ mconcat (("\n"++).uncurry (prettybinarytable values)
         <$> [
-            (land, andname)
-            , (lor, orname)
+              (binarify land, andname)
+            , (binarify lor, orname)
             , (limplies, impliesname)
             , (lequals, equalsname)
             ])

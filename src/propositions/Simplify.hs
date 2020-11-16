@@ -2,9 +2,9 @@
     removeRedundancy
 ) where
 
+import Logic
 import Propositions
-    ( pimplies,
-      simplify,
+    ( simplify,
       PropositionalFormula(..) )
 import SAT ( contradicts, taut )
 import Data.List
@@ -25,7 +25,7 @@ removeRedundancy axiom (PAnd cs) =
     else
         simplify $
         PAnd $
-        foldr (\elementToInspect b -> if taut $ pimplies axiom (PAnd $ elementToInspect:b) then b else elementToInspect:b) [] $
+        foldr (\elementToInspect b -> if taut $ limplies axiom (PAnd $ elementToInspect:b) then b else elementToInspect:b) [] $
         -- (\c -> removeRedundancy (PAnd $ axiom:(delete c cs)) c) <$> cs
         removeRedundancy axiom <$> cs
 removeRedundancy axiom (POr cs) =
@@ -39,7 +39,7 @@ removeRedundancy axiom x =
     if contradicts $ PAnd [y, axiom] then PFalse else y
 
 removeRedundancyBase :: (Ord a, Show a) => PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
-removeRedundancyBase axiom x = simplify $ if taut $ pimplies axiom x then PTrue else x
+removeRedundancyBase axiom x = simplify $ if taut $ limplies axiom x then PTrue else x
 
 
  {-

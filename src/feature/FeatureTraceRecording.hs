@@ -3,6 +3,7 @@ module FeatureTraceRecording where
 import Edits
 import AST
 import FeatureTrace
+import Logic
 import Propositions
 import NullPropositions
 import Data.Set
@@ -17,7 +18,7 @@ Arguments are:
 2. initial feature trace (for example FeatureTrace.emptyTrace)
 3. initial source code as AST
 4. edit script (i.e., the sequence of edits applied to the initial AST upon which feature traces should be recorded)
-5. lost of feature contexts, one feature context for each edit
+5. list of feature contexts, one feature context for each edit
 -}
 featureTraceRecording :: (Show a, Eq a) => FeatureTraceRecordingAlgorithm g a -> FeatureTrace g a -> AST g a -> EditScript g a -> [FeatureFormula] -> (FeatureTrace g a, AST g a)
 featureTraceRecording algorithm f0 t0 editscript contexts = last $ featureTraceRecordingWithIntermediateSteps algorithm f0 t0 editscript contexts
@@ -98,20 +99,20 @@ ftr_del e = \context f_old t_old ->
         if not $ member v $ delta e t_old
         then f_old v
         else (if isnull context && not (isnull $ pc t_old f_old v)
-              then Just PFalse
+              then lfalse
               {-
               Due to our logical operators with null,
               three of the cases of R_del in the paper can actually be collapsed
               into this single formula.
               -}
-              else nullable_and [f_old v, nullable_not context] 
+              else land [f_old v, lnot context] 
         )
 
 ftr_move :: (Show a, Eq a) => Edit g a -> RecordingFunction g a
 ftr_move e = \context f_old t_old ->
     \v ->
         if member v $ delta e t_old
-        then nullable_and [f_old v, context]
+        then land [f_old v, context]
         else f_old v
 
 ftr_up :: (Eq a, Show a) => Edit g a -> RecordingFunction g a
