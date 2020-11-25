@@ -1,7 +1,5 @@
 module Util where
 
-
-
 genIndent :: Int -> String
 genIndent i = concat $ replicate i " "
 

@@ -97,7 +97,7 @@ main = (<>showTruthtables) $ withTerminal $ runTerminalT $
     Select your OutputFormat here.
     Above, there is a list of presets you can choose from.
     -}
-    let format = userFormat in
+    let format = astFormat in
     do
         putDoc hardline
         headline "Running Feature Trace Recording Prototype"

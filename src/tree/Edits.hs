@@ -17,6 +17,19 @@ data Edit g a = Edit {
     delta :: AST g a -> Set (Node g a)} -- inverse :: Edit a
 type EditScript g a = [Edit g a]
 
+-- editscriptmerge :: AST g a -> EditScript g a -> EditScript g a -> EditScript g a
+-- editscriptmerge t e1 e2 = e1++e2
+
+{-
+Can we resort an edit script?
+Assume we have a function that takes an edit script e and generates a dependency graph d.
+d should be a directed acyclic graph.
+In d, each edit is a node and a directed edge from a to b indicates that a depends on b, i.e., it has to be executed after b.
+Then d induces a partial order.
+d can be projected onto different total orders.
+Each such total order then is one possible resorted edit script.
+-}
+
 instance Show (Edit g a) where
     show = name
 

@@ -32,7 +32,7 @@ Crashes when the given node is not in the given tree.
 -}
 pc_parentpart :: (Grammar g, Show a, Eq a) => AST g a -> FeatureTrace g a -> Node g a -> FeatureFormula
 pc_parentpart root trace v
-  | optionaltype v == Mandatory = parent root t >>= \p -> pc root trace $ element p
+  | optionaltype v == Mandatory = parent root t >>= pc root trace . element
   | otherwise = land $ trace.element <$> (treeoptionalAncestors root t)
   where t = tree root v
 

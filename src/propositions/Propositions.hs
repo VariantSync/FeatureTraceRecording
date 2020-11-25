@@ -12,10 +12,31 @@ data PropositionalFormula a =
     | POr [PropositionalFormula a]
     deriving (Eq)
 
+-- instance Logic (PropositionalFormula a) Bool where
+--     ltrue = PTrue
+--     lfalse = PFalse
+--     lvalues = [lfalse, ltrue]
+
+--     lnot PTrue = PFalse
+--     lnot PFalse = PTrue
+--     lnot p = PNot p
+    
+--     land [] = PTrue
+--     land l = PAnd l
+
+--     lor [] = PFalse
+--     lor l = POr l
+    
+--     leval _ PTrue = True
+--     leval _ PFalse = False
+--     leval config (PNot x) = not $ leval config x -- This should evaluate as config should only map to lvalues and lnot directly inverts PTrue and PFalse.
+--     leval config (PAnd cs) = and $ fmap (leval config) cs
+--     leval config (POr cs) = or $ fmap (leval config) cs
+--     leval config v@(PVariable x) = config v
+
 instance Logic (PropositionalFormula a) where
     ltrue = PTrue
     lfalse = PFalse
-    lvalues = [lfalse, ltrue]
 
     lnot PTrue = PFalse
     lnot PFalse = PTrue
