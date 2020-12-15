@@ -3,6 +3,7 @@ module FeatureTrace where
 import Feature
 import Tree
 import AST
+import Grammar
 import Logic
 import Propositions
 import NullPropositions

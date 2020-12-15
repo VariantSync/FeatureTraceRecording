@@ -4,6 +4,8 @@ import Tree
 import Control.Monad.State ( State )
 import UUID ( UUID )
 import AST
+import Grammar
+import ASTPrettyPrinter
 import Data.List ( intersperse )
 
 type SCXXAST a = AST SimpleCXXGrammar a
@@ -125,6 +127,7 @@ instance Grammar SimpleCXXGrammar where
     nodetypeof SCXX_Literal = Optional
     nodetypeof SCXX_Assignment = Mandatory
 
+instance ASTPrettyPrinter SimpleCXXGrammar where
     {- print AST as source code -}
     prettyPrint i indentGenerator prtStrWithContext prtNode (Tree n children) =
         mconcat $

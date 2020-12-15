@@ -41,7 +41,7 @@ alertstatuspgm = sequence $ scxx_exprstatement $ scxx_funccall "alertstatuspgm" 
 somefunction :: State UUID SSCXXAST
 somefunction = sequence $ scxx_funcdef "void" "foo" [] []
 
-createPatternExample :: (MonadColorPrinter m) => String -> SSCXXAST -> RecordedEditScript SimpleCXXGrammar String -> Example m SimpleCXXGrammar String
+createPatternExample :: (MonadColorPrinter m) => String -> SSCXXAST -> History SimpleCXXGrammar String -> Example m SimpleCXXGrammar String
 createPatternExample name start edits =
     Example {
         Example.name = name,

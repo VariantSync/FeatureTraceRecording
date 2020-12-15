@@ -3,6 +3,8 @@ module Edits where
 import UUID
 import Tree
 import AST
+import Grammar
+
 import Util
 import ListUtil
 
@@ -16,6 +18,9 @@ data Edit g a = Edit {
     run :: AST g a -> AST g a,
     delta :: AST g a -> Set (Node g a)} -- inverse :: Edit a
 type EditScript g a = [Edit g a]
+
+invertEdit :: Edit g a -> Edit g a
+invertEdit = error "not implemented"
 
 -- editscriptmerge :: AST g a -> EditScript g a -> EditScript g a -> EditScript g a
 -- editscriptmerge t e1 e2 = e1++e2

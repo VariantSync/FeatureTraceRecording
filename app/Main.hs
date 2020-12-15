@@ -6,6 +6,8 @@ import UUID ( UUID )
 import Util (removeQuotes,  genIndent )
 import Tree ( prettyPrint )
 import AST
+import Grammar
+import ASTPrettyPrinter
 import Edits ( edit_identity )
 import Logic
 import Propositions
@@ -97,55 +99,48 @@ main = (<>showTruthtables) $ withTerminal $ runTerminalT $
     Select your OutputFormat here.
     Above, there is a list of presets you can choose from.
     -}
-    let format = astFormat in
+    let format = userFormat in
     do
         putDoc hardline
         headline "Running Feature Trace Recording Prototype"
         
         headline ">>> [Motivating Example] <<<"
-        runExample format StackPopAlice.example
-        runExample format StackPopBob.example
+        runStepwise format StackPopAlice.example
+        runStepwise format StackPopBob.example
         
         headline ">>> [Code Change Patterns] <<<"
-        runExample format CodeChangePatterns.addIfdef
+        runStepwise format CodeChangePatterns.addIfdef
         -- We omitted AddIfdef* as it is just a repitition of the previous pattern with arbitrary contexts and code fragments.
         -- AddIfDefElse has to be reproduced using two variants.
         -- Hence, we need two different examples here, one for the if-branch and one for the else-branch.
-        runExample format CodeChangePatterns.addIfdefElse_IfBranch
-        runExample format CodeChangePatterns.addIfdefElse_ElseBranch
-        runExample format CodeChangePatterns.addIfdefWrapElse
-        runExample format CodeChangePatterns.addIfdefWrapThen
+        runStepwise format CodeChangePatterns.addIfdefElse_IfBranch
+        runStepwise format CodeChangePatterns.addIfdefElse_ElseBranch
+        runStepwise format CodeChangePatterns.addIfdefWrapElse
+        runStepwise format CodeChangePatterns.addIfdefWrapThen
         -- Adding non-variational code (code that belongs to all clones)
-        runExample format CodeChangePatterns.addNormalCode_nonvariational
+        runStepwise format CodeChangePatterns.addNormalCode_nonvariational
         -- Adding code without any associated trace into a tree-optional scope that is already traced.
-        runExample format CodeChangePatterns.addNormalCode_outerpc
+        runStepwise format CodeChangePatterns.addNormalCode_outerpc
         -- Removing code that does not have a presence condition
-        runExample format CodeChangePatterns.remNormalCode_null
+        runStepwise format CodeChangePatterns.remNormalCode_null
         -- Removing code that has a feature trace and thereby a presence condition
-        runExample format CodeChangePatterns.remNormalCode_notnull
+        runStepwise format CodeChangePatterns.remNormalCode_notnull
         -- Removing code that has a feature trace
-        runExample format CodeChangePatterns.remIfdef
+        runStepwise format CodeChangePatterns.remIfdef
 
 headline :: (MonadColorPrinter m) => String -> m()
 headline text = putDoc $ hardline <+> (annotate (background red) $ pretty text) <+> hardline <+> hardline
 
-runExample :: (MonadColorPrinter m, Grammar g) => OutputFormat -> State UUID (Example m g String) -> m ()
-runExample format ex =
-    let example = finalizeExample ex
-        result = printTraces format example (runFTR example) in
-    (putDoc $ result <+> hardline) >> flush
-
 finalizeExample :: State UUID (Example m g a) -> Example m g a
 finalizeExample ex = fst $ runState ex 0
 
-runFTR :: (Grammar g, Show a, Eq a) => Example m g a -> [(FeatureTrace g a, AST g a)]
-runFTR example = featureTraceRecordingWithIntermediateSteps
-        defaultFeatureTraceRecording
-        (Example.startTrace example)
-        (Example.startTree example)
-        (Example.editscript example)
+runStepwise :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g) => OutputFormat -> State UUID (Example m g String) -> m ()
+runStepwise format ex =
+    let example = finalizeExample ex
+        result = printTraces format example (Example.runExampleWithDefaultFTR example) in
+    (putDoc $ result <+> hardline) >> flush
 
-printTraces :: (MonadColorPrinter m, Grammar g, Show a, Eq a) => OutputFormat -> Example m g a -> [(FeatureTrace g a, AST g a)] -> Doc (Attribute m)
+printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) => OutputFormat -> Example m g a -> [(FeatureTrace g a, AST g a)] -> Doc (Attribute m)
 printTraces format example tracesAndTrees = 
     let
         featureColourPalette = colours example

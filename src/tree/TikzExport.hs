@@ -1,7 +1,8 @@
 ﻿module TikzExport where
 
 import Tree (element,  Tree(Tree) )
-import AST 
+import AST
+import Grammar
 import Propositions
 import Feature
 import FeatureTrace

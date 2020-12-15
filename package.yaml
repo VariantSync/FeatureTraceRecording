@@ -34,6 +34,7 @@ library:
   source-dirs:
     - src
     - src/feature
+    - src/feature/recording
     - src/tree
     - src/tree/grammars
     - src/propositions
