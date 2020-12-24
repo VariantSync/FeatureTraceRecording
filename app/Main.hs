@@ -192,7 +192,7 @@ printTraces format example tracesAndTrees =
                     treePrint tree trace,
                     s])
         $ zip
-            ((edit_identity, Nothing):(editscript example)) -- Prepend identity edit here to show initial tree. Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
+            ((edit_identity, Nothing):(history example)) -- Prepend identity edit here to show initial tree. Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
             ((\(trace, tree) -> (toPC trace tree, treeAbstract tree)) <$> tracesAndTrees)
 
 

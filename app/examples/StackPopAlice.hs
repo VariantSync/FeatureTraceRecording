@@ -74,9 +74,8 @@ example =
         return Example {
             Example.name = "Motivating Example: Alice works on Stack.pop",
             Example.colours = featurecolours,
-            Example.startTrace = emptyTrace,
-            Example.startTree = tree_start,
-            editscript = zip [
+            Example.startVersion = (emptyTrace, tree_start),
+            history = zip [ -- Edits
                 edit_ins_tree tree_cond id_tree_start_body 0
               , edit_move_tree id_tree_start_storage id_tree_cond_body 0
               , edit_del_tree id_tree_start_storage
@@ -84,7 +83,7 @@ example =
               , edit_ins_tree tree_clonedef id_tree_start_body 0
               , edit_ins_tree tree_cloneretstatement id_tree_start_body 2
               , edit_update id_tree_start_ret SCXX_Type newReturnType
-            ] [
+            ] [ -- corresponding feature contexts
                 Just $ PVariable feature_SafeStack
               , Nothing
               , Just $ PVariable feature_ImmutableStack

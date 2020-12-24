@@ -24,17 +24,16 @@ example =
     >>= \alice ->
         let numEditsToSynchronise = 2
             deleteThatUpdatesBobsTrace = 2
-            startTree = Example.startTree alice
-            alicesEdits = editscript alice
+            startVersion@(startTrace, startTree) = Example.startVersion alice
+            alicesEdits = history alice
             alicesEditsToSyncDirectly = take numEditsToSynchronise alicesEdits
             popVersion3 = foldEditScript (fst <$> alicesEditsToSyncDirectly) startTree
             in
         return Example {
             Example.name = "Motivating Example: Simulating synchronisation of Alice's edits on Stack.pop to Bob's clone",
             Example.colours = StackPopBob.featureColourPalette $ colours alice,
-            Example.startTrace = Example.startTrace alice,
-            Example.startTree = startTree,
-            Example.editscript = 
+            Example.startVersion = startVersion,
+            Example.history = 
                 alicesEditsToSyncDirectly++
                 [(edit_trace_only $ delta (fst $ alicesEdits !! deleteThatUpdatesBobsTrace) popVersion3, Just $ PNot $ PVariable feature_ImmutableStack)]
         }

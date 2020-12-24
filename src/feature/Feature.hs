@@ -1,6 +1,5 @@
 ﻿module Feature where
 
-import Logic
 import Propositions
 import NullPropositions
 

@@ -42,13 +42,15 @@ somefunction :: State UUID SSCXXAST
 somefunction = sequence $ scxx_funcdef "void" "foo" [] []
 
 createPatternExample :: (MonadColorPrinter m) => String -> SSCXXAST -> History SimpleCXXGrammar String -> Example m SimpleCXXGrammar String
-createPatternExample name start edits =
+createPatternExample = createPatternExampleWithStartTrace emptyTrace
+
+createPatternExampleWithStartTrace :: (MonadColorPrinter m) => FeatureTrace SimpleCXXGrammar String -> String -> SSCXXAST -> History SimpleCXXGrammar String -> Example m SimpleCXXGrammar String
+createPatternExampleWithStartTrace startTrace name start edits =
     Example {
         Example.name = name,
         colours = featurecolours,
-        startTrace = emptyTrace,
-        startTree = start,
-        editscript = edits
+        startVersion = (startTrace, start),
+        history = edits
     }
 
 addIfdef :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
@@ -119,13 +121,14 @@ addNormalCode_outerpc = do
         start = (run $ edit_ins_tree foo (uuidOf file) 0) file
         statementsOfFoo = uuidOf . fromJust $ findByGrammarType SCXX_Statements foo
         in
-        return $
-            (createPatternExample "AddNormalCode (with outer PC)" start
-                [(edit_ins_tree lcd statementsOfFoo 0, 
-                -- Here, any feature context would be feasible that is weaker than outer_pc (e.g., outer_pc itself).
-                 Just PTrue)])
+        return $ createPatternExampleWithStartTrace
             -- change the start trace so that there is already a trace
-            {startTrace = \n -> if n == element foo then outer_pc else Nothing}
+            (\n -> if n == element foo then outer_pc else Nothing)
+            "AddNormalCode (with outer PC)"
+            start
+            -- Here, any feature context would be feasible that is weaker than outer_pc (e.g., outer_pc itself).
+            [(edit_ins_tree lcd statementsOfFoo 0, Just PTrue)]
+            
 
 remNormalCode_null :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
 remNormalCode_null = do
@@ -143,10 +146,11 @@ remNormalCode_notnull = do
         start = (run $ edit_ins_tree lcd (uuidOf file) 0) file
         existingtrace = Just $ PVariable feature_ULTRA_LCD
         in
-        return $
-            (createPatternExample "RemNormalCode (with trace)" start
-            [(edit_del_tree (uuidOf lcd), Nothing {-null-})])
-            {startTrace = \n -> if n == element lcd then existingtrace else Nothing}
+        return $ createPatternExampleWithStartTrace
+            (\n -> if n == element lcd then existingtrace else Nothing)
+            "RemNormalCode (with trace)"
+            start
+            [(edit_del_tree (uuidOf lcd), Nothing {-null-})]
 
 {- This behaves the same as remNormalCode_notnull. -}
 remIfdef :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)

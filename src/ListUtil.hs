@@ -5,7 +5,7 @@ safehead [] = Nothing
 safehead (x:_) = Just x
 
 getRange :: Int -> Int -> [a] -> [a]
-getRange i j [] = []
+getRange _ _ [] = []
 getRange i j l = (l!!) <$> [i..j]
 
 insertAtIndex :: Int -> a -> [a] -> [a]
@@ -31,3 +31,8 @@ removeRange i j (head:tail)
     | i == 0 && j > 0 = removeRange 0 (j-1) tail
     | i == 0 && j <= 0 = tail
     | otherwise = head:(removeRange (i-1) (j-1) tail)
+
+removeDuplicates :: (Eq a) => [a] -> [a]
+removeDuplicates [] = []
+removeDuplicates [x] = [x]
+removeDuplicates (x:xs) = x : [ k  | k <- removeDuplicates xs, k /=x ]

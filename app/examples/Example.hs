@@ -11,17 +11,13 @@ import FeatureColour (FeatureFormulaColourPalette)
 
 data Example m g a = Example {
     name :: String,
-    startTrace :: FeatureTrace g a,
-    startTree :: AST g a,
-    editscript :: History g a,
+    startVersion :: Version g a,
+    history :: History g a,
     colours :: FeatureFormulaColourPalette m
 }
 
-runExample :: (Grammar g, Show a, Eq a) => FeatureTraceRecording g a -> Example m g a -> [(FeatureTrace g a, AST g a)]
-runExample ftr example = runFTRWithIntermediateSteps ftr
-    (startTrace example)
-    (startTree example)
-    (editscript example)
+runExample :: (Grammar g, Show a, Eq a) => FeatureTraceRecording g a -> Example m g a -> [Version g a]
+runExample ftr example = runFTRWithIntermediateSteps ftr (startVersion example) (history example)
 
-runExampleWithDefaultFTR :: (Grammar g, Show a, Eq a) => Example m g a -> [(FeatureTrace g a, AST g a)]
+runExampleWithDefaultFTR :: (Grammar g, Show a, Eq a) => Example m g a -> [Version g a]
 runExampleWithDefaultFTR = runExample defaultFeatureTraceRecording

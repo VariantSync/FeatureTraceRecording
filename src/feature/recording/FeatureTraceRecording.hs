@@ -5,50 +5,46 @@ import AST
 import Feature
 import FeatureTrace
 
-import Data.Bifunctor ( Bifunctor(first) )
-
 type FeatureContext = FeatureFormula
 
+{-
+Encapsulates an edit that was recorded under a given feature context.
+This might happen via IDE interaction or diffing techniques.
+-}
 type RecordedEdit g a = (Edit g a, FeatureContext)
 type History g a = [RecordedEdit g a]
 
-type RecordingFunction g a = RecordedEdit g a -> AST g a -> FeatureTrace g a -> FeatureTrace g a
+{-
+We denote the state of a software system at any point in time as a Version.
+We describe the a version by the software artefacts in terms of an AST and the according feature traces we have at that version.
+-}
+type Version g a = (FeatureTrace g a, AST g a)
+
+{-
+Type for the recording functions for individual edit types.
+In the paper, these edits are referred to as R_ins, R_del, R_mov, and R_up.
+Instead of just passing the delta, we give the entire edit as input to the function from which the delta can be calculated.
+-}
+type RecordingFunction g a = RecordedEdit g a -> Version g a -> FeatureTrace g a
+
+{-
+Abstraction over Algorithm 1 in the paper.
+For different use cases and to prevent future errors, feature trace recording is configurable.
+In a framework-like manner, it gives us an implementation for a recording function.
+-}
 type FeatureTraceRecording g a = EditType -> RecordingFunction g a
 
--- Inverse of RecordingFunction w.r.t. the feature context.
-type ReverseEngineeringFTR g a = Edit g a -> AST g a -> FeatureTrace g a -> FeatureTrace g a -> FeatureContext
+{-
+Runs the given feature trace recording implementation starting at the given version.
+All edits in the given history will be applied to the given version yielding the new version after that history.
+-}
+runFTR :: (Show a, Eq a) => FeatureTraceRecording g a -> Version g a -> History g a -> Version g a
+runFTR ftr startVersion history = last $ runFTRWithIntermediateSteps ftr startVersion history
 
 {-
-Runs the given feature trace recording.
-Arguments are:
-1. chosen feature trace recording algorithm (for example defaultFeatureTraceRecording)
-2. initial feature trace (for example FeatureTrace.emptyTrace)
-3. initial source code as AST
-4. edit script (i.e., the sequence of edits applied to the initial AST upon which feature traces should be recorded) with the corresponding feature contexts
+The same as runFTR but also returns all intermediate results.
 -}
-runFTR :: (Show a, Eq a) => FeatureTraceRecording g a -> FeatureTrace g a -> AST g a -> History g a -> (FeatureTrace g a, AST g a)
-runFTR ftr f0 t0 reditscript = last $ runFTRWithIntermediateSteps ftr f0 t0 reditscript
-
-{-
-The same as featureTraceRecording but also returns all intermediate results.
--}
-runFTRWithIntermediateSteps :: (Show a, Eq a) => FeatureTraceRecording g a -> FeatureTrace g a -> AST g a -> History g a -> [(FeatureTrace g a, AST g a)]
-runFTRWithIntermediateSteps ftr f0 t0 = scanl record (f0, t0)
-    where record (f_old, t_old) recordedEdit@(edit, _) = ((ftr $ edittype edit) recordedEdit t_old f_old, run edit t_old)
-
-runBackwards :: (Show a, Eq a) => FeatureTraceRecording g a -> FeatureTrace g a -> AST g a -> History g a -> [(FeatureTrace g a, AST g a)]
-runBackwards ftr fLast tLast history = reverse $ runFTRWithIntermediateSteps ftr fLast tLast (invertHistory history)
-
--- reverseEngineerContext :: FeatureTraceRecording g a -> FeatureTrace g a -> AST g a -> FeatureTrace g a -> Edit g a -> FeatureContext
--- reverseEngineerContext ftr f_old t_old f_new edit = 
-
-{-
-Given a history
-a -> b -> c -> ... -> n
-we first invert all the edits and get
-a <- b <- c <- ... <- n
-and then reverse the entire history to get
-n -> ... -> a -> b -> c 
--}
-invertHistory :: History g a -> History g a
-invertHistory history = reverse $ fmap ({-bifunctor-} first invertEdit) history
+runFTRWithIntermediateSteps :: (Show a, Eq a) => FeatureTraceRecording g a -> Version g a -> History g a -> [Version g a]
+runFTRWithIntermediateSteps ftr startVersion = scanl record startVersion
+    where record (f_old, t_old) recordedEdit@(edit, _)
+            = (ftr (edittype edit) recordedEdit (f_old, t_old), run edit t_old)
