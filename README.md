@@ -1,6 +1,6 @@
 # Prototype of Feature Trace Recording
 
-This code is supplementary material for the submission _Feature Trace Recording_ at the _28th IEEE International Conference on Software Analysis, Evolution and Reengineering (SANER), 2021_.
+This code is supplementary material for the submission _Feature Trace Recording_ at _PUT VENUE HERE_.
 
 ## How to Run the Project
 This prototype is written in Haskell and uses the Stack build system.
@@ -50,13 +50,15 @@ By default, the following examples are executed in this order:
 
 ## Interesting Code Locations
 
-- `main` function in [`app/Main.hs`](app/Main.hs): Here you can choose which examples to run and in which format the source code should be displayed. Choose from:
+- `showExamples` function in [`app/Main.hs`](app/Main.hs): Here you can choose which examples to run and in which format the source code should be displayed. Choose from:
     - `userFormat` (default): The perspective of the developer who is editing source code while traces are recorded in the background. This is the format used in the figures in the paper. Feature traces are indicated by colours.
     - `userFormatDetailed`: A variation of `userFormat` where traces and presence conditions can be investigated seperately at the same time. Code is coloured in the colour of its feature trace while presence conditions are indicated by coloured lines on the left.
     - `astFormat`: Shows the abstract syntax tree of the source code with feature traces as formulas.
     - `tikzFormat`: Tikz export of abstract syntax trees with traces. Used for figures in the paper.
 
-- [`src/feature/FeatureTraceRecording.hs`](src/feature/FeatureTraceRecording.hs): The implementation of the feature trace recording itself. Here you can find Algorithm 1 from the paper (`defaultFeatureTraceRecording`) and the recording functions for insertions, deletions, moves, and updates.
+- [`src/feature/recording/FeatureTraceRecording.hs`](src/feature/recording/FeatureTraceRecording.hs): This file includes type definitions and interfaces for feature trace recording to make it configurable (e.g., plug in custom recording functions).
+
+- [`src/feature/recording/DefaultFeatureTraceRecording.hs`](src/feature/recording/DefaultFeatureTraceRecording.hs): The implementation of the feature trace recording. Here you can find Algorithm 1 from the paper (`defaultFeatureTraceRecording`) and the recording functions for insertions, deletions, moves, and updates.
 
 - [`src/feature/FeatureTrace.hs`](src/feature/FeatureTrace.hs): Here you can find definitions for feature traces and presence conditions.
 
@@ -64,4 +66,4 @@ By default, the following examples are executed in this order:
 
 - [`app/examples/`](app/examples/): In this directory, the source code for the examples can be found. The motivating example from the paper is implemented in [`StackPopAlice.hs`](app/examples/StackPopAlice.hs) and [`StackPopBob.hs`](app/examples/StackPopBob.hs). The reproduction of the code change patterns used in our evaluation can be found in [`CodeChangePatterns.hs`](app/examples/CodeChangePatterns.hs).
 
-- [`src/propositions/NullPropositions.hs`](src/propositions/NullPropositions.hs): Operators for our ternary logic with `null`, based on our implementation of propositional logic in [`src/propositions/Propositions.hs`](src/propositions/Propositions.hs).
+- [`src/propositions/NullPropositions.hs`](src/propositions/NullPropositions.hs): Operators for our ternary logic with `null`, based on our implementation of propositional logic in [`src/propositions/Propositions.hs`](src/propositions/Propositions.hs). You can inspect the truth tables for this logic by uncommenting the respective line (`showTruthtables`) in the `main` function in [`app/Main.hs`](app/Main.hs) and running the project again.
