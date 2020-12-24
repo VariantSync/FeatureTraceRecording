@@ -93,8 +93,13 @@ tikzFormat = OutputFormat {
 }
         
 main :: IO ()
--- main = showTruthtables
-main = (<>showTruthtables) $ withTerminal $ runTerminalT $
+main = mconcat [
+    showExamples
+    -- , showTruthtables
+    ]
+
+showExamples :: IO ()
+showExamples = withTerminal $ runTerminalT $
     {-
     Select your OutputFormat here.
     Above, there is a list of presets you can choose from.
@@ -127,6 +132,7 @@ main = (<>showTruthtables) $ withTerminal $ runTerminalT $
         runStepwise format CodeChangePatterns.remNormalCode_notnull
         -- Removing code that has a feature trace
         runStepwise format CodeChangePatterns.remIfdef
+    
 
 headline :: (MonadColorPrinter m) => String -> m()
 headline text = putDoc $ hardline <+> (annotate (background red) $ pretty text) <+> hardline <+> hardline
