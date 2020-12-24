@@ -37,7 +37,7 @@ import Truthtable (generatetruthtablesfor)
 data OutputFormat = OutputFormat {codeStyle :: CodePrintStyle, traceDisplay :: TraceDisplay, traceStyle :: TraceStyle, withTraceLines :: Bool, hideMandatoryNodes :: Bool}
 data CodePrintStyle = ShowAST | ShowCode | ShowTikz deriving (Show)
 data TraceDisplay = Trace | PC deriving (Show, Eq)
-data TraceStyle = Text | Colour | None deriving (Show, Eq)
+data TraceStyle = Text | Colour | Hidden deriving (Show, Eq)
 
 -- Some presets for output formats:
 
@@ -87,7 +87,7 @@ tikzFormat :: OutputFormat
 tikzFormat = OutputFormat {
     codeStyle = ShowTikz,
     traceDisplay = Trace,
-    traceStyle = None,
+    traceStyle = Hidden,
     withTraceLines = False,
     hideMandatoryNodes = False
 }
@@ -160,13 +160,13 @@ printTraces format example tracesAndTrees =
         treeAbstract = if hidemandatory then abstract else id
         treePrint = \tree trace -> case codestyle of
             ShowAST -> (case tracestyle of
-                None -> pretty.show
+                Hidden -> pretty.show
                 Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace n) $ show n)
                 Text -> pretty.(FeatureTrace.prettyPrint).(augmentWithTrace trace)) tree
             ShowTikz -> pretty $ astToTikzWithTraceDefault trace tree
             ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
             where nodePrint trace n = case tracestyle of
-                      None -> pretty.removeQuotes.show $ value n
+                      Hidden -> pretty.removeQuotes.show $ value n
                       Colour -> paint (trace n) $ removeQuotes.show $ value n
                       Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ trace n, ">", removeQuotes.show $ value n]
                   stringPrint trace n s = case tracestyle of

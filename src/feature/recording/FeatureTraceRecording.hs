@@ -4,8 +4,16 @@ import Edits
 import AST
 import Feature
 import FeatureTrace
+import Grammar
 
 type FeatureContext = FeatureFormula
+data FeasibleFeatureContext =
+      None String -- string contains metadata on why there is no feasible feature context
+    | WeakerEquals FeatureContext
+    | StrongerEquals FeatureContext
+    | Exactly FeatureContext
+    | OneOf [FeatureContext]
+    | Any
 
 {-
 Encapsulates an edit that was recorded under a given feature context.
@@ -25,7 +33,14 @@ Type for the recording functions for individual edit types.
 In the paper, these edits are referred to as R_ins, R_del, R_mov, and R_up.
 Instead of just passing the delta, we give the entire edit as input to the function from which the delta can be calculated.
 -}
-type RecordingFunction g a = RecordedEdit g a -> Version g a -> FeatureTrace g a
+data RecordingFunction g a = RecordingFunction {
+    runRecording :: RecordedEdit g a -> Version g a -> FeatureTrace g a,
+    {-
+    Tells us a possible feature context such that the given feature trace would be calculated by `run`
+    when the given edit when applied to the given version.
+    -}
+    reverseEngineerFeatureContext :: Edit g a -> Version g a -> FeatureTrace g a -> FeasibleFeatureContext
+}
 
 {-
 Abstraction over Algorithm 1 in the paper.
@@ -47,4 +62,4 @@ The same as runFTR but also returns all intermediate results.
 runFTRWithIntermediateSteps :: (Show a, Eq a) => FeatureTraceRecording g a -> Version g a -> History g a -> [Version g a]
 runFTRWithIntermediateSteps ftr startVersion = scanl record startVersion
     where record (f_old, t_old) recordedEdit@(edit, _)
-            = (ftr (edittype edit) recordedEdit (f_old, t_old), run edit t_old)
+            = (runRecording (ftr (edittype edit)) recordedEdit (f_old, t_old), Edits.run edit t_old)
