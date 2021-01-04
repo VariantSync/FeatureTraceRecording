@@ -7,6 +7,7 @@ import Grammar
 import Logic
 import Propositions
 import NullPropositions
+import Data.Set
 import Simplify ( removeRedundancy )
 import Util ( nothingIf )
 
@@ -15,10 +16,13 @@ type FeatureTrace g a = Node g a -> FeatureFormula
 emptyTrace :: FeatureTrace g a
 emptyTrace _ = Nothing
 
-simplify :: (Grammar g, Show a, Eq a) => FeatureTrace g a -> AST g a -> FeatureTrace g a
-simplify f t v = case (pc_parentpart t f v, f v) of
+simplifyFeatureTrace :: (Grammar g, Show a, Eq a) => FeatureTrace g a -> AST g a -> FeatureTrace g a
+simplifyFeatureTrace f t v = case (pc_parentpart t f v, f v) of
   (Just p, Just f') -> nothingIf (==PTrue) (removeRedundancy p f')
   _ -> Propositions.simplify <$> f v
+
+simplifyFeatureTraceOfNodes :: (Grammar g, Show a, Eq a) => FeatureTrace g a -> AST g a -> Set (Node g a) -> FeatureTrace g a
+simplifyFeatureTraceOfNodes f t d = \v -> if member v d then simplifyFeatureTrace f t v else f v
 
 {-
 Calculates the presence condition of a node (third argument) in the given tree (first argument) with the given feature traces (second argument).

@@ -38,8 +38,9 @@ nullifyMandatory wrappee = \redit version -> \v ->
 removeTheRedundanciesWeIntroduced :: (Grammar g, Eq a, Show a) => RecordingFunction g a -> RecordingFunction g a
 removeTheRedundanciesWeIntroduced wrappee = \redit@(edit, _) version@(_, t_old) ->
     let f_new = wrappee redit version
-        t_new = run edit t_old in
-        FeatureTrace.simplify f_new t_new
+        t_new = run edit t_old
+        d = delta edit t_old in
+        FeatureTrace.simplifyFeatureTraceOfNodes f_new t_new d
 
 {-
 Feature trace recording for identity edit:
