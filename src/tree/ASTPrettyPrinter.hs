@@ -8,7 +8,7 @@ class Show g => ASTPrettyPrinter g where
   prettyPrint :: (Monoid b) => b -> (Node g a -> Int -> b) -> (Node g a -> String -> b) -> (Node g a -> b) -> AST g a -> b
 
 showCode :: (Show a, Grammar g, ASTPrettyPrinter g) => AST g a -> String
-showCode = showCodeAs "" (\_ i -> genIndent i) (\_ s -> s) show
+showCode = showCodeAs "" (\_ i -> genIndent i) (\_ s -> s) (removeQuotes.show.value)
 
 showCodeAs :: (Monoid b, ASTPrettyPrinter g) => b -> (Node g a -> Int -> b) -> (Node g a -> String -> b) -> (Node g a -> b) -> AST g a -> b
 showCodeAs = prettyPrint

@@ -30,6 +30,8 @@ data SimpleCXXGrammar =
   | SCXX_Literal
   | SCXX_Type
   | SCXX_File
+  | SCXX_Try
+  | SCXX_Catch
   deriving (Eq, Show)
 
 type SCXXState = Tree (State UUID (Node SimpleCXXGrammar String))
@@ -107,6 +109,16 @@ scxx_type val = Tree (node val SCXX_Type) []
 scxx_file :: String -> [SCXXState] -> SCXXState
 scxx_file name content = Tree (node name SCXX_File) content
 
+scxx_trycatch :: [SCXXState] -> String -> String -> [SCXXState] -> SCXXState
+scxx_trycatch try exceptionType exceptionName catch =
+    Tree (node mempty SCXX_Try) [
+        scxx_statements try,
+        Tree (node mempty SCXX_Catch) [
+            scxx_vardecl exceptionType exceptionName,
+            scxx_statements catch
+        ]
+    ]
+
 {- Define optionality for all node types in our C++ grammar. -}
 instance Grammar SimpleCXXGrammar where
     nodetypeof SCXX_FuncDef = Treeoptional
@@ -126,6 +138,8 @@ instance Grammar SimpleCXXGrammar where
     nodetypeof SCXX_VarRef = Optional
     nodetypeof SCXX_Literal = Optional
     nodetypeof SCXX_Assignment = Mandatory
+    nodetypeof SCXX_Try = Optional
+    nodetypeof SCXX_Catch = Mandatory
 
 instance ASTPrettyPrinter SimpleCXXGrammar where
     {- print AST as source code -}
@@ -164,3 +178,5 @@ instance ASTPrettyPrinter SimpleCXXGrammar where
                 SCXX_Literal -> return me
                 SCXX_Type -> return me
                 SCXX_File -> [indent, prtStr "FILE [", me, prtStr $ "] {\n", showList "\n" children, prtStr "\n", indent, prtStr "}"]
+                SCXX_Try -> [indent, prtStr "try ", showList " " children]
+                SCXX_Catch -> [prtStr "catch (", showHead, prtStr ") ", showListNoIndentIncrease " " $ tail children]

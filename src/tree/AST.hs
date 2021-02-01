@@ -45,5 +45,16 @@ abstract = filterNodes (\(Tree n _) -> optionaltype n /= Mandatory)
 treeoptionalAncestors :: (Eq a, Grammar g) => AST g a -> AST g a -> [AST g a]
 treeoptionalAncestors root = (filter (\(Tree n _) -> optionaltype n == Treeoptional)).(ancestors root)
 
+removeNodeWiseFilter :: Eq g => g -> AST g a -> [AST g a]
+removeNodeWiseFilter targetType ast@(Tree n children)
+  | targetType == grammartype n = children
+  | otherwise = mconcat (removeNodeWiseFilter targetType <$> children)
+
+removeNodeWise :: (Eq g, Grammar g) => Node g a -> AST g a -> AST g a
+removeNodeWise nodeToRemove (Tree n children)
+  | optionaltype nodeToRemove /= Optional = error "Given node has to be node-optional!"
+  | any (\(Tree x _) -> uuid x == uuid nodeToRemove) children = Tree n (mconcat $ removeNodeWiseFilter (grammartype n) <$> children)
+  | otherwise = Tree n (removeNodeWise nodeToRemove <$> children)
+
 instance (Grammar g, Show a) => Show (Node g a) where
   show n = "("++(show $ uuid n)++", "++(show $ grammartype n)++", "++(show $ value n)++", "++(show $ optionaltype n)++")"

@@ -3,6 +3,13 @@ import SAT
 import Util
 import Simplify
 
+import Control.Monad.State
+import Tree
+import UUID
+import AST
+import SimpleCXX
+import ASTPrettyPrinter
+
 
 {-Test CNF conversion-}
 
@@ -77,13 +84,67 @@ testCases = [
     (varA, PAnd [varA, PNot $ PAnd [varA, varB]])
     ]
 
-main :: IO ()
-main = putStrLn $
+testSimplify :: IO()
+testSimplify = putStrLn $
     foldr (\a b -> a++"\n"++b) mempty $
     map (\(axiom, formula) -> concat [
         "             axiom = ", show axiom, "\n",
         "           formula = ", show formula, "\n",
         "simplified formula = ", show $ removeRedundancy axiom (toNNF formula), "\n"]) testCases
+
+testRemoveNodeWiseCondition :: State UUID SSCXXAST
+testRemoveNodeWiseCondition = sequence $
+    scxx_funcdef "void" "foo" [] [
+        scxx_condition (scxx_unaryop "!" $ scxx_funccall "empty" []) [
+            scxx_exprstatement $ scxx_funccall "bar" []
+        ]
+    ]
+testRemoveNodeWiseConditionNode :: SSCXXAST -> Node SimpleCXXGrammar String
+testRemoveNodeWiseConditionNode t = 
+    case Tree.find (\(Tree x _) -> grammartype x == SCXX_Condition) t of
+        Just (Tree n _) -> n
+        Nothing -> error "Illegal Test Case Definition"
+
+testRemoveNodeWiseTryCatch :: State UUID SSCXXAST
+testRemoveNodeWiseTryCatch = sequence $
+    scxx_funcdef "void" "foo" [] [
+        scxx_trycatch [
+            scxx_exprstatement $ scxx_funccall "first" []
+        ] "SomeException" "e" [
+            scxx_exprstatement $ scxx_funccall "second" []
+        ]
+    ]
+testRemoveNodeWiseTryCatchNode :: SSCXXAST -> Node SimpleCXXGrammar String
+testRemoveNodeWiseTryCatchNode t = 
+    case Tree.find (\(Tree x _) -> grammartype x == SCXX_Try) t of
+        Just (Tree n _) -> n
+        Nothing -> error "Illegal Test Case Definition"
+
+
+testRemoveNodeWise :: IO ()
+testRemoveNodeWise = do
+    let cases = [
+            (testRemoveNodeWiseCondition, testRemoveNodeWiseConditionNode),
+            (testRemoveNodeWiseTryCatch, testRemoveNodeWiseTryCatchNode)]
+        -- printer = show
+        printer = showCode
+    mconcat $ (\(treeState, getNodeToRemove) -> do
+        let tree = fst $ runState treeState 0
+            nodeToRemove = getNodeToRemove tree
+        putStrLn "=== Test Case ==="
+        putStrLn "Tree:"
+        putStrLn . printer $ tree
+        putStrLn ""
+        putStr "Tree after removing "
+        putStrLn $ show nodeToRemove
+        putStrLn . printer $ removeNodeWise nodeToRemove tree
+        putStrLn ""
+        ) <$> cases
+
+main :: IO ()
+main = do
+    testSimplify
+    testRemoveNodeWise
 
 {-Test NNF conversion-}
 -- main :: IO ()
