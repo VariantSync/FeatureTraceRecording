@@ -12,8 +12,9 @@ import Edits ( edit_identity )
 import Logic
 import Propositions
 import NullPropositions 
-import FeatureTrace (FeatureTrace,  augmentWithTrace, pc, prettyPrint )
+import FeatureTrace 
 import FeatureTraceRecording
+import FeatureColour (FeatureFormulaColourPalette)
 
 import Example
 
@@ -146,36 +147,41 @@ runStepwise format ex =
         result = printTraces format example (Example.runExampleWithDefaultFTR example) in
     (putDoc $ result <+> hardline) >> flush
 
-printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) => OutputFormat -> Example m g a -> [(FeatureTrace g a, AST g a)] -> Doc (Attribute m)
-printTraces format example tracesAndTrees = 
-    let
-        featureColourPalette = colours example
+printASTWithTrace :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) => OutputFormat -> FeatureFormulaColourPalette m -> AST g a -> FeatureTrace g a -> Doc (Attribute m)
+printASTWithTrace format featureColourPalette tree trace = 
+    let 
         codestyle = codeStyle format
         tracestyle = traceStyle format
         tracedisplay = traceDisplay format
         withtracelines = withTraceLines format
-        hidemandatory = hideMandatoryNodes format
-        -- Some helper functions for output formatting
-        toPC = \trace tree -> if tracedisplay == PC then pc tree trace else trace
-        treeAbstract = if hidemandatory then abstract else id
-        treePrint = \tree trace -> case codestyle of
+        nodePrint trace n = case tracestyle of
+                        None -> pretty.removeQuotes.show $ value n
+                        Colour -> paint (trace n) $ removeQuotes.show $ value n
+                        Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ trace n, ">", removeQuotes.show $ value n]
+        stringPrint trace n s = case tracestyle of
+                        Colour -> paint (trace n) s
+                        _ -> pretty s
+        indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && optionaltype n == Treeoptional
+                        then mappend (paint (trace n) "|") (pretty $ genIndent (i-1))
+                        else pretty $ genIndent i
+        paint formula = (annotate (foreground $ featureColourPalette formula)).pretty
+        in
+        case codestyle of
             ShowAST -> (case tracestyle of
                 None -> pretty.show
                 Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace n) $ show n)
                 Text -> pretty.(FeatureTrace.prettyPrint).(augmentWithTrace trace)) tree
             ShowTikz -> pretty $ astToTikzWithTraceDefault trace tree
             ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
-            where nodePrint trace n = case tracestyle of
-                      None -> pretty.removeQuotes.show $ value n
-                      Colour -> paint (trace n) $ removeQuotes.show $ value n
-                      Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ trace n, ">", removeQuotes.show $ value n]
-                  stringPrint trace n s = case tracestyle of
-                      Colour -> paint (trace n) s
-                      _ -> pretty s
-                  indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && optionaltype n == Treeoptional
-                      then mappend (paint (trace n) "|") (pretty $ genIndent (i-1))
-                      else pretty $ genIndent i
-                  paint formula = (annotate (foreground $ featureColourPalette formula)).pretty
+
+printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) => OutputFormat -> Example m g a -> [(FeatureTrace g a, AST g a)] -> Doc (Attribute m)
+printTraces format example tracesAndTrees = 
+    let
+        featureColourPalette = colours example
+        tracedisplay = traceDisplay format
+        -- Some helper functions for output formatting
+        toPC = \trace tree -> if tracedisplay == PC then pc tree trace else trace
+        treePrint = printASTWithTrace format featureColourPalette
         in
         mappend (annotate (background red) $ pretty $ intercalate "\n  " [
             "\nRunning "++name example
@@ -199,7 +205,7 @@ printTraces format example tracesAndTrees =
                     s])
         $ zip
             ((edit_identity, Nothing):(history example)) -- Prepend identity edit here to show initial tree. Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
-            ((\(trace, tree) -> (toPC trace tree, treeAbstract tree)) <$> tracesAndTrees)
+            ((\(trace, tree) -> (toPC trace tree, tree)) <$> tracesAndTrees)
 
 
 propositional_values :: [PropositionalFormula String]
