@@ -51,9 +51,13 @@ removeNodeWiseFilter targetType ast@(Tree n children)
   | otherwise = mconcat (removeNodeWiseFilter targetType <$> children)
 
 removeNodeWise :: (Eq g, Grammar g) => Node g a -> AST g a -> AST g a
-removeNodeWise nodeToRemove (Tree n children)
+removeNodeWise nodeToRemove ast@(Tree n children)
   | optionaltype nodeToRemove /= Optional = error "Given node has to be node-optional!"
-  | any (\(Tree x _) -> uuid x == uuid nodeToRemove) children = Tree n (mconcat $ removeNodeWiseFilter (grammartype n) <$> children)
+  | any (\(Tree x _) -> uuid x == uuid nodeToRemove) children =
+    Tree n (mconcat $ removeNodeWiseFilter (grammartype n) <$> children)
+  -- | uuid n == uuid nodeToRemove =
+  --   let p = parent n ast
+  --   Tree p (mconcat $ removeNodeWiseFilter (grammartype p) <$> children)
   | otherwise = Tree n (removeNodeWise nodeToRemove <$> children)
 
 instance (Grammar g, Show a) => Show (Node g a) where
