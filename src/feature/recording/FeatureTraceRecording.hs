@@ -45,6 +45,8 @@ runFTR ftr startVersion history = last $ runFTRWithIntermediateSteps ftr startVe
 The same as runFTR but also returns all intermediate results.
 -}
 runFTRWithIntermediateSteps :: (StructuralElement s) => FeatureTraceRecording s -> Version s -> History s -> [Version s]
-runFTRWithIntermediateSteps ftr startVersion = scanl record startVersion
-    where record (f_old, t_old) recordedEdit@(edit, _)
-            = (ftr (edittype edit) recordedEdit (f_old, t_old), run edit t_old)
+runFTRWithIntermediateSteps ftr startVersion history =
+    -- This yields a list of all versions together with the startVersion.
+    scanl record startVersion history
+    where record oldVersion@(_, t_old) recordedEdit@(edit, _)
+            = (ftr (edittype edit) recordedEdit oldVersion, run edit t_old)
