@@ -179,17 +179,13 @@ printTraces format example tracesAndTrees =
     let
         featureColourPalette = colours example
         tracedisplay = traceDisplay format
-        -- Some helper functions for output formatting
         toPC = \trace tree -> if tracedisplay == PC then pc tree trace else trace
-        treePrint = printASTWithTrace format featureColourPalette
         in
         mappend (annotate (background red) $ pretty $ intercalate "\n  " [
             "\nRunning "++name example
             -- "codeStyle      = "++show codestyle,
             -- "traceDisplay   = "++show tracedisplay,
-            -- "traceStyle     = "++show tracestyle,
-            -- "withTraceLines = "++show withtracelines,
-            -- "hideMandatory  = "++show hidemandatory
+            -- "traceStyle     = "++show tracestyle
             ])
         $ flip foldr
             mempty
@@ -201,12 +197,16 @@ printTraces format example tracesAndTrees =
                     annotate (foreground $ featureColourPalette fc) $ pretty $ NullPropositions.prettyPrint fc,
                     pretty $ " giving us ====",
                     hardline,
-                    treePrint tree trace,
+                    printASTWithTrace format featureColourPalette tree (toPC trace tree),
                     s])
         $ zip
-            ((edit_identity, Nothing):(history example)) -- Prepend identity edit here to show initial tree. Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
-            ((\(trace, tree) -> (toPC trace tree, tree)) <$> tracesAndTrees)
+        -- We have to do this as the first entry in tracesAndTrees will be the initial state of the program
+        (alsoShowInitialStateInHistory (history example))
+        tracesAndTrees
 
+alsoShowInitialStateInHistory :: History s -> History s
+-- Prepend identity edit here to show initial tree. Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
+alsoShowInitialStateInHistory h = (edit_identity, Nothing):h
 
 propositional_values :: [PropositionalFormula String]
 propositional_values = lvalues
