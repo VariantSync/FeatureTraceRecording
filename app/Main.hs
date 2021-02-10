@@ -147,7 +147,8 @@ runStepwise format ex =
         result = printTraces format example (Example.runExampleWithDefaultFTR example) in
     (putDoc $ result <+> hardline) >> flush
 
-printASTWithTrace :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) => OutputFormat -> FeatureFormulaColourPalette m -> AST g a -> FeatureTrace g a -> Doc (Attribute m)
+printASTWithTrace :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) =>
+    OutputFormat -> FeatureFormulaColourPalette m -> AST g a -> FeatureTrace g a -> Doc (Attribute m)
 printASTWithTrace format featureColourPalette tree trace = 
     let 
         codestyle = codeStyle format
@@ -161,7 +162,7 @@ printASTWithTrace format featureColourPalette tree trace =
         stringPrint trace n s = case tracestyle of
                         Colour -> paint (trace n) s
                         _ -> pretty s
-        indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && optionaltype n == Treeoptional
+        indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && optionaltype n == Optional
                         then mappend (paint (trace n) "|") (pretty $ genIndent (i-1))
                         else pretty $ genIndent i
         paint formula = (annotate (foreground $ featureColourPalette formula)).pretty
@@ -174,7 +175,8 @@ printASTWithTrace format featureColourPalette tree trace =
             ShowTikz -> pretty $ astToTikzWithTraceDefault trace tree
             ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
 
-printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) => OutputFormat -> Example m g a -> [(FeatureTrace g a, AST g a)] -> Doc (Attribute m)
+printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) =>
+    OutputFormat -> Example m g a -> [(FeatureTrace g a, AST g a)] -> Doc (Attribute m)
 printTraces format example tracesAndTrees = 
     let
         featureColourPalette = colours example
@@ -204,7 +206,7 @@ printTraces format example tracesAndTrees =
         (alsoShowInitialStateInHistory (history example))
         tracesAndTrees
 
-alsoShowInitialStateInHistory :: History s -> History s
+alsoShowInitialStateInHistory :: History g a -> History g a
 -- Prepend identity edit here to show initial tree. Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
 alsoShowInitialStateInHistory h = (edit_identity, Nothing):h
 

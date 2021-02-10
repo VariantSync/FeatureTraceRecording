@@ -109,13 +109,13 @@ scxx_file name content = Tree (node name SCXX_File) content
 
 {- Define optionality for all node types in our C++ grammar. -}
 instance Grammar SimpleCXXGrammar where
-    nodetypeof SCXX_FuncDef = Treeoptional
-    nodetypeof SCXX_Return = Treeoptional
-    nodetypeof SCXX_File = Treeoptional
-    nodetypeof SCXX_ExprStatement = Treeoptional
+    nodetypeof SCXX_FuncDef = Optional
+    nodetypeof SCXX_Return = Optional --leaf
+    nodetypeof SCXX_File = Optional
+    nodetypeof SCXX_ExprStatement = Optional
     nodetypeof SCXX_VarDecl = Mandatory
-    nodetypeof SCXX_Condition = Optional
-    nodetypeof SCXX_UnaryOp = Optional
+    nodetypeof SCXX_Condition = Wrapper
+    nodetypeof SCXX_UnaryOp = Wrapper
     nodetypeof SCXX_Type = Optional
     nodetypeof SCXX_Expression = Mandatory
     nodetypeof SCXX_ParametersDef = Mandatory
@@ -123,8 +123,8 @@ instance Grammar SimpleCXXGrammar where
     nodetypeof SCXX_Statements = Mandatory
     nodetypeof SCXX_BinaryOp = Optional
     nodetypeof SCXX_FuncCall = Optional
-    nodetypeof SCXX_VarRef = Optional
-    nodetypeof SCXX_Literal = Optional
+    nodetypeof SCXX_VarRef = Optional -- leaf
+    nodetypeof SCXX_Literal = Optional -- leaf
     nodetypeof SCXX_Assignment = Mandatory
 
 instance ASTPrettyPrinter SimpleCXXGrammar where

@@ -39,11 +39,11 @@ findByValue v = findByNode (\n -> value n == v)
 findByGrammarType :: (Eq g) => g -> AST g a -> Maybe (AST g a)
 findByGrammarType r = findByNode ((r==).grammartype)
 
-abstract :: Grammar g => AST g a -> AST g a
-abstract = filterNodes (\(Tree n _) -> optionaltype n /= Mandatory)
+-- abstract :: Grammar g => AST g a -> AST g a
+-- abstract = filterNodes (\(Tree n _) -> optionaltype n /= Mandatory)
 
-treeoptionalAncestors :: (Eq a, Grammar g) => AST g a -> AST g a -> [AST g a]
-treeoptionalAncestors root = (filter (\(Tree n _) -> optionaltype n == Treeoptional)).(ancestors root)
+optionalAncestors :: (Eq a, Grammar g) => AST g a -> AST g a -> [AST g a]
+optionalAncestors root = (filter (\(Tree n _) -> optionaltype n == Optional)).(ancestors root)
 
 instance (Grammar g, Show a) => Show (Node g a) where
   show n = "("++(show $ uuid n)++", "++(show $ grammartype n)++", "++(show $ value n)++", "++(show $ optionaltype n)++")"
