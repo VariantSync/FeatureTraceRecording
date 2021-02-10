@@ -16,7 +16,7 @@ type AST g a = Tree (Node g a)
 instance Eq (Node g a) where
   n == m = (uuid n) == (uuid m)
 
-instance (Eq a) => Ord (Node g a) where
+instance Ord (Node g a) where
   v <= w = (uuid v) <= (uuid w)
 
 instance Functor (Node g) where
@@ -25,7 +25,7 @@ instance Functor (Node g) where
 instance (Grammar g, Eq a, Show a) => StructuralElement (AST g a) where
   se_canBeAnnotated (Tree n _) = optionaltype n /= Mandatory
   se_isWrapper (Tree n _) = optionaltype n == Optional
-  se_parent root t = parent root t
+  se_parent = parent
   se_children (Tree _ c) = c
 
 optionaltype :: Grammar g => Node g a -> NodeType
