@@ -9,7 +9,7 @@ import Data.Set
 import ListUtil
 import Util
 
-data Tree a = Tree a [Tree a] deriving (Eq, Traversable)
+data Tree a = Tree a [Tree a] deriving (Traversable)
 
 prettyPrint :: (Show a, Monoid b) => Int -> (String -> b) -> (a -> b) -> Tree a -> b
 prettyPrint i strToB nodePrinter (Tree n []) = (strToB $ genIndent i) <> (nodePrinter n) <>  (strToB " []\n")
@@ -19,6 +19,9 @@ prettyPrint i strToB nodePrinter (Tree n children) = (strToB $ genIndent i)
   <> (mconcat $ fmap (prettyPrint (i+2) strToB nodePrinter) children)
   <> (strToB $ genIndent i)
   <> (strToB "]\n")
+
+instance (Eq a) => Eq (Tree a) where
+  (Tree x _) == (Tree y _) = x == y
 
 instance Show a => Show (Tree a) where
   show = prettyPrint 0 id show
