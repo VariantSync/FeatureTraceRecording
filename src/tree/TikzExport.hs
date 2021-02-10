@@ -11,7 +11,7 @@ import Data.List ( intercalate )
 
 {-This file is a bit hacky.-}
 
-astToTikzWithTraceDefault :: (Eq a, Show a, Grammar g) => FeatureTrace g a -> AST g a -> String
+astToTikzWithTraceDefault :: (Eq a, Show a, Grammar g) => ASTFeatureTrace g a -> AST g a -> String
 astToTikzWithTraceDefault =
     astToTikzWithTrace
     (tikzifyName
@@ -20,9 +20,9 @@ astToTikzWithTraceDefault =
                 valStr  = removeQuotes.show.value $ n in
             ruleStr++(if valStr /= mempty && valStr /= ruleStr then "\\linebreak\\code{"++valStr++"}" else ""))
         .element)
-    (\tree node trace -> intercalate ", " [
-        tikzifyName.(\s -> s++if optionaltype node == Mandatory then "Inherited" else "").featuresToTikzClass $ pc tree trace node,
-        show $ optionaltype node
+    (\root tree trace -> intercalate ", " [
+        tikzifyName.(\s -> s++if optionaltype (element tree) == Mandatory then "Inherited" else "").featuresToTikzClass $ pc root trace tree,
+        show $ optionaltype (element tree)
       ])
 
 featuresToTikzClass :: FeatureFormula -> String
@@ -33,8 +33,8 @@ featuresToTikzClass (Just (PVariable v)) = v
 featuresToTikzClass (Just (PNot p)) = "not"++(featuresToTikzClass $ Just p)
 featuresToTikzClass _ = error "Only literals are supported"
 
-astToTikzWithTrace :: (AST g a -> String) -> (AST g a -> Node g a -> FeatureTrace g a -> String) -> FeatureTrace g a -> AST g a -> String
-astToTikzWithTrace val toCls trace t = astToTikz val (\s -> toCls t (element s) trace) t
+astToTikzWithTrace :: (AST g a -> String) -> (AST g a -> AST g a -> ASTFeatureTrace g a -> String) -> ASTFeatureTrace g a -> AST g a -> String
+astToTikzWithTrace val toCls trace t = astToTikz val (\s -> toCls t s trace) t
 
 astToTikz :: (AST g a -> String) -> (AST g a -> String) -> AST g a -> String
 astToTikz val cls t = "\\"++(astToTikzRecursive 0 val cls t)++";"

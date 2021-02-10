@@ -1,5 +1,6 @@
 ﻿module Example where
 
+import StructuralElement
 import AST ( AST )
 import Edits ( EditScript )
 import Grammar
@@ -9,15 +10,17 @@ import FeatureTraceRecording
 import DefaultFeatureTraceRecording
 import FeatureColour (FeatureFormulaColourPalette)
 
-data Example m g a = Example {
+data Example m s = Example {
     name :: String,
-    startVersion :: Version g a,
-    history :: History g a,
+    startVersion :: Version s,
+    history :: History s,
     colours :: FeatureFormulaColourPalette m
 }
 
-runExample :: (Grammar g, Show a, Eq a) => FeatureTraceRecording g a -> Example m g a -> [Version g a]
+type ASTExample m g a = Example m (AST g a)
+
+runExample :: (StructuralElement s) => FeatureTraceRecording s -> Example m s -> [Version s]
 runExample ftr example = runFTRWithIntermediateSteps ftr (startVersion example) (history example)
 
-runExampleWithDefaultFTR :: (Grammar g, Show a, Eq a) => Example m g a -> [Version g a]
+runExampleWithDefaultFTR :: (StructuralElement s) => Example m s -> [Version s]
 runExampleWithDefaultFTR = runExample defaultFeatureTraceRecording

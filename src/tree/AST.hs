@@ -1,9 +1,13 @@
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module AST where
 
 import UUID
 import Tree
 import Grammar
 import Control.Monad.State
+import StructuralElement
 
 -- g has to be a grammar
 data Node g a = Node {value::a, grammartype::g, uuid::UUID} --, version::Int
@@ -17,6 +21,12 @@ instance (Eq a) => Ord (Node g a) where
 
 instance Functor (Node g) where
   fmap f n = Node {value = f $ value n, grammartype = grammartype n, uuid = uuid n}
+
+instance (Grammar g, Eq a, Show a) => StructuralElement (AST g a) where
+  se_canBeAnnotated (Tree n _) = optionaltype n /= Mandatory
+  se_isWrapper (Tree n _) = optionaltype n == Optional
+  se_parent root t = parent root t
+  se_children (Tree _ c) = c
 
 optionaltype :: Grammar g => Node g a -> NodeType
 optionaltype = nodetypeof.grammartype

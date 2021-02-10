@@ -15,6 +15,8 @@ import Propositions
 import Tree
 import Data.Maybe (fromJust)
 
+type CodeChangePatternExample m g a = ASTExample m g a
+
 feature_ULTRA_LCD :: Feature
 feature_ULTRA_LCD = toFeature "ULTRA_LCD"
 
@@ -41,10 +43,19 @@ alertstatuspgm = sequence $ scxx_exprstatement $ scxx_funccall "alertstatuspgm" 
 somefunction :: State UUID SSCXXAST
 somefunction = sequence $ scxx_funcdef "void" "foo" [] []
 
-createPatternExample :: (MonadColorPrinter m) => String -> SSCXXAST -> History SimpleCXXGrammar String -> Example m SimpleCXXGrammar String
+createPatternExample :: (MonadColorPrinter m) =>
+    String
+    -> SSCXXAST
+    -> History (AST SimpleCXXGrammar String)
+    -> CodeChangePatternExample m SimpleCXXGrammar String
 createPatternExample = createPatternExampleWithStartTrace emptyTrace
 
-createPatternExampleWithStartTrace :: (MonadColorPrinter m) => FeatureTrace SimpleCXXGrammar String -> String -> SSCXXAST -> History SimpleCXXGrammar String -> Example m SimpleCXXGrammar String
+createPatternExampleWithStartTrace :: (MonadColorPrinter m) =>
+    ASTFeatureTrace SimpleCXXGrammar String
+    -> String
+    -> SSCXXAST
+    -> History (AST SimpleCXXGrammar String)
+    -> CodeChangePatternExample m SimpleCXXGrammar String
 createPatternExampleWithStartTrace startTrace name start edits =
     Example {
         Example.name = name,
@@ -53,24 +64,24 @@ createPatternExampleWithStartTrace startTrace name start edits =
         history = edits
     }
 
-addIfdef :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addIfdef :: (MonadColorPrinter m) => State UUID (CodeChangePatternExample m SimpleCXXGrammar String)
 addIfdef = do
     start <- emptyfile
     lcd <- lcd_setstatusalertpgm
     return $ createPatternExample "AddIfdef" start
         [(edit_ins_tree lcd (uuidOf start) 0, Just $ PVariable feature_ULTRA_LCD)]
 
-addIfdefElse_IfBranch :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addIfdefElse_IfBranch :: (MonadColorPrinter m) => State UUID (CodeChangePatternExample m SimpleCXXGrammar String)
 addIfdefElse_IfBranch = addIfdef >>= \ifbranch -> return ifbranch {Example.name = "AddIfdefElse (if branch)"}
 
-addIfdefElse_ElseBranch :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addIfdefElse_ElseBranch :: (MonadColorPrinter m) => State UUID (CodeChangePatternExample m SimpleCXXGrammar String)
 addIfdefElse_ElseBranch = do
     start <- emptyfile
     alert <- alertstatuspgm
     return $ createPatternExample "AddIfdefElse (else branch)" start
         [(edit_ins_tree alert (uuidOf start) 0, Just $ PNot $ PVariable feature_ULTRA_LCD)]
 
-addIfdefWrapElse :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addIfdefWrapElse :: (MonadColorPrinter m) => State UUID (CodeChangePatternExample m SimpleCXXGrammar String)
 addIfdefWrapElse = do
     file <- emptyfile
     lcd <- lcd_setstatusalertpgm
@@ -87,7 +98,7 @@ addIfdefWrapElse = do
             Just $ PVariable feature_ULTRA_LCD
         ]
 
-addIfdefWrapThen :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addIfdefWrapThen :: (MonadColorPrinter m) => State UUID (CodeChangePatternExample m SimpleCXXGrammar String)
 addIfdefWrapThen = do
     file <- emptyfile
     lcd <- lcd_setstatusalertpgm
@@ -104,14 +115,14 @@ addIfdefWrapThen = do
             Just $ PNot $ PVariable feature_ULTRA_LCD
         ]
 
-addNormalCode_nonvariational :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addNormalCode_nonvariational :: (MonadColorPrinter m) => State UUID (CodeChangePatternExample m SimpleCXXGrammar String)
 addNormalCode_nonvariational = do
     start <- emptyfile
     lcd <- lcd_setstatusalertpgm
     return $ createPatternExample "AddNormalCode (non-variational)" start
         [(edit_ins_tree lcd (uuidOf start) 0, Just PTrue)]
 
-addNormalCode_outerpc :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addNormalCode_outerpc :: (MonadColorPrinter m) => State UUID (CodeChangePatternExample m SimpleCXXGrammar String)
 addNormalCode_outerpc = do
     file <- emptyfile
     foo <- somefunction
@@ -123,14 +134,14 @@ addNormalCode_outerpc = do
         in
         return $ createPatternExampleWithStartTrace
             -- change the start trace so that there is already a trace
-            (\n -> if n == element foo then outer_pc else Nothing)
+            (\n -> if n == foo then outer_pc else Nothing)
             "AddNormalCode (with outer PC)"
             start
             -- Here, any feature context would be feasible that is weaker than outer_pc (e.g., outer_pc itself).
             [(edit_ins_tree lcd statementsOfFoo 0, Just PTrue)]
             
 
-remNormalCode_null :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+remNormalCode_null :: (MonadColorPrinter m) => State UUID (CodeChangePatternExample m SimpleCXXGrammar String)
 remNormalCode_null = do
     file <- emptyfile
     lcd <- lcd_setstatusalertpgm
@@ -138,7 +149,7 @@ remNormalCode_null = do
         return $ createPatternExample "RemNormalCode (without traces)" start
             [(edit_del_tree (uuidOf lcd), Just PTrue)]
 
-remNormalCode_notnull :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+remNormalCode_notnull :: (MonadColorPrinter m) => State UUID (CodeChangePatternExample m SimpleCXXGrammar String)
 remNormalCode_notnull = do
     file <- emptyfile
     lcd <- lcd_setstatusalertpgm
@@ -147,11 +158,11 @@ remNormalCode_notnull = do
         existingtrace = Just $ PVariable feature_ULTRA_LCD
         in
         return $ createPatternExampleWithStartTrace
-            (\n -> if n == element lcd then existingtrace else Nothing)
+            (\n -> if n == lcd then existingtrace else Nothing)
             "RemNormalCode (with trace)"
             start
             [(edit_del_tree (uuidOf lcd), Nothing {-null-})]
 
 {- This behaves the same as remNormalCode_notnull. -}
-remIfdef :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+remIfdef :: (MonadColorPrinter m) => State UUID (CodeChangePatternExample m SimpleCXXGrammar String)
 remIfdef = remNormalCode_notnull >>= \r -> return r {Example.name = "RemIfdef"}

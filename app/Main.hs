@@ -4,7 +4,7 @@ import Control.Monad.State ( State, runState )
 
 import UUID ( UUID )
 import Util (removeQuotes,  genIndent )
-import Tree ( prettyPrint )
+import Tree
 import AST
 import Grammar
 import ASTPrettyPrinter
@@ -105,49 +105,51 @@ showExamples = withTerminal $ runTerminalT $
     Select your OutputFormat here.
     Above, there is a list of presets you can choose from.
     -}
-    let format = userFormat in
+    let format = astFormat in
     do
         putDoc hardline
         headline "Running Feature Trace Recording Prototype"
         
         headline ">>> [Motivating Example] <<<"
         runStepwise format StackPopAlice.example
-        runStepwise format StackPopBob.example
+        -- runStepwise format StackPopBob.example
         
-        headline ">>> [Code Change Patterns] <<<"
-        runStepwise format CodeChangePatterns.addIfdef
-        -- We omitted AddIfdef* as it is just a repitition of the previous pattern with arbitrary contexts and code fragments.
-        -- AddIfDefElse has to be reproduced using two variants.
-        -- Hence, we need two different examples here, one for the if-branch and one for the else-branch.
-        runStepwise format CodeChangePatterns.addIfdefElse_IfBranch
-        runStepwise format CodeChangePatterns.addIfdefElse_ElseBranch
-        runStepwise format CodeChangePatterns.addIfdefWrapElse
-        runStepwise format CodeChangePatterns.addIfdefWrapThen
-        -- Adding non-variational code (code that belongs to all clones)
-        runStepwise format CodeChangePatterns.addNormalCode_nonvariational
-        -- Adding code without any associated trace into a tree-optional scope that is already traced.
-        runStepwise format CodeChangePatterns.addNormalCode_outerpc
-        -- Removing code that does not have a presence condition
-        runStepwise format CodeChangePatterns.remNormalCode_null
-        -- Removing code that has a feature trace and thereby a presence condition
-        runStepwise format CodeChangePatterns.remNormalCode_notnull
-        -- Removing code that has a feature trace
-        runStepwise format CodeChangePatterns.remIfdef
+        -- headline ">>> [Code Change Patterns] <<<"
+        -- runStepwise format CodeChangePatterns.addIfdef
+        -- -- We omitted AddIfdef* as it is just a repitition of the previous pattern with arbitrary contexts and code fragments.
+        -- -- AddIfDefElse has to be reproduced using two variants.
+        -- -- Hence, we need two different examples here, one for the if-branch and one for the else-branch.
+        -- runStepwise format CodeChangePatterns.addIfdefElse_IfBranch
+        -- runStepwise format CodeChangePatterns.addIfdefElse_ElseBranch
+        -- runStepwise format CodeChangePatterns.addIfdefWrapElse
+        -- runStepwise format CodeChangePatterns.addIfdefWrapThen
+        -- -- Adding non-variational code (code that belongs to all clones)
+        -- runStepwise format CodeChangePatterns.addNormalCode_nonvariational
+        -- -- Adding code without any associated trace into a tree-optional scope that is already traced.
+        -- runStepwise format CodeChangePatterns.addNormalCode_outerpc
+        -- -- Removing code that does not have a presence condition
+        -- runStepwise format CodeChangePatterns.remNormalCode_null
+        -- -- Removing code that has a feature trace and thereby a presence condition
+        -- runStepwise format CodeChangePatterns.remNormalCode_notnull
+        -- -- Removing code that has a feature trace
+        -- runStepwise format CodeChangePatterns.remIfdef
     
 
 headline :: (MonadColorPrinter m) => String -> m()
 headline text = putDoc $ hardline <+> (annotate (background red) $ pretty text) <+> hardline <+> hardline
 
-finalizeExample :: State UUID (Example m g a) -> Example m g a
+finalizeExample :: State UUID (Example m s) -> Example m s
 finalizeExample ex = fst $ runState ex 0
 
-runStepwise :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g) => OutputFormat -> State UUID (Example m g String) -> m ()
+runStepwise :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g) =>
+    OutputFormat -> State UUID (ASTExample m g String) -> m ()
 runStepwise format ex =
     let example = finalizeExample ex
         result = printTraces format example (Example.runExampleWithDefaultFTR example) in
     (putDoc $ result <+> hardline) >> flush
 
-printASTWithTrace :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) => OutputFormat -> FeatureFormulaColourPalette m -> AST g a -> FeatureTrace g a -> Doc (Attribute m)
+printASTWithTrace :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) =>
+    OutputFormat -> FeatureFormulaColourPalette m -> AST g a -> ASTFeatureTrace g a -> Doc (Attribute m)
 printASTWithTrace format featureColourPalette tree trace = 
     let 
         codestyle = codeStyle format
@@ -156,25 +158,27 @@ printASTWithTrace format featureColourPalette tree trace =
         withtracelines = withTraceLines format
         nodePrint trace n = case tracestyle of
                         None -> pretty.removeQuotes.show $ value n
-                        Colour -> paint (trace n) $ removeQuotes.show $ value n
-                        Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ trace n, ">", removeQuotes.show $ value n]
+                        Colour -> paint (trace $ Tree.tree tree n) $ removeQuotes.show $ value n
+                        Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ (trace $ Tree.tree tree n), ">", removeQuotes.show $ value n]
         stringPrint trace n s = case tracestyle of
-                        Colour -> paint (trace n) s
+                        Colour -> paint (trace $ Tree.tree tree n) s
                         _ -> pretty s
         indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && optionaltype n == Treeoptional
-                        then mappend (paint (trace n) "|") (pretty $ genIndent (i-1))
+                        then mappend (paint (trace $ Tree.tree tree n) "|") (pretty $ genIndent (i-1))
                         else pretty $ genIndent i
         paint formula = (annotate (foreground $ featureColourPalette formula)).pretty
         in
         case codestyle of
             ShowAST -> (case tracestyle of
                 None -> pretty.show
-                Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace n) $ show n)
-                Text -> pretty.(FeatureTrace.prettyPrint).(augmentWithTrace trace)) tree
+                Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace $ Tree.tree tree n) $ show n)
+                Text -> pretty . (FeatureTrace.prettyPrint) . (augmentWithTrace trace))
+                tree
             ShowTikz -> pretty $ astToTikzWithTraceDefault trace tree
             ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
 
-printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) => OutputFormat -> Example m g a -> [(FeatureTrace g a, AST g a)] -> Doc (Attribute m)
+printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) =>
+    OutputFormat -> ASTExample m g a -> [(ASTFeatureTrace g a, AST g a)] -> Doc (Attribute m)
 printTraces format example tracesAndTrees = 
     let
         featureColourPalette = colours example

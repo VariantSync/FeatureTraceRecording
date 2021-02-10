@@ -3,7 +3,7 @@
 import StackPopAlice ( feature_ImmutableStack, example )
 
 import UUID ( UUID )
-import Example ( Example(..) )
+import Example
 import Edits ( Edit(delta), foldEditScript, edit_trace_only )
 import Propositions ( PropositionalFormula(..) )
 import SimpleCXX ( SimpleCXXGrammar )
@@ -18,7 +18,7 @@ featureColourPalette fallback formula
     | formula == (Just $ PVariable $ feature_ImmutableStack) = magenta
     | otherwise = fallback formula
 
-example :: MonadColorPrinter m => State UUID (Example m SimpleCXXGrammar String)
+example :: MonadColorPrinter m => State UUID (ASTExample m SimpleCXXGrammar String)
 example =
     StackPopAlice.example
     >>= \alice ->

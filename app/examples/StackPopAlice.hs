@@ -58,7 +58,7 @@ cloneRetStatement = sequence $ scxx_return $ scxx_varref "c"
 newReturnType :: String
 newReturnType = "Stack<T>"
 
-example :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+example :: (MonadColorPrinter m) => State UUID (ASTExample m SimpleCXXGrammar String)
 example =
     do
         tree_start <- StackPopAlice.startTree

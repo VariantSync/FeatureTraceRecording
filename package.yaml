@@ -38,6 +38,7 @@ library:
     - src/tree
     - src/tree/grammars
     - src/propositions
+    - src/structure
 
 executables:
   ftr-exe:

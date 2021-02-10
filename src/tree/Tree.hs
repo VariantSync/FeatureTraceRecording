@@ -33,6 +33,9 @@ instance Applicative Tree where
    pure a = Tree a []
    (Tree f cf) <*> (Tree x cx) = Tree (f x) ((fmap (fmap f) cx)++(concatMap (\g -> fmap (\c -> g <*> c) cx) cf))
 
+instance Ord a => Ord (Tree a) where
+  (Tree x _) <= (Tree y _) = x <= y
+
 -- instance Monad Tree where
 --   return = pure
 --   (Tree x c) >>= f = f x
@@ -56,8 +59,15 @@ tree t x = case safetree t x of
 safetree :: Eq a => Tree a -> a -> Maybe(Tree a)
 safetree t x = Tree.find (\(Tree y _) -> x == y) t
 
-toset :: Ord a => Tree a -> Set a
-toset = fromList.(foldMap pure)
+toelementset :: Ord a => Tree a -> Set a
+toelementset = fromList.(foldMap pure)
+
+-- should be in dfs order
+subtrees :: Tree a -> [Tree a]
+subtrees t@(Tree n c) = t:(mconcat $ subtrees <$> c)
+
+tosubtreeset :: Ord a => Tree a -> Set (Tree a)
+tosubtreeset = fromList . subtrees
 
 {-
 Find the first subtree in the given tree (first argument) whose root matches the predicate (second argument).
