@@ -93,6 +93,11 @@ tikzFormat = OutputFormat {
     hideMandatoryNodes = False
 }
         
+{-
+Select what to show here.
+By default, we will show the output of all exaples (Alice, Bob, and the edit patterns).
+Additionally, you might want to look at the truthtable of the ternary logic by Sobocinski we use.
+-}
 main :: IO ()
 main = mconcat [
     showExamples
@@ -105,7 +110,7 @@ showExamples = withTerminal $ runTerminalT $
     Select your OutputFormat here.
     Above, there is a list of presets you can choose from.
     -}
-    let format = userFormat in
+    let format = tikzFormat in
     do
         putDoc hardline
         headline "Running Feature Trace Recording Prototype"
