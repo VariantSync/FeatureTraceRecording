@@ -102,7 +102,7 @@ Additionally, you might want to look at the truthtable of the ternary logic by S
 main :: IO ()
 main = mconcat [
     showExamples
-    -- , showTruthtables
+    , showTruthtables
     ]
 
 showExamples :: IO ()
@@ -230,5 +230,5 @@ showTruthtables = withTerminal $ runTerminalT $
         headline "Propositional Logic"
         putDoc.pretty $ generatetruthtablesfor propositional_values
         putDoc $ hardline <+> hardline
-        headline "VariantSync Logic"
+        headline "Ternary Logic With Null"
         putDoc.pretty $ generatetruthtablesfor nullableFormula_values
