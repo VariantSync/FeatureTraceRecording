@@ -1,4 +1,4 @@
-﻿module CodeChangePatterns where
+﻿module EditPatterns where
 
 import Example
 import SimpleCXX

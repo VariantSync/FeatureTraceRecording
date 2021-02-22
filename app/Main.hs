@@ -22,7 +22,7 @@ import TikzExport ( astToTikzWithTraceDefault )
 
 import StackPopAlice (example)
 import StackPopBob (example)
-import CodeChangePatterns
+import EditPatterns
 
 import Data.List (intercalate)
 
@@ -35,10 +35,15 @@ import System.Terminal
 import Truthtable (generatetruthtablesfor)
 
 
-data OutputFormat = OutputFormat {codeStyle :: CodePrintStyle, traceDisplay :: TraceDisplay, traceStyle :: TraceStyle, withTraceLines :: Bool, hideMandatoryNodes :: Bool}
 data CodePrintStyle = ShowAST | ShowCode | ShowTikz deriving (Show)
 data TraceDisplay = Trace | PC deriving (Show, Eq)
 data TraceStyle = Text | Colour | None deriving (Show, Eq)
+data OutputFormat = OutputFormat {
+    codeStyle :: CodePrintStyle,
+    traceDisplay :: TraceDisplay,
+    traceStyle :: TraceStyle,
+    withTraceLines :: Bool
+}
 
 -- Some presets for output formats:
 
@@ -51,8 +56,7 @@ userFormat = OutputFormat {
     codeStyle = ShowCode,
     traceDisplay = PC,
     traceStyle = Colour,
-    withTraceLines = False,
-    hideMandatoryNodes = False
+    withTraceLines = False
 }
 
 {-
@@ -64,8 +68,7 @@ userFormatDetailed = OutputFormat {
     codeStyle = ShowCode,
     traceDisplay = Trace,
     traceStyle = Colour,
-    withTraceLines = True,
-    hideMandatoryNodes = False
+    withTraceLines = True
 }
 
 {-
@@ -76,8 +79,7 @@ astFormat = OutputFormat {
     codeStyle = ShowAST,
     traceDisplay = Trace,
     traceStyle = Text,
-    withTraceLines = False,
-    hideMandatoryNodes = False
+    withTraceLines = False
 }
 
 {-
@@ -89,8 +91,7 @@ tikzFormat = OutputFormat {
     codeStyle = ShowTikz,
     traceDisplay = Trace,
     traceStyle = None,
-    withTraceLines = False,
-    hideMandatoryNodes = False
+    withTraceLines = False
 }
         
 {-
@@ -110,34 +111,36 @@ showExamples = withTerminal $ runTerminalT $
     Select your OutputFormat here.
     Above, there is a list of presets you can choose from.
     -}
-    let format = tikzFormat in
+    let format = userFormat
+        run = runStepwise format
+    in
     do
         putDoc hardline
         headline "Running Feature Trace Recording Prototype"
         
         headline ">>> [Motivating Example] <<<"
-        runStepwise format StackPopAlice.example
-        runStepwise format StackPopBob.example
+        run StackPopAlice.example
+        run StackPopBob.example
         
-        headline ">>> [Code Change Patterns] <<<"
-        runStepwise format CodeChangePatterns.addIfdef
+        headline ">>> [Edit Patterns] <<<"
+        run EditPatterns.addIfdef
         -- We omitted AddIfdef* as it is just a repitition of the previous pattern with arbitrary contexts and code fragments.
         -- AddIfDefElse has to be reproduced using two variants.
         -- Hence, we need two different examples here, one for the if-branch and one for the else-branch.
-        runStepwise format CodeChangePatterns.addIfdefElse_IfBranch
-        runStepwise format CodeChangePatterns.addIfdefElse_ElseBranch
-        runStepwise format CodeChangePatterns.addIfdefWrapElse
-        runStepwise format CodeChangePatterns.addIfdefWrapThen
+        run EditPatterns.addIfdefElse_IfBranch
+        run EditPatterns.addIfdefElse_ElseBranch
+        run EditPatterns.addIfdefWrapElse
+        run EditPatterns.addIfdefWrapThen
         -- Adding non-variational code (code that belongs to all clones)
-        runStepwise format CodeChangePatterns.addNormalCode_nonvariational
+        run EditPatterns.addNormalCode_nonvariational
         -- Adding code without any associated trace into a tree-optional scope that is already traced.
-        runStepwise format CodeChangePatterns.addNormalCode_outerpc
+        run EditPatterns.addNormalCode_outerpc
         -- Removing code that does not have a presence condition
-        runStepwise format CodeChangePatterns.remNormalCode_null
+        run EditPatterns.remNormalCode_null
         -- Removing code that has a feature trace and thereby a presence condition
-        runStepwise format CodeChangePatterns.remNormalCode_notnull
+        run EditPatterns.remNormalCode_notnull
         -- Removing code that has a feature trace
-        runStepwise format CodeChangePatterns.remIfdef
+        run EditPatterns.remIfdef
     
 
 headline :: (MonadColorPrinter m) => String -> m()
