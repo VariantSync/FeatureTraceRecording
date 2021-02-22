@@ -67,6 +67,6 @@ By default, the following examples are executed in this order:
 - [`app/examples/`](app/examples/): In this directory, the source code for the examples can be found. The motivating example from the paper is implemented in [`StackPopAlice.hs`](app/examples/StackPopAlice.hs) and [`StackPopBob.hs`](app/examples/StackPopBob.hs). The reproduction of the code change patterns used in our evaluation can be found in [`CodeChangePatterns.hs`](app/examples/CodeChangePatterns.hs).
 
 - [`src/propositions/NullPropositions.hs`](src/propositions/NullPropositions.hs): Operators for the ternary logic with `null`.
-We provide truthtables for the logic in [Truthtable.md](Truthtable.md).
+We provide truthtables for the logic in [docs/Truthtable.md](docs/Truthtable.md).
 The implementation is based on our implementation for propositional logic in [`src/propositions/Propositions.hs`](src/propositions/Propositions.hs).
 You can inspect the truth tables for the ternary logic by uncommenting the respective line (`showTruthtables`) in the `main` function in [`app/Main.hs`](app/Main.hs) and running the project again.

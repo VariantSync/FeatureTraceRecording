@@ -102,7 +102,7 @@ Additionally, you might want to look at the truthtable of the ternary logic by S
 main :: IO ()
 main = mconcat [
     showExamples
-    , showTruthtables
+    -- , showTruthtables
     ]
 
 showExamples :: IO ()
