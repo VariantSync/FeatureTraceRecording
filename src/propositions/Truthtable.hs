@@ -43,8 +43,7 @@ generatetruthtablesfor values =
         equalsname = "⇔"
         in
     prettyunarytable values lnot notname
-    ++"\n"
-    ++ mconcat (("\n"++).uncurry (prettybinarytable values)
+    ++ mconcat (("\n\n"++).uncurry (prettybinarytable values)
         <$> [
               (binarify land, andname)
             , (binarify lor, orname)

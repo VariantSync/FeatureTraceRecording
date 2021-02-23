@@ -26,37 +26,6 @@ We write `⊤` for `true` and `⊥` for `false`.
     Just ⊤  Just ⊥  | Just ⊥
     Just ⊤  Just ⊤  | Just ⊤
 
-    ∨
-    _________________________
-    Nothing Nothing | Nothing
-    Nothing Just ⊥  | Just ⊥
-    Nothing Just ⊤  | Just ⊤
-    Just ⊥  Nothing | Just ⊥
-    Just ⊥  Just ⊥  | Just ⊥
-    Just ⊥  Just ⊤  | Just ⊤
-    Just ⊤  Nothing | Just ⊤
-    Just ⊤  Just ⊥  | Just ⊤
-    Just ⊤  Just ⊤  | Just ⊤
-
-    ⇒
-    _________________________
-    Nothing Nothing | Nothing
-    Nothing | Nothing
-    Just ⊥  | Just ⊤
-    Just ⊤  | Just ⊥
-
-
-    ∧
-    _________________________
-    Nothing Nothing | Nothing
-    Nothing Just ⊥  | Just ⊥
-    Nothing Just ⊤  | Just ⊤
-    Just ⊥  Nothing | Just ⊥
-    Just ⊥  Just ⊥  | Just ⊥
-    Just ⊥  Just ⊤  | Just ⊥
-    Just ⊤  Nothing | Just ⊤
-    Just ⊤  Just ⊥  | Just ⊥
-    Just ⊤  Just ⊤  | Just ⊤
 
     ∨
     _________________________
@@ -69,6 +38,7 @@ We write `⊤` for `true` and `⊥` for `false`.
     Just ⊤  Nothing | Just ⊤
     Just ⊤  Just ⊥  | Just ⊤
     Just ⊤  Just ⊤  | Just ⊤
+
 
     ⇒
     _________________________
@@ -81,6 +51,7 @@ We write `⊤` for `true` and `⊥` for `false`.
     Just ⊤  Nothing | Just ⊥
     Just ⊤  Just ⊥  | Just ⊥
     Just ⊤  Just ⊤  | Just ⊤
+
 
     ⇔
     _________________________
