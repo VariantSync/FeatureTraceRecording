@@ -39,7 +39,7 @@ featurecolours p
 
 startTree :: State UUID SSCXXAST
 startTree = sequence $
-    scxx_funcdef "void" "pop" [] [
+    scxx_methoddef "void" "pop" [] [
         scxx_exprstatement $ scxx_assignment (scxx_varref "storage[head--]") "=" (scxx_literal "null")
     ]
 

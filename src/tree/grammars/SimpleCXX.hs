@@ -13,7 +13,7 @@ type SSCXXAST = SCXXAST String
 
 {- Simplified grammer for pseudo C++ -}
 data SimpleCXXGrammar = 
-    SCXX_FuncDef
+    SCXX_MethodDef
   | SCXX_ParametersDef
   | SCXX_Args
   | SCXX_Statements
@@ -36,9 +36,9 @@ type SCXXState = Tree (State UUID (Node SimpleCXXGrammar String))
 
 {- Grammar rules to build the AST -}
 
-scxx_funcdef :: String -> String -> [(String, String)] -> [SCXXState] -> SCXXState
-scxx_funcdef rettype name params content =
-    (Tree (node name SCXX_FuncDef) [
+scxx_methoddef :: String -> String -> [(String, String)] -> [SCXXState] -> SCXXState
+scxx_methoddef rettype name params content =
+    (Tree (node name SCXX_MethodDef) [
         scxx_type rettype,
         scxx_parametersdef params,
         scxx_statements content
@@ -109,7 +109,7 @@ scxx_file name content = Tree (node name SCXX_File) content
 
 {- Define optionality for all node types in our C++ grammar. -}
 instance Grammar SimpleCXXGrammar where
-    nodetypeof SCXX_FuncDef = Optional
+    nodetypeof SCXX_MethodDef = Optional
     nodetypeof SCXX_Return = Optional --leaf
     nodetypeof SCXX_File = Optional
     nodetypeof SCXX_ExprStatement = Optional
@@ -140,7 +140,7 @@ instance ASTPrettyPrinter SimpleCXXGrammar where
             showListNoIndentIncrease sep l = mconcat $ intersperse (prtStr sep) $ showCodeAs i indentGenerator prtStrWithContext prtNode <$> l
             showHead = showCodeAs indent indentGenerator prtStrWithContext prtNode $ head children
             in case grammartype n of
-                SCXX_FuncDef -> [indent, showHead, prtStr " ", me, showList " " $ tail children]
+                SCXX_MethodDef -> [indent, showHead, prtStr " ", me, showList " " $ tail children]
                 SCXX_ParametersDef -> [prtStr "(", showList ", " children, prtStr ")"]
                 SCXX_Args -> [prtStr "(", showList ", " children, prtStr ")"]
                 SCXX_Statements -> [

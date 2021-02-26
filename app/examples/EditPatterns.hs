@@ -39,7 +39,7 @@ alertstatuspgm :: State UUID SSCXXAST
 alertstatuspgm = sequence $ scxx_exprstatement $ scxx_funccall "alertstatuspgm" [scxx_varref "msg"]
 
 somefunction :: State UUID SSCXXAST
-somefunction = sequence $ scxx_funcdef "void" "foo" [] []
+somefunction = sequence $ scxx_methoddef "void" "foo" [] []
 
 createPatternExample :: (MonadColorPrinter m) => String -> SSCXXAST -> History SimpleCXXGrammar String -> Example m SimpleCXXGrammar String
 createPatternExample = createPatternExampleWithStartTrace emptyTrace
