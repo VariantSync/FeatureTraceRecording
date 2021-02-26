@@ -6,7 +6,7 @@ import UUID ( UUID )
 import Example ( Example(..) )
 import Edits ( Edit(delta), foldEditScript, edit_trace_only )
 import Propositions ( PropositionalFormula(..) )
-import SimpleCXX ( SimpleCXXGrammar )
+import SimpleJava ( SimpleJavaGrammar )
 import FeatureColour
 import FeatureTrace
 
@@ -18,7 +18,7 @@ featureColourPalette fallback formula
     | formula == (Just $ PVariable $ feature_ImmutableStack) = magenta
     | otherwise = fallback formula
 
-example :: MonadColorPrinter m => State UUID (Example m SimpleCXXGrammar String)
+example :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
 example =
     StackPopAlice.example
     >>= \alice ->

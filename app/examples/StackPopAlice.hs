@@ -9,7 +9,7 @@ import Propositions
 import Feature
 import FeatureTrace
 import FeatureColour
-import SimpleCXX
+import SimpleJava
 import System.Terminal
     ( MonadColorPrinter(..) )
 import Data.Maybe ( fromJust )
@@ -37,28 +37,28 @@ featurecolours p
     | p == (Just $ PVariable $ feature_ImmutableStack) = yellow
     | otherwise = white
 
-startTree :: State UUID SSCXXAST
+startTree :: State UUID SSJavaAST
 startTree = sequence $
-    scxx_methoddef "void" "pop" [] [
-        scxx_exprstatement $ scxx_assignment (scxx_varref "storage[head--]") "=" (scxx_literal "null")
+    sjava_methoddef "void" "pop" [] [
+        sjava_exprstatement $ sjava_assignment (sjava_varref "storage[head--]") "=" (sjava_literal "null")
     ]
 
-condTree :: State UUID SSCXXAST
-condTree = sequence $ scxx_condition (scxx_unaryop "!" $ scxx_funccall "empty" []) []
+condTree :: State UUID SSJavaAST
+condTree = sequence $ sjava_condition (sjava_unaryop "!" $ sjava_funccall "empty" []) []
 
-cloneDef :: State UUID SSCXXAST
-cloneDef = sequence $ scxx_exprstatement $ scxx_assignment (scxx_vardecl "Stack<T>" "c") "=" (scxx_funccall "clone" [])
+cloneDef :: State UUID SSJavaAST
+cloneDef = sequence $ sjava_exprstatement $ sjava_assignment (sjava_vardecl "Stack<T>" "c") "=" (sjava_funccall "clone" [])
 
-cloneStorage :: State UUID SSCXXAST
-cloneStorage = sequence $ scxx_exprstatement $ scxx_assignment (scxx_varref "c.storage[c.head--]") "=" (scxx_literal "null")
+cloneStorage :: State UUID SSJavaAST
+cloneStorage = sequence $ sjava_exprstatement $ sjava_assignment (sjava_varref "c.storage[c.head--]") "=" (sjava_literal "null")
 
-cloneRetStatement :: State UUID SSCXXAST
-cloneRetStatement = sequence $ scxx_return $ scxx_varref "c"
+cloneRetStatement :: State UUID SSJavaAST
+cloneRetStatement = sequence $ sjava_return $ sjava_varref "c"
 
 newReturnType :: String
 newReturnType = "Stack<T>"
 
-example :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+example :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 example =
     do
         tree_start <- StackPopAlice.startTree
@@ -67,10 +67,10 @@ example =
         tree_clonestorage <- StackPopAlice.cloneStorage
         tree_cloneretstatement <- StackPopAlice.cloneRetStatement
         let
-            id_tree_start_body = uuidOf . fromJust $ findByGrammarType SCXX_Statements tree_start
-            id_tree_start_storage = uuidOf . fromJust $ findByGrammarType SCXX_ExprStatement tree_start
-            id_tree_cond_body = uuidOf . fromJust $ findByGrammarType SCXX_Statements tree_cond
-            id_tree_start_ret = uuidOf . fromJust $ findByGrammarType SCXX_Type tree_start
+            id_tree_start_body = uuidOf . fromJust $ findByGrammarType SJava_Statements tree_start
+            id_tree_start_storage = uuidOf . fromJust $ findByGrammarType SJava_ExprStatement tree_start
+            id_tree_cond_body = uuidOf . fromJust $ findByGrammarType SJava_Statements tree_cond
+            id_tree_start_ret = uuidOf . fromJust $ findByGrammarType SJava_Type tree_start
         return Example {
             Example.name = "Motivating Example: Alice works on Stack.pop",
             Example.colours = featurecolours,
@@ -82,7 +82,7 @@ example =
               , edit_ins_tree tree_clonestorage id_tree_cond_body 0
               , edit_ins_tree tree_clonedef id_tree_start_body 0
               , edit_ins_tree tree_cloneretstatement id_tree_start_body 2
-              , edit_update id_tree_start_ret SCXX_Type newReturnType
+              , edit_update id_tree_start_ret SJava_Type newReturnType
             ] [ -- corresponding feature contexts
                 Just $ PVariable feature_SafeStack
               , Nothing

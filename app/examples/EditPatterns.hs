@@ -1,7 +1,7 @@
 ﻿module EditPatterns where
 
 import Example
-import SimpleCXX
+import SimpleJava
 import UUID ( UUID )
 import Control.Monad.State ( State )
 import System.Terminal
@@ -29,22 +29,22 @@ featurecolours p
     | otherwise = white
 
 
-emptyfile :: State UUID SSCXXAST
-emptyfile = sequence $ scxx_file "some file" []
+emptyfile :: State UUID SSJavaAST
+emptyfile = sequence $ sjava_file "some file" []
 
-lcd_setstatusalertpgm :: State UUID SSCXXAST
-lcd_setstatusalertpgm = sequence $ scxx_exprstatement $ scxx_funccall "lcd_setalertstatuspgm" [scxx_varref "lcd_msg"]
+lcd_setstatusalertpgm :: State UUID SSJavaAST
+lcd_setstatusalertpgm = sequence $ sjava_exprstatement $ sjava_funccall "lcd_setalertstatuspgm" [sjava_varref "lcd_msg"]
 
-alertstatuspgm :: State UUID SSCXXAST
-alertstatuspgm = sequence $ scxx_exprstatement $ scxx_funccall "alertstatuspgm" [scxx_varref "msg"]
+alertstatuspgm :: State UUID SSJavaAST
+alertstatuspgm = sequence $ sjava_exprstatement $ sjava_funccall "alertstatuspgm" [sjava_varref "msg"]
 
-somefunction :: State UUID SSCXXAST
-somefunction = sequence $ scxx_methoddef "void" "foo" [] []
+somefunction :: State UUID SSJavaAST
+somefunction = sequence $ sjava_methoddef "void" "foo" [] []
 
-createPatternExample :: (MonadColorPrinter m) => String -> SSCXXAST -> History SimpleCXXGrammar String -> Example m SimpleCXXGrammar String
+createPatternExample :: (MonadColorPrinter m) => String -> SSJavaAST -> History SimpleJavaGrammar String -> Example m SimpleJavaGrammar String
 createPatternExample = createPatternExampleWithStartTrace emptyTrace
 
-createPatternExampleWithStartTrace :: (MonadColorPrinter m) => FeatureTrace SimpleCXXGrammar String -> String -> SSCXXAST -> History SimpleCXXGrammar String -> Example m SimpleCXXGrammar String
+createPatternExampleWithStartTrace :: (MonadColorPrinter m) => FeatureTrace SimpleJavaGrammar String -> String -> SSJavaAST -> History SimpleJavaGrammar String -> Example m SimpleJavaGrammar String
 createPatternExampleWithStartTrace startTrace name start edits =
     Example {
         Example.name = name,
@@ -53,24 +53,24 @@ createPatternExampleWithStartTrace startTrace name start edits =
         history = edits
     }
 
-addIfdef :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addIfdef :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 addIfdef = do
     start <- emptyfile
     lcd <- lcd_setstatusalertpgm
     return $ createPatternExample "AddIfdef" start
         [(edit_ins_tree lcd (uuidOf start) 0, Just $ PVariable feature_ULTRA_LCD)]
 
-addIfdefElse_IfBranch :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addIfdefElse_IfBranch :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 addIfdefElse_IfBranch = addIfdef >>= \ifbranch -> return ifbranch {Example.name = "AddIfdefElse (if branch)"}
 
-addIfdefElse_ElseBranch :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addIfdefElse_ElseBranch :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 addIfdefElse_ElseBranch = do
     start <- emptyfile
     alert <- alertstatuspgm
     return $ createPatternExample "AddIfdefElse (else branch)" start
         [(edit_ins_tree alert (uuidOf start) 0, Just $ PNot $ PVariable feature_ULTRA_LCD)]
 
-addIfdefWrapElse :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addIfdefWrapElse :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 addIfdefWrapElse = do
     file <- emptyfile
     lcd <- lcd_setstatusalertpgm
@@ -87,7 +87,7 @@ addIfdefWrapElse = do
             Just $ PVariable feature_ULTRA_LCD
         ]
 
-addIfdefWrapThen :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addIfdefWrapThen :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 addIfdefWrapThen = do
     file <- emptyfile
     lcd <- lcd_setstatusalertpgm
@@ -104,14 +104,14 @@ addIfdefWrapThen = do
             Just $ PNot $ PVariable feature_ULTRA_LCD
         ]
 
-addNormalCode_nonvariational :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addNormalCode_nonvariational :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 addNormalCode_nonvariational = do
     start <- emptyfile
     lcd <- lcd_setstatusalertpgm
     return $ createPatternExample "AddNormalCode (non-variational)" start
         [(edit_ins_tree lcd (uuidOf start) 0, Just PTrue)]
 
-addNormalCode_outerpc :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+addNormalCode_outerpc :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 addNormalCode_outerpc = do
     file <- emptyfile
     foo <- somefunction
@@ -119,7 +119,7 @@ addNormalCode_outerpc = do
     let
         outer_pc = Just $ PVariable feature_FOO
         start = (run $ edit_ins_tree foo (uuidOf file) 0) file
-        statementsOfFoo = uuidOf . fromJust $ findByGrammarType SCXX_Statements foo
+        statementsOfFoo = uuidOf . fromJust $ findByGrammarType SJava_Statements foo
         in
         return $ createPatternExampleWithStartTrace
             -- change the start trace so that there is already a trace
@@ -130,7 +130,7 @@ addNormalCode_outerpc = do
             [(edit_ins_tree lcd statementsOfFoo 0, Just PTrue)]
             
 
-remNormalCode_null :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+remNormalCode_null :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 remNormalCode_null = do
     file <- emptyfile
     lcd <- lcd_setstatusalertpgm
@@ -138,7 +138,7 @@ remNormalCode_null = do
         return $ createPatternExample "RemNormalCode (without traces)" start
             [(edit_del_tree (uuidOf lcd), Just PTrue)]
 
-remNormalCode_notnull :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+remNormalCode_notnull :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 remNormalCode_notnull = do
     file <- emptyfile
     lcd <- lcd_setstatusalertpgm
@@ -153,5 +153,5 @@ remNormalCode_notnull = do
             [(edit_del_tree (uuidOf lcd), Nothing {-null-})]
 
 {- This behaves the same as remNormalCode_notnull. -}
-remIfdef :: (MonadColorPrinter m) => State UUID (Example m SimpleCXXGrammar String)
+remIfdef :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 remIfdef = remNormalCode_notnull >>= \r -> return r {Example.name = "RemIfdef"}
