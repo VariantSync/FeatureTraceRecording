@@ -74,16 +74,17 @@ ftr_ins (edit, context) (f_old, t_old) =
 ftr_del :: (Grammar g, Eq a, Show a) => RecordingFunction g a
 ftr_del (edit, context) (f_old, t_old) =
     \v ->
+        let pcv = pc t_old f_old v in
         if not $ member v $ delta edit t_old
         then f_old v
-        else (if isnull context && not (isnull $ pc t_old f_old v)
+        else (if isnull context && not (isnull pcv)
               then lfalse
               {-
               Due to our logical operators with null,
-              three of the cases of R_del in the paper can actually be collapsed
+              two of the cases of R_del in the paper can actually be collapsed
               into this single formula.
               -}
-              else land [f_old v, lnot context] 
+              else land [pcv, lnot context] 
         )
 
 ftr_move :: (Show a, Eq a) => RecordingFunction g a
