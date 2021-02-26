@@ -33,7 +33,7 @@ feature_ImmutableStack = toFeature "ImmutableStack"
 featurecolours :: MonadColorPrinter m => FeatureFormulaColourPalette m
 featurecolours p
     | p == (Just $ PNot $ PVariable $ feature_ImmutableStack) = magenta
-    | p == (Just $ PVariable $ feature_SafeStack) = green
+    | p == (Just $ PVariable $ feature_SafeStack) = cyan
     | p == (Just $ PVariable $ feature_ImmutableStack) = yellow
     | otherwise = white
 

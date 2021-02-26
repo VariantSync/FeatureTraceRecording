@@ -73,7 +73,7 @@ addIfdefWithPC = do
         fileNode = element $ fromJust $ findByGrammarType SJava_File startAST
         ultraFormula = Just $ PVariable feature_ULTRA_LCD
     return $ plainAddIfdef{
-        Example.name = (Example.name plainAddIfdef)++(buildPCName (value fileNode) ultraFormula),
+        Example.name = "AddIfdef"++(buildPCName (value fileNode) ultraFormula),
         startVersion = (\v -> if v == fileNode then ultraFormula else (startTrace v), startAST),
         history = (\(edit, fc) -> (edit, Nothing)) <$> history plainAddIfdef
     }
@@ -82,13 +82,13 @@ addIfdefElse_IfBranch :: (MonadColorPrinter m) => State UUID (Example m SimpleJa
 addIfdefElse_IfBranch = addIfdef >>= \ifbranch -> return ifbranch {Example.name = "AddIfdefElse (if branch) (general case)"}
 
 addIfdefElse_IfBranchWithPC :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
-addIfdefElse_IfBranchWithPC = addIfdefWithPC >>= \ifbranch -> return ifbranch {Example.name = "AddIfdefElse (if branch) "++(buildPCName rootName $ Just $ PVariable feature_ULTRA_LCD)}
+addIfdefElse_IfBranchWithPC = addIfdefWithPC >>= \ifbranch -> return ifbranch {Example.name = "AddIfdefElse (if branch)"++(buildPCName rootName $ Just $ PVariable feature_ULTRA_LCD)}
 
 addIfdefElse_ElseBranch :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 addIfdefElse_ElseBranch = do
     start <- emptyfile
     alert <- alertstatuspgm
-    return $ createPatternExample "AddIfdefElse (else branch)" start
+    return $ createPatternExample "AddIfdefElse (else branch) (general case)" start
         [(edit_ins_tree alert (uuidOf start) 0, Just $ PNot $ PVariable feature_ULTRA_LCD)]
 
 addIfdefElse_ElseBranchWithPC :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
@@ -140,7 +140,7 @@ addNormalCode_nonvariational :: (MonadColorPrinter m) => State UUID (Example m S
 addNormalCode_nonvariational = do
     start <- emptyfile
     lcd <- lcd_setstatusalertpgm
-    return $ createPatternExample "AddNormalCode (non-variational)" start
+    return $ createPatternExample "AddNormalCode (non-variable)" start
         [(edit_ins_tree lcd (uuidOf start) 0, Just PTrue)]
 
 addNormalCode_outerpc :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
