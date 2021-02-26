@@ -8,7 +8,7 @@ Instructions for installing stack can be found [here](https://docs.haskellstack.
 On linux, `sudo apt-get install haskell-stack` (or `sudo pacman -S stack` if you are using pacman) should do the job.
 After you installed stack, please open a terminal and navigate to the repositorie's directory (the directory containing this `README.md`).
 Our prototype prints coloured text to the terminal, so it might not be compatible with every terminal.
-We tested it within the Windows Terminal, Windows Powershell, Windows Subsystem for Linux (WSL) and the default terminal on Manjaro. (It does not work with Git Bash.)
+We tested it within the Windows Terminal, Windows Powershell, Windows Subsystem for Linux (WSL) and the default terminal on Manjaro. (It might not work with Git Bash.)
 You can then run the prototype as follows:
 
     cd <path/to/this/repository>
@@ -34,19 +34,16 @@ Afterwards, the code that is a result of this edit is shown (similar to Figure 2
 By default, the following examples are executed in this order:
 
 1. Motivating Example
-    - Alice's part of the motivating example shown in Figure 2 in the paper.
+    - Alice's part of the motivating example shown in Figure 1 in the paper.
     - Bob's part of the motivating example shown in Figure 3 in the paper. As the synchronisation of code and feature traces across clones is subject to future work, this example simulates how we envision the synchronisation.
-2. Code Change Patterns from the Evaluation (Section 6): As there are sometimes several ways for reproducing a pattern (e.g., depending on the presence of an outer presence condition), some patterns are shown multiple times. We omitted AddIfdef* as it is just a repitition of AddIfdef with arbitrary contexts and code fragments. As AddIfdefElse has to be reproduced using two variants, we need two different examples here, one for the if-branch and one for the else-branch.
-    - _AddIfdef_
-    - _AddIfdefElse_IfBranch_
-    - _AddIfdefElse_ElseBranch_
-    - _AddIfdefWrapElse_
-    - _AddIfdefWrapThen_
-    - _AddNormalCode_nonvariational_ (Adding code that belongs to all clones.)
-    - _AddNormalCode_outerpc_ (Adding code without any associated trace into a tree-optional scope that is already traced.)
-    - _RemNormalCode_null_ (Removing code that does not have a presence condition)
-    - _RemNormalCode_notnull_ (Removing code that has a feature trace and thereby a presence condition)
-    - _RemIfdef_
+2. Edit Patterns from the Evaluation (Section 5): For each pattern we show how to reproduce it in the general case and when an outer scope (eg., a method) is already assigned the target mapping. We omitted AddIfdef* as it is just a repitition of AddIfdef with arbitrary contexts and code fragments. As AddIfdefElse has to be reproduced using two variants, we need two different examples here, one for the if-branch and one for the else-branch.
+
+## If You Cannot Get it Running ...
+..., you can find screenshots of the prototype's output in the docs folder:
+
+- [docs/Alice.png](docs/Alice.png): Shows the output for Figure 1 in the paper. Alice performs several edits to the `pop` method.
+- [docs/Bob.png](docs/Bob.png): Shows how synchronising Alice's changes to Bob's variant would look like. As the synchronisation of code and feature traces across clones is subject to future work, this example simulates how we envision the synchronisation.
+- [docs/Patterns.png](docs/Patterns.png): Shows how our tool can reproduce the edit patterns described in the paper.
 
 ## Interesting Code Locations
 
@@ -62,9 +59,9 @@ By default, the following examples are executed in this order:
 
 - [`src/feature/FeatureTrace.hs`](src/feature/FeatureTrace.hs): Here you can find definitions for feature traces and presence conditions.
 
-- [`src/tree/grammars/SimpleCXX.hs`](src/tree/grammars/SimpleCXX.hs): Example implementation for a simplified C++ grammar used for the examples in our paper. Here you can see the different rules of the grammar as well as the classifiation of terminal symbols (node types) as _mandatory_, _optional_, or _tree-optional_.
+- [`src/tree/grammars/SimpleJava.hs`](src/tree/grammars/SimpleJava.hs): Example implementation for a simplified Java grammar used for the examples in our paper. Here you can see the different rules of the grammar as well as the classifiation of terminal symbols (node types) as _mandatory_, _optional_, or _wrappers_.
 
-- [`app/examples/`](app/examples/): In this directory, the source code for the examples can be found. The motivating example from the paper is implemented in [`StackPopAlice.hs`](app/examples/StackPopAlice.hs) and [`StackPopBob.hs`](app/examples/StackPopBob.hs). The reproduction of the code change patterns used in our evaluation can be found in [`CodeChangePatterns.hs`](app/examples/CodeChangePatterns.hs).
+- [`app/examples/`](app/examples/): In this directory, the source code for the examples can be found. The motivating example from the paper is implemented in [`StackPopAlice.hs`](app/examples/StackPopAlice.hs) and [`StackPopBob.hs`](app/examples/StackPopBob.hs). The reproduction of the edit patterns used in our evaluation can be found in [`EditPatterns.hs`](app/examples/EditPatterns.hs).
 
 - [`src/propositions/NullPropositions.hs`](src/propositions/NullPropositions.hs): Operators for the ternary logic with `null`.
 We provide truthtables for the logic in [docs/Truthtable.md](docs/Truthtable.md).
