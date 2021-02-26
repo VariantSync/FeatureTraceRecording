@@ -1,6 +1,6 @@
 # Prototype of Feature Trace Recording
 
-This code is supplementary material for the submission _Feature Trace Recording_ at _PUT VENUE HERE_.
+This code is supplementary material for the submission _Feature Trace Recording_ at _ESEC/FSE 2021_.
 
 ## How to Run the Project
 This prototype is written in Haskell and uses the Stack build system.
