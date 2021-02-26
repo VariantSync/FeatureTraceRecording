@@ -124,11 +124,14 @@ showExamples = withTerminal $ runTerminalT $
         
         headline ">>> [Edit Patterns] <<<"
         run EditPatterns.addIfdef
+        run EditPatterns.addIfdefWithPC
         -- We omitted AddIfdef* as it is just a repitition of the previous pattern with arbitrary contexts and code fragments.
         -- AddIfDefElse has to be reproduced using two variants.
         -- Hence, we need two different examples here, one for the if-branch and one for the else-branch.
         run EditPatterns.addIfdefElse_IfBranch
         run EditPatterns.addIfdefElse_ElseBranch
+        run EditPatterns.addIfdefElse_IfBranchWithPC
+        run EditPatterns.addIfdefElse_ElseBranchWithPC
         run EditPatterns.addIfdefWrapElse
         run EditPatterns.addIfdefWrapThen
         -- Adding non-variational code (code that belongs to all clones)

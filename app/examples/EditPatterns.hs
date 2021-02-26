@@ -7,6 +7,7 @@ import Control.Monad.State ( State )
 import System.Terminal
 import Feature
 import FeatureTrace
+import NullPropositions
 import FeatureTraceRecording
 import FeatureColour
 import Edits
@@ -16,10 +17,16 @@ import Tree
 import Data.Maybe (fromJust)
 
 feature_ULTRA_LCD :: Feature
-feature_ULTRA_LCD = toFeature "ULTRA_LCD"
+feature_ULTRA_LCD = toFeature "m"
 
 feature_FOO :: Feature
 feature_FOO = toFeature "FOO"
+
+rootName :: String
+rootName = "some file"
+
+buildPCName :: String -> FeatureFormula -> String
+buildPCName nodename f = " (with \""++nodename++"\" mapped to "++(NullPropositions.prettyPrint f)++")"
 
 featurecolours :: MonadColorPrinter m => FeatureFormulaColourPalette m
 featurecolours p
@@ -28,9 +35,8 @@ featurecolours p
     | p == (Just $ PVariable $ feature_FOO) = yellow
     | otherwise = white
 
-
 emptyfile :: State UUID SSJavaAST
-emptyfile = sequence $ sjava_file "some file" []
+emptyfile = sequence $ sjava_file rootName []
 
 lcd_setstatusalertpgm :: State UUID SSJavaAST
 lcd_setstatusalertpgm = sequence $ sjava_exprstatement $ sjava_funccall "lcd_setalertstatuspgm" [sjava_varref "lcd_msg"]
@@ -57,11 +63,26 @@ addIfdef :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar Str
 addIfdef = do
     start <- emptyfile
     lcd <- lcd_setstatusalertpgm
-    return $ createPatternExample "AddIfdef" start
+    return $ createPatternExample "AddIfdef (general case)" start
         [(edit_ins_tree lcd (uuidOf start) 0, Just $ PVariable feature_ULTRA_LCD)]
 
+addIfdefWithPC :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
+addIfdefWithPC = do
+    plainAddIfdef <- addIfdef
+    let (startTrace, startAST) = startVersion plainAddIfdef
+        fileNode = element $ fromJust $ findByGrammarType SJava_File startAST
+        ultraFormula = Just $ PVariable feature_ULTRA_LCD
+    return $ plainAddIfdef{
+        Example.name = (Example.name plainAddIfdef)++(buildPCName (value fileNode) ultraFormula),
+        startVersion = (\v -> if v == fileNode then ultraFormula else (startTrace v), startAST),
+        history = (\(edit, fc) -> (edit, Nothing)) <$> history plainAddIfdef
+    }
+
 addIfdefElse_IfBranch :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
-addIfdefElse_IfBranch = addIfdef >>= \ifbranch -> return ifbranch {Example.name = "AddIfdefElse (if branch)"}
+addIfdefElse_IfBranch = addIfdef >>= \ifbranch -> return ifbranch {Example.name = "AddIfdefElse (if branch) (general case)"}
+
+addIfdefElse_IfBranchWithPC :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
+addIfdefElse_IfBranchWithPC = addIfdefWithPC >>= \ifbranch -> return ifbranch {Example.name = "AddIfdefElse (if branch) "++(buildPCName rootName $ Just $ PVariable feature_ULTRA_LCD)}
 
 addIfdefElse_ElseBranch :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 addIfdefElse_ElseBranch = do
@@ -69,6 +90,17 @@ addIfdefElse_ElseBranch = do
     alert <- alertstatuspgm
     return $ createPatternExample "AddIfdefElse (else branch)" start
         [(edit_ins_tree alert (uuidOf start) 0, Just $ PNot $ PVariable feature_ULTRA_LCD)]
+
+addIfdefElse_ElseBranchWithPC :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
+addIfdefElse_ElseBranchWithPC = do
+    start <- emptyfile
+    alert <- alertstatuspgm
+    let context = Just $ PNot $ PVariable feature_ULTRA_LCD
+    return $ createPatternExampleWithStartTrace
+        (\v -> if v == (element start) then context else Nothing)
+        ("AddIfdefElse (else branch)"++(buildPCName (value $ element start) context))
+        start
+        [(edit_ins_tree alert (uuidOf start) 0, Nothing)]
 
 addIfdefWrapElse :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 addIfdefWrapElse = do
