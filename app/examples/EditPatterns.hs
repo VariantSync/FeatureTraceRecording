@@ -39,10 +39,10 @@ emptyfile :: State UUID SSJavaAST
 emptyfile = sequence $ sjava_file rootName []
 
 lcd_setstatusalertpgm :: State UUID SSJavaAST
-lcd_setstatusalertpgm = sequence $ sjava_exprstatement $ sjava_funccall "lcd_setalertstatuspgm" [sjava_varref "lcd_msg"]
+lcd_setstatusalertpgm = sequence $ sjava_exprstatement $ sjava_funccall "codeThenCase" [] --[sjava_varref "lcd_msg"]
 
 alertstatuspgm :: State UUID SSJavaAST
-alertstatuspgm = sequence $ sjava_exprstatement $ sjava_funccall "alertstatuspgm" [sjava_varref "msg"]
+alertstatuspgm = sequence $ sjava_exprstatement $ sjava_funccall "codeElseCase" [] --[sjava_varref "msg"]
 
 somefunction :: State UUID SSJavaAST
 somefunction = sequence $ sjava_methoddef "void" "foo" [] []
