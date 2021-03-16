@@ -3,10 +3,10 @@
 This code is supplementary material for the submission _Feature Trace Recording_ at _ESEC/FSE 2021_.
 
 ## How to Run the Project
-This prototype is written in Haskell and uses the Stack build system.
+This prototype is written in Haskell and uses the _Stack_ build system.
 Instructions for installing stack can be found [here](https://docs.haskellstack.org/en/stable/README/).
 On linux, `sudo apt-get install haskell-stack` (or `sudo pacman -S stack` if you are using pacman) should do the job.
-After you installed stack, please open a terminal and navigate to the repositorie's directory (the directory containing this `README.md`).
+After you installed stack, please open a terminal and navigate to the repository's directory (the directory containing this `README.md`).
 Our prototype prints coloured text to the terminal, so it might not be compatible with every terminal.
 We tested it within the Windows Terminal, Windows Powershell, Windows Subsystem for Linux (WSL) and the default terminal on Manjaro. (It might not work with Git Bash.)
 You can then run the prototype as follows:
