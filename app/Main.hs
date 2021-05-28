@@ -116,7 +116,7 @@ showExamples = withTerminal $ runTerminalT $
     in
     do
         putDoc hardline
-        headline "Running Feature Trace Recording Prototype"
+        headline "Running Feature Trace Recording Demo"
         
         headline ">>> [Motivating Example] <<<"
         run StackPopAlice.example
@@ -194,8 +194,8 @@ printTraces format example tracesAndTrees =
         tracedisplay = traceDisplay format
         toPC = \trace tree -> if tracedisplay == PC then pc tree trace else trace
         in
-        mappend (annotate (background red) $ pretty $ intercalate "\n  " [
-            "\nRunning "++name example
+        mappend (mappend (pretty "\n") $ annotate (background red) $ pretty $ intercalate "\n  " [
+            "Running "++name example
             -- "codeStyle      = "++show codestyle,
             -- "traceDisplay   = "++show tracedisplay,
             -- "traceStyle     = "++show tracestyle
