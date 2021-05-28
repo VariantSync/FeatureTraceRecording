@@ -1,6 +1,8 @@
 # Feature Trace Recording
 
-This repository contains artefacts for the paper _Feature Trace Recording_, accepted at _ESEC/FSE 2021_.
+Artifact repository for the paper _Feature Trace Recording_, accepted at _ESEC/FSE 2021_.
+Authors are [Paul Maximilian Bittner][paul], [Alexander Schultheiß][alexander], [Thomas Thüm][thomas], [Timo Kehrer][timo], [Jeffrey M. Young][jeffrey], and [Lukas Linsbauer][lukas].
+
 The artefact mainly consists of a library written in the Haskell language that implements feature trace recording.
 The library is accompanied with a demo application that uses the library to reproduce our motivating example (Alice and Bob using feature trace recording in Section 2 in our paper) as well as examples of the edit patterns we used to evaluate feature trace recording (Section 5).
 
@@ -70,3 +72,11 @@ By default, the following examples are executed in this order:
 We provide truthtables for the logic in [docs/Truthtable.md](docs/Truthtable.md).
 The implementation is based on our implementation for propositional logic in [`src/propositions/Propositions.hs`](src/propositions/Propositions.hs).
 You can inspect the truth tables for the ternary logic by uncommenting the respective line (`showTruthtables`) in the `main` function in [`app/Main.hs`](app/Main.hs) and running the project again.
+
+
+[paul]: https://www.uni-ulm.de/in/sp/team/paul-maximilian-bittner/
+[alexander]: https://www.informatik.hu-berlin.de/de/forschung/gebiete/mse/mitarb/alexander-schultheiss.html
+[thomas]: https://www.uni-ulm.de/in/sp/team/thuem/
+[timo]: https://www.informatik.hu-berlin.de/de/forschung/gebiete/mse/mitarb/kehrerti.html
+[jeffrey]: https://www.uni-ulm.de/in/sp/team/former-employees-and-doctorands/jeffrey-young/
+[lukas]: https://www.tu-braunschweig.de/isf/team/lukas-linsbauer
