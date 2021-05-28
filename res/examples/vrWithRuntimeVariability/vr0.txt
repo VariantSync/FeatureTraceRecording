@@ -1,6 +1,0 @@
-﻿void main(String[] args) {
-    initGame();
-    start();
-}
-
-// all is annotated with null
