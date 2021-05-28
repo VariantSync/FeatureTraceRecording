@@ -28,7 +28,7 @@ For each edit, we first show its type and the feature context under which that e
 
 where an abstract syntax tree (AST) whose root has ID 11 is inserted below node 4 in the current AST at index 0 under feature context "SafeStack".
 (The first edit will always be `identity` under context `null`. This is a technical detail necessary to show the initial state of the example.)
-Afterwards, the code that is a result of this edit is shown (similar to Figure 2 in the paper):
+Afterwards, the code that is a result of this edit is shown (similar to Figure 1 in the paper):
 
     void pop() {
         if (!empty()) {
