@@ -6,7 +6,7 @@ import Grammar
 import Control.Monad.State
 
 -- g has to be a grammar
-data Node g a = Node {value::a, grammartype::g, uuid::UUID} --, version::Int
+data Node g a = Node {value::a, grammartype::g, uuid::UUID}
 type AST g a = Tree (Node g a)
 
 instance Eq (Node g a) where
@@ -23,9 +23,9 @@ optionaltype = nodetypeof.grammartype
 
 node :: Grammar g => a -> g -> State UUID (Node g a)
 node v vt = do
-  next ()
+  next
   id <- get
-  return Node {value = v, grammartype = vt, uuid = id} --, version = 0
+  return Node {value = v, grammartype = vt, uuid = id}
 
 uuidOf :: AST g a -> UUID
 uuidOf = uuid . element

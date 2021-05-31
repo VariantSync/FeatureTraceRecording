@@ -72,7 +72,7 @@ intifyFormula m (PVariable v) =
     if member v m
     then return (m, PVariable (m ! v))
     else do
-        next ()
+        next
         uuidForV <- get
         let intval = toInt uuidForV in
             return (insert v intval m, PVariable intval)
@@ -111,7 +111,7 @@ Creates a list of the two literals 'x' and 'not x' where x is a new generated va
 -}
 createConflictingLiterals :: (Ord a) => Bimap a Int -> State UUID (Bimap a Int, [PropositionalFormula Int])
 createConflictingLiterals m = do
-    next ()
+    next
     z <- get
     let intval = toInt z in
         return (m, [PVariable intval, PNot $ PVariable intval])
