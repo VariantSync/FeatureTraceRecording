@@ -1,3 +1,4 @@
+-- | Module for edits to ASTs.
 module Edits where
 
 import UUID
@@ -11,39 +12,41 @@ import ListUtil
 import Data.List
 import Data.Set
 
-data EditType = Identity | TraceOnly | Insert | Delete | Move | Update deriving (Eq, Show)
+-- | Each edit is associated to a type depending on what it does.
+data EditType
+    = Identity  -- ^ @Identity@ edits do nothing to the AST (they are noops).
+    | TraceOnly -- ^ @TraceOnly@ are edits that do not alter the AST but have a non-empty delta. This delta is used to descibe side-effects that should be applied to all nodes in the delta (e.g., change their feature mapping).
+    | Insert    -- * @Insert@ edits only add nodes to a tree.
+    | Delete    -- * @Delete@ edits only remove nodes from a tree.
+    | Move      -- * @Move@s only relocate nodes within the same tree.
+    | Update    -- * @Update@s only change the contents of one or more nodes without altering the tree structure.
+    deriving (Eq, Show)
+
+-- | An edit to an AST.
 data Edit g a = Edit {
+    -- | The type of this edit classifying its behaviour.
     edittype :: EditType,
+    -- | The name of this edit. Used for debugging and printing.
     name :: String,
+    -- | Applies the edit to an AST, yielding the edited AST.
     run :: AST g a -> AST g a,
-    delta :: AST g a -> Set (Node g a)} -- inverse :: Edit a
+    -- | Computs the set of all nodes that will be altered (inserted, deleted, moved, updated ...) when applying the edit to a given AST.
+    delta :: AST g a -> Set (Node g a)
+}
+
+-- | An @EditScript@ is a sequence of edits that should be applied in order to a single AST.
 type EditScript g a = [Edit g a]
-
-invertEdit :: Edit g a -> Edit g a
-invertEdit = error "not implemented"
-
--- editscriptmerge :: AST g a -> EditScript g a -> EditScript g a -> EditScript g a
--- editscriptmerge t e1 e2 = e1++e2
-
-{-
-Can we resort an edit script?
-Assume we have a function that takes an edit script e and generates a dependency graph d.
-d should be a directed acyclic graph.
-In d, each edit is a node and a directed edge from a to b indicates that a depends on b, i.e., it has to be executed after b.
-Then d induces a partial order.
-d can be projected onto different total orders.
-Each such total order then is one possible resorted edit script.
--}
 
 instance Show (Edit g a) where
     show = name
 
--- Turns an edit script into one single function
--- The returned function will run the entire edit script on the given AST.
+-- | Runs an entire edit script on a given AST.
+-- If curried, turns an edit script into one single function that can run that script on any AST.
 foldEditScript :: EditScript g a -> AST g a -> AST g a
 foldEditScript es = reversefoldr (.) id $ run <$> es
 
--- The identity of edits
+-- | The identity of edits.
+-- Does nothing and has an empty delta for all trees.
 edit_identity :: Edit g a
 edit_identity = Edit {
     edittype = Identity,
@@ -52,7 +55,7 @@ edit_identity = Edit {
     name = "identity"}
 
 {-
-An identity edit that will keep the given set of nodes as delta for the feature trace recording.
+| An identity edit that will keep the given set of nodes as delta for the feature trace recording.
 Upon recording, all given nodes will have their feature trace changed to the feature context.
 This function assumes that the given set of nodes is a subset of the nodes in the future edited tree.
 -}
@@ -63,7 +66,8 @@ edit_trace_only nodes = Edit {
     delta = \_ -> nodes,
     name = "tracechange"}
 
--- Add the tree s as the i-th child of node p
+-- | Inserts a subtree into another tree.
+-- The given tree (first argument) will become the @i@-th child of the node with the given UUID.
 edit_ins_tree :: (Eq a) => AST g a -> UUID -> Int -> Edit g a
 edit_ins_tree stree p i = Edit {
     edittype = Insert,
@@ -74,7 +78,7 @@ edit_ins_tree stree p i = Edit {
                              then Tree n (ListUtil.insertAtIndex i stree c)
                              else x
 
--- delete the node v and move its children up
+-- | Delete the node with the given UUID v and move its children up (such that they become children of the deleted node's parent).
 edit_del_node :: (Eq a) => UUID -> Edit g a
 edit_del_node v = Edit {
     edittype = Delete,
@@ -84,7 +88,7 @@ edit_del_node v = Edit {
         Just t' -> singleton $ element t',
     name = "del_node("++(show v)++")"}
 
--- delete the subtree rooted in v
+-- | Delete the entire subtree whose root has the given id.
 edit_del_tree :: (Eq a) => UUID -> Edit g a
 edit_del_tree v = Edit {
     edittype = Delete,
@@ -94,9 +98,8 @@ edit_del_tree v = Edit {
         Just t' -> toset t',
     name = "del_tree("++(show v)++")"}
 
--- This commented out signature is the signature of move_tree in the paper.
--- Actually, the given subtree should just be an index because the subtree is present in the given tree.
--- edit_move_tree :: (Eq a) => AST a -> UUID -> Int -> Edit a
+-- | Moves the subtree @s@ with the given root (first argument).
+-- @s@ will become the i-th child of the node with the given id (second argument).
 edit_move_tree :: (Grammar g, Eq a, Show a) => UUID -> UUID -> Int -> Edit g a
 edit_move_tree s p i = Edit {
     edittype = Move,
@@ -111,6 +114,8 @@ edit_move_tree s p i = Edit {
           del = run $ edit_del_tree s
           ins t = run $ edit_ins_tree t p i
 
+-- | Updates the node with the given UUID to have a new grammar type and a new value.
+-- The node will keep its UUID (i.e., not get a new uuid as it is still associated to the same previous node.
 edit_update :: (Grammar g, Show a, Eq a) => UUID -> g -> a -> Edit g a
 edit_update id newGrammarType newVal = Edit {
     edittype = Update,

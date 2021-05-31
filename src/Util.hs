@@ -1,96 +1,53 @@
+-- | A module containing various utility functions.
 module Util where
 
+-- | Generates a string of /i/ spaces where /i/ is the given indent.
+-- For example @genIndent 4@ returns @"    "@.
 genIndent :: Int -> String
 genIndent i = concat $ replicate i " "
 
+-- | Returns @x@ iff the given Maybe is @Just x@.
+-- Otherwise, returns the value produced by the given generator function.
 safeFromJust :: Maybe a -> (() -> a) -> a
 safeFromJust Nothing gen = gen ()
 safeFromJust (Just x) _ = x
 
+-- | Folds the given list after reversing it.
 reversefoldr :: (a -> b -> b) -> b -> [a] -> b
 reversefoldr f zero container = foldr f zero $ reverse container
 
+-- | Generates parenthesis aroung the given string iff the given bool is true.
 parenIf :: Bool -> String -> String
 parenIf True s = "("++s++")"
 parenIf False s = s
 
+-- | Filters the given Maybe.
+-- If the maybe's element satisfies the given predicate, the element will be kept.
+-- Otherwise, returns @Nothing@.
 takeIf :: (a -> Bool) -> Maybe a -> Maybe a
 takeIf _ Nothing = Nothing
 takeIf p (Just x)
     | p x = Just x
     | otherwise = Nothing
 
+-- | Lifts a value to a Maybe based on a predicate.
+-- Iff the element satisfies the predicate, the result is @Nothing@.
+-- Otherwise returns the @Just@ the element.
 nothingIf :: (a -> Bool) -> a -> Maybe a
 nothingIf p a
     | p a = Nothing
     | otherwise = Just a
 
+-- | Removes the first and the last element of a list.
 removeFirstAndLast :: [a] -> [a]
 removeFirstAndLast [] = []
 removeFirstAndLast [x] = []
 removeFirstAndLast xs = tail $ init xs
 
+-- | If the given string starts and ends with quotes @"@ (i.e., it is of the form @"\"something\""@), those parenthesis will be removed (i.e., turned to just @"something"@).
+-- This is used for showing strings from a polymorphic context.
 removeQuotes :: String -> String
 removeQuotes s =
     if head s == '\"' && last s == '\"'
     then removeFirstAndLast s
     else s
-
--- Here are some exercises
-{-
-
-data List a = Empty | Head a | Tail a (List a)
-
-instance Semigroup (List a) where
-    Empty <> l = l
-    l <> Empty = l
-    (Head x) <> l = Tail x l
-    (Tail x xs) <> l = Tail x (xs <> l)
-
-instance Monoid (List a) where
-    mempty = Empty
-    mappend = (<>)
-
-instance Functor List where
-    fmap f Empty = Empty
-    fmap f (Head x) = Head (f x)
-    fmap f (Tail x l) = Tail (f x) (fmap f l)
-
-instance Applicative List where
-    pure x = Head x
-    Empty <*> l = Empty
-    (Head f) <*> l = fmap f l
-    (Tail f fs) <*> l = (fmap f l) <> (fs <*> l)
-
-instance Monad List where
-    return = pure
-    -- (>>=)       :: forall a b. m a -> (a -> m b) -> m b
-    Empty >>= f = Empty
-    (Head x) >>= f = f x
-    (Tail x xs) >>= f = f x <> (xs >>= f)
-
-data Nullable a = Null | Actually a
-
-instance Semigroup a => Semigroup (Nullable a) where
-    Null <> n = n
-    n <> Null = n
-    (Actually a) <> (Actually b) = Actually (a <> b)
-
-instance Semigroup a => Monoid (Nullable a) where
-    mempty = Null
-    mappend = (<>)
-
-instance Functor Nullable where
-    fmap f Null = Null
-    fmap f (Actually x) = Actually (f x)
-
-instance Applicative Nullable where
-    pure x = Actually x
-    Null <*> n = Null
-    (Actually f) <*> n = fmap f n
-
-instance Monad Nullable where
-    return = pure
-    Null >>= f = Null
-    Actually x >>= f = f x
---}

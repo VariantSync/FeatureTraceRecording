@@ -6,7 +6,7 @@ import Control.Monad.State
 -- | A universable unique identifiers (UUID) realised as an integer.
 type UUID = Int
 
--- | Computes the next UUID and sets it as state.
+-- | Computes successor UUID of the current UUID.
 next :: State UUID ()
 next = do
     num <- get
