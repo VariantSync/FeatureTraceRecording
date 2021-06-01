@@ -16,10 +16,10 @@ import Data.Set
 data EditType
     = Identity  -- ^ @Identity@ edits do nothing to the AST (they are noops).
     | TraceOnly -- ^ @TraceOnly@ are edits that do not alter the AST but have a non-empty delta. This delta is used to descibe side-effects that should be applied to all nodes in the delta (e.g., change their feature mapping).
-    | Insert    -- * @Insert@ edits only add nodes to a tree.
-    | Delete    -- * @Delete@ edits only remove nodes from a tree.
-    | Move      -- * @Move@s only relocate nodes within the same tree.
-    | Update    -- * @Update@s only change the contents of one or more nodes without altering the tree structure.
+    | Insert    -- ^ @Insert@ edits only add nodes to a tree.
+    | Delete    -- ^ @Delete@ edits only remove nodes from a tree.
+    | Move      -- ^ @Move@s only relocate nodes within the same tree.
+    | Update    -- ^ @Update@s only change the contents of one or more nodes without altering the tree structure.
     deriving (Eq, Show)
 
 -- | An edit to an AST.
