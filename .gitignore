@@ -5,3 +5,4 @@
 .stack-work/
 ftr.cabal
 stack.yaml.lock
+dist-newstyle
