@@ -13,7 +13,7 @@ data Node g a = Node {
   -- | The grammar rule this node was parsed from. @g@ should be an instance of 'Grammar'.
   grammartype::g,
   -- | A unique identifier to trace nodes across several versions of ASTs.
-  uuid::UUI
+  uuid::UUID
 }
 
 instance Eq (Node g a) where
