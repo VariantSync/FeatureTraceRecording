@@ -47,7 +47,7 @@ data OutputFormat = OutputFormat {
 
 -- Some presets for output formats:
 
-{-
+{- |
 The perspective of the developer who is editing code while traces are recorded in the background
 This is the format used in the figures in the paper.
 -}
@@ -59,7 +59,7 @@ userFormat = OutputFormat {
     withTraceLines = False
 }
 
-{-
+{- |
 A variation of 'userFormat' where traces and presence conditions can be investigated seperately at the same time.
 Code is coloured in the colour of its trace while presence conditions are indicated by coloured lines on the left.
 -}
@@ -71,7 +71,7 @@ userFormatDetailed = OutputFormat {
     withTraceLines = True
 }
 
-{-
+{- |
 Shows the Abstract Syntax Tree of the source code with feature traces as formulas.
 -}
 astFormat :: OutputFormat
@@ -82,7 +82,7 @@ astFormat = OutputFormat {
     withTraceLines = False
 }
 
-{-
+{- |
 Tikz export of AST with traces.
 Used for figures in the paper.
 -}
@@ -95,7 +95,7 @@ tikzFormat = OutputFormat {
 }
         
 {-
-Select what to show here.
+| Select what to show here.
 By default, we will show the output of all exaples (Alice, Bob, and the edit patterns).
 Additionally, you might want to look at the truthtable of the ternary logic by Sobocinski we use.
 -}
