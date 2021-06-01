@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="">&#65279;module TikzExport where
+</span><span>
+</span><span id="line-3"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Tree.html"><span class="hs-identifier">Tree</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Tree.html#element"><span class="hs-identifier">element</span></a></span><span class="hs-special">,</span><span>  </span><span class="annot"><a href="Tree.html#Tree"><span class="hs-identifier">Tree</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Tree.html#Tree"><span class="hs-identifier">Tree</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">)</span><span>
+</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="AST.html"><span class="hs-identifier">AST</span></a></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Grammar.html"><span class="hs-identifier">Grammar</span></a></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Propositions.html"><span class="hs-identifier">Propositions</span></a></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Feature.html"><span class="hs-identifier">Feature</span></a></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="FeatureTrace.html"><span class="hs-identifier">FeatureTrace</span></a></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Util.html"><span class="hs-identifier">Util</span></a></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier">intercalate</span></span><span> </span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-comment">{-This file is a bit hacky.-}</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span id="local-6989586621679094466"><span id="local-6989586621679094467"><span class="annot"><a href="TikzExport.html#astToTikzWithTraceDefault"><span class="hs-identifier hs-type">astToTikzWithTraceDefault</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679094467"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679094467"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Grammar.html#Grammar"><span class="hs-identifier hs-type">Grammar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094466"><span class="hs-identifier hs-type">g</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="FeatureTrace.html#FeatureTrace"><span class="hs-identifier hs-type">FeatureTrace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094466"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094467"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094466"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094467"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span></span><span>
+</span><span id="line-15"></span><span id="astToTikzWithTraceDefault"><span class="annot"><span class="annottext">astToTikzWithTraceDefault :: FeatureTrace g a -&gt; AST g a -&gt; String
+</span><a href="TikzExport.html#astToTikzWithTraceDefault"><span class="hs-identifier hs-var hs-var">astToTikzWithTraceDefault</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><span class="annottext">(AST g a -&gt; String)
+-&gt; (AST g a -&gt; Node g a -&gt; FeatureTrace g a -&gt; String)
+-&gt; FeatureTrace g a
+-&gt; AST g a
+-&gt; String
+forall g a.
+(AST g a -&gt; String)
+-&gt; (AST g a -&gt; Node g a -&gt; FeatureTrace g a -&gt; String)
+-&gt; FeatureTrace g a
+-&gt; AST g a
+-&gt; String
+</span><a href="TikzExport.html#astToTikzWithTrace"><span class="hs-identifier hs-var">astToTikzWithTrace</span></a></span><span>
+</span><span id="line-17"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="TikzExport.html#tikzifyName"><span class="hs-identifier hs-var">tikzifyName</span></a></span><span>
+</span><span id="line-18"></span><span>        </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; (AST g a -&gt; String) -&gt; AST g a -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679094461"><span class="annot"><span class="annottext">n :: Node g a
+</span><a href="#local-6989586621679094461"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-19"></span><span>            </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679094460"><span class="annot"><span class="annottext">ruleStr :: String
+</span><a href="#local-6989586621679094460"><span class="hs-identifier hs-var hs-var">ruleStr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; String -&gt; String
+forall a. Int -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">drop</span></span><span> </span><span class="annot"><span class="hs-number">5</span></span><span class="hs-special">)</span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; (Node g a -&gt; String) -&gt; Node g a -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Util.html#removeQuotes"><span class="hs-identifier hs-var">removeQuotes</span></a></span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; (Node g a -&gt; String) -&gt; Node g a -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">g -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span class="annot"><span class="annottext">(g -&gt; String) -&gt; (Node g a -&gt; g) -&gt; Node g a -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">Node g a -&gt; g
+forall g a. Node g a -&gt; g
+</span><a href="AST.html#grammartype"><span class="hs-identifier hs-var hs-var">grammartype</span></a></span><span> </span><span class="annot"><span class="annottext">(Node g a -&gt; String) -&gt; Node g a -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Node g a
+</span><a href="#local-6989586621679094461"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-comment">-- TODO: Fix the hacky &quot;drop 5&quot; that only works for SCXX_Grammar</span><span>
+</span><span id="line-20"></span><span>                </span><span id="local-6989586621679094455"><span class="annot"><span class="annottext">valStr :: String
+</span><a href="#local-6989586621679094455"><span class="hs-identifier hs-var hs-var">valStr</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Util.html#removeQuotes"><span class="hs-identifier hs-var">removeQuotes</span></a></span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; (Node g a -&gt; String) -&gt; Node g a -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">a -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span class="annot"><span class="annottext">(a -&gt; String) -&gt; (Node g a -&gt; a) -&gt; Node g a -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">Node g a -&gt; a
+forall g a. Node g a -&gt; a
+</span><a href="AST.html#value"><span class="hs-identifier hs-var hs-var">value</span></a></span><span> </span><span class="annot"><span class="annottext">(Node g a -&gt; String) -&gt; Node g a -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Node g a
+</span><a href="#local-6989586621679094461"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-keyword">in</span><span>
+</span><span id="line-21"></span><span>            </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679094460"><span class="hs-identifier hs-var">ruleStr</span></a></span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679094455"><span class="hs-identifier hs-var">valStr</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">String
+forall a. Monoid a =&gt; a
+</span><span class="hs-identifier hs-var">mempty</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679094455"><span class="hs-identifier hs-var">valStr</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679094460"><span class="hs-identifier hs-var">ruleStr</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="hs-string">&quot;\\linebreak\\code{&quot;</span></span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679094455"><span class="hs-identifier hs-var">valStr</span></a></span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="hs-string">&quot;}&quot;</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="hs-string">&quot;&quot;</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span>        </span><span class="annot"><span class="annottext">(Node g a -&gt; String) -&gt; (AST g a -&gt; Node g a) -&gt; AST g a -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">AST g a -&gt; Node g a
+forall a. Tree a -&gt; a
+</span><a href="Tree.html#element"><span class="hs-identifier hs-var">element</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>    </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679094451"><span class="annot"><span class="annottext">tree :: AST g a
+</span><a href="#local-6989586621679094451"><span class="hs-identifier hs-var">tree</span></a></span></span><span> </span><span id="local-6989586621679094450"><span class="annot"><span class="annottext">node :: Node g a
+</span><a href="#local-6989586621679094450"><span class="hs-identifier hs-var">node</span></a></span></span><span> </span><span id="local-6989586621679094449"><span class="annot"><span class="annottext">trace :: FeatureTrace g a
+</span><a href="#local-6989586621679094449"><span class="hs-identifier hs-var">trace</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; String
+forall a. [a] -&gt; [[a]] -&gt; [a]
+</span><span class="hs-identifier hs-var">intercalate</span></span><span> </span><span class="annot"><span class="hs-string">&quot;, &quot;</span></span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-24"></span><span>        </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="TikzExport.html#tikzifyName"><span class="hs-identifier hs-var">tikzifyName</span></a></span><span class="annot"><span class="annottext">(String -&gt; String)
+-&gt; (FeatureFormula -&gt; String) -&gt; FeatureFormula -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679094448"><span class="annot"><span class="annottext">s :: String
+</span><a href="#local-6989586621679094448"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679094448"><span class="hs-identifier hs-var">s</span></a></span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Node g a -&gt; NodeType
+forall g a. Grammar g =&gt; Node g a -&gt; NodeType
+</span><a href="AST.html#optionaltype"><span class="hs-identifier hs-var">optionaltype</span></a></span><span> </span><span class="annot"><span class="annottext">Node g a
+</span><a href="#local-6989586621679094450"><span class="hs-identifier hs-var">node</span></a></span><span> </span><span class="annot"><span class="annottext">NodeType -&gt; NodeType -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">NodeType
+</span><a href="Grammar.html#Mandatory"><span class="hs-identifier hs-var">Mandatory</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="hs-string">&quot;Inherited&quot;</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="hs-string">&quot;&quot;</span></span><span class="hs-special">)</span><span class="annot"><span class="annottext">(String -&gt; String)
+-&gt; (FeatureFormula -&gt; String) -&gt; FeatureFormula -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">FeatureFormula -&gt; String
+</span><a href="TikzExport.html#featuresToTikzClass"><span class="hs-identifier hs-var">featuresToTikzClass</span></a></span><span> </span><span class="annot"><span class="annottext">(FeatureFormula -&gt; String) -&gt; FeatureFormula -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; FeatureTrace g a -&gt; FeatureTrace g a
+forall g a.
+(Grammar g, Show a, Eq a) =&gt;
+AST g a -&gt; FeatureTrace g a -&gt; FeatureTrace g a
+</span><a href="FeatureTrace.html#pc"><span class="hs-identifier hs-var">pc</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094451"><span class="hs-identifier hs-var">tree</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureTrace g a
+</span><a href="#local-6989586621679094449"><span class="hs-identifier hs-var">trace</span></a></span><span> </span><span class="annot"><span class="annottext">Node g a
+</span><a href="#local-6989586621679094450"><span class="hs-identifier hs-var">node</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>        </span><span class="annot"><span class="annottext">NodeType -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">(NodeType -&gt; String) -&gt; NodeType -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Node g a -&gt; NodeType
+forall g a. Grammar g =&gt; Node g a -&gt; NodeType
+</span><a href="AST.html#optionaltype"><span class="hs-identifier hs-var">optionaltype</span></a></span><span> </span><span class="annot"><span class="annottext">Node g a
+</span><a href="#local-6989586621679094450"><span class="hs-identifier hs-var">node</span></a></span><span>
+</span><span id="line-26"></span><span>      </span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="annot"><a href="TikzExport.html#featuresToTikzClass"><span class="hs-identifier hs-type">featuresToTikzClass</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Feature.html#FeatureFormula"><span class="hs-identifier hs-type">FeatureFormula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-29"></span><span id="featuresToTikzClass"><span class="annot"><span class="annottext">featuresToTikzClass :: FeatureFormula -&gt; String
+</span><a href="TikzExport.html#featuresToTikzClass"><span class="hs-identifier hs-var hs-var">featuresToTikzClass</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;null&quot;</span></span><span>
+</span><span id="line-30"></span><span class="annot"><a href="TikzExport.html#featuresToTikzClass"><span class="hs-identifier hs-var">featuresToTikzClass</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="annot"><a href="Propositions.html#PTrue"><span class="hs-identifier hs-type">PTrue</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;true&quot;</span></span><span>
+</span><span id="line-31"></span><span class="annot"><a href="TikzExport.html#featuresToTikzClass"><span class="hs-identifier hs-var">featuresToTikzClass</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="annot"><a href="Propositions.html#PFalse"><span class="hs-identifier hs-type">PFalse</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;false&quot;</span></span><span>
+</span><span id="line-32"></span><span class="annot"><a href="TikzExport.html#featuresToTikzClass"><span class="hs-identifier hs-var">featuresToTikzClass</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Propositions.html#PVariable"><span class="hs-identifier hs-type">PVariable</span></a></span><span> </span><span id="local-6989586621679094440"><span class="annot"><span class="annottext">v :: String
+</span><a href="#local-6989586621679094440"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679094440"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-33"></span><span class="annot"><a href="TikzExport.html#featuresToTikzClass"><span class="hs-identifier hs-var">featuresToTikzClass</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Propositions.html#PNot"><span class="hs-identifier hs-type">PNot</span></a></span><span> </span><span id="local-6989586621679094438"><span class="annot"><span class="annottext">p :: PropositionalFormula String
+</span><a href="#local-6989586621679094438"><span class="hs-identifier hs-var">p</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;not&quot;</span></span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">FeatureFormula -&gt; String
+</span><a href="TikzExport.html#featuresToTikzClass"><span class="hs-identifier hs-var">featuresToTikzClass</span></a></span><span> </span><span class="annot"><span class="annottext">(FeatureFormula -&gt; String) -&gt; FeatureFormula -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula String -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula String
+</span><a href="#local-6989586621679094438"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="annot"><a href="TikzExport.html#featuresToTikzClass"><span class="hs-identifier hs-var">featuresToTikzClass</span></a></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;Only literals are supported&quot;</span></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span id="local-6989586621679094516"><span id="local-6989586621679094517"><span class="annot"><a href="TikzExport.html#astToTikzWithTrace"><span class="hs-identifier hs-type">astToTikzWithTrace</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094517"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094516"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094517"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094516"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="AST.html#Node"><span class="hs-identifier hs-type">Node</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094517"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094516"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FeatureTrace.html#FeatureTrace"><span class="hs-identifier hs-type">FeatureTrace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094517"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094516"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FeatureTrace.html#FeatureTrace"><span class="hs-identifier hs-type">FeatureTrace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094517"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094516"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094517"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094516"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span></span><span>
+</span><span id="line-37"></span><span id="astToTikzWithTrace"><span class="annot"><span class="annottext">astToTikzWithTrace :: (AST g a -&gt; String)
+-&gt; (AST g a -&gt; Node g a -&gt; FeatureTrace g a -&gt; String)
+-&gt; FeatureTrace g a
+-&gt; AST g a
+-&gt; String
+</span><a href="TikzExport.html#astToTikzWithTrace"><span class="hs-identifier hs-var hs-var">astToTikzWithTrace</span></a></span></span><span> </span><span id="local-6989586621679094436"><span class="annot"><span class="annottext">val :: AST g a -&gt; String
+</span><a href="#local-6989586621679094436"><span class="hs-identifier hs-var">val</span></a></span></span><span> </span><span id="local-6989586621679094435"><span class="annot"><span class="annottext">toCls :: AST g a -&gt; Node g a -&gt; FeatureTrace g a -&gt; String
+</span><a href="#local-6989586621679094435"><span class="hs-identifier hs-var">toCls</span></a></span></span><span> </span><span id="local-6989586621679094434"><span class="annot"><span class="annottext">trace :: FeatureTrace g a
+</span><a href="#local-6989586621679094434"><span class="hs-identifier hs-var">trace</span></a></span></span><span> </span><span id="local-6989586621679094433"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094433"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(AST g a -&gt; String) -&gt; (AST g a -&gt; String) -&gt; AST g a -&gt; String
+forall g a.
+(AST g a -&gt; String) -&gt; (AST g a -&gt; String) -&gt; AST g a -&gt; String
+</span><a href="TikzExport.html#astToTikz"><span class="hs-identifier hs-var">astToTikz</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; String
+</span><a href="#local-6989586621679094436"><span class="hs-identifier hs-var">val</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679094431"><span class="annot"><span class="annottext">s :: AST g a
+</span><a href="#local-6989586621679094431"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Node g a -&gt; FeatureTrace g a -&gt; String
+</span><a href="#local-6989586621679094435"><span class="hs-identifier hs-var">toCls</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094433"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AST g a -&gt; Node g a
+forall a. Tree a -&gt; a
+</span><a href="Tree.html#element"><span class="hs-identifier hs-var">element</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094431"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">FeatureTrace g a
+</span><a href="#local-6989586621679094434"><span class="hs-identifier hs-var">trace</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094433"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span id="local-6989586621679094484"><span id="local-6989586621679094485"><span class="annot"><a href="TikzExport.html#astToTikz"><span class="hs-identifier hs-type">astToTikz</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094485"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094484"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094485"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094484"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094485"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094484"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span></span><span>
+</span><span id="line-40"></span><span id="astToTikz"><span class="annot"><span class="annottext">astToTikz :: (AST g a -&gt; String) -&gt; (AST g a -&gt; String) -&gt; AST g a -&gt; String
+</span><a href="TikzExport.html#astToTikz"><span class="hs-identifier hs-var hs-var">astToTikz</span></a></span></span><span> </span><span id="local-6989586621679094430"><span class="annot"><span class="annottext">val :: AST g a -&gt; String
+</span><a href="#local-6989586621679094430"><span class="hs-identifier hs-var">val</span></a></span></span><span> </span><span id="local-6989586621679094429"><span class="annot"><span class="annottext">cls :: AST g a -&gt; String
+</span><a href="#local-6989586621679094429"><span class="hs-identifier hs-var">cls</span></a></span></span><span> </span><span id="local-6989586621679094428"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094428"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;\\&quot;</span></span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+-&gt; (AST g a -&gt; String) -&gt; (AST g a -&gt; String) -&gt; AST g a -&gt; String
+forall g a.
+Int
+-&gt; (AST g a -&gt; String) -&gt; (AST g a -&gt; String) -&gt; AST g a -&gt; String
+</span><a href="TikzExport.html#astToTikzRecursive"><span class="hs-identifier hs-var">astToTikzRecursive</span></a></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; String
+</span><a href="#local-6989586621679094430"><span class="hs-identifier hs-var">val</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; String
+</span><a href="#local-6989586621679094429"><span class="hs-identifier hs-var">cls</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094428"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="hs-string">&quot;;&quot;</span></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span id="local-6989586621679094480"><span id="local-6989586621679094481"><span class="annot"><a href="TikzExport.html#astToTikzRecursive"><span class="hs-identifier hs-type">astToTikzRecursive</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094481"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094480"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094481"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094480"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094481"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094480"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span></span><span>
+</span><span id="line-43"></span><span id="astToTikzRecursive"><span class="annot"><span class="annottext">astToTikzRecursive :: Int
+-&gt; (AST g a -&gt; String) -&gt; (AST g a -&gt; String) -&gt; AST g a -&gt; String
+</span><a href="TikzExport.html#astToTikzRecursive"><span class="hs-identifier hs-var hs-var">astToTikzRecursive</span></a></span></span><span> </span><span id="local-6989586621679094426"><span class="annot"><span class="annottext">i :: Int
+</span><a href="#local-6989586621679094426"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span id="local-6989586621679094425"><span class="annot"><span class="annottext">val :: AST g a -&gt; String
+</span><a href="#local-6989586621679094425"><span class="hs-identifier hs-var">val</span></a></span></span><span> </span><span id="local-6989586621679094424"><span class="annot"><span class="annottext">cls :: AST g a -&gt; String
+</span><a href="#local-6989586621679094424"><span class="hs-identifier hs-var">cls</span></a></span></span><span> </span><span id="local-6989586621679094423"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094423"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Tree.html#Tree"><span class="hs-identifier hs-type">Tree</span></a></span><span> </span><span id="local-6989586621679094422"><span class="annot"><span class="annottext">n :: Node g a
+</span><a href="#local-6989586621679094422"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679094421"><span class="annot"><span class="annottext">cs :: [AST g a]
+</span><a href="#local-6989586621679094421"><span class="hs-identifier hs-var">cs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; String
+forall a. [a] -&gt; [[a]] -&gt; [a]
+</span><span class="hs-identifier hs-var">intercalate</span></span><span> </span><span class="annot"><span class="hs-string">&quot; &quot;</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; [String] -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-44"></span><span>    </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;node&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-string">&quot;[&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; String
+</span><a href="#local-6989586621679094424"><span class="hs-identifier hs-var">cls</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094423"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-string">&quot;] {&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; String
+</span><a href="#local-6989586621679094425"><span class="hs-identifier hs-var">val</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094423"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-string">&quot;}&quot;</span></span><span class="hs-special">]</span><span class="annot"><span class="annottext">[String] -&gt; [String] -&gt; [String]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-45"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[[String]] -&gt; [String]
+forall a. Monoid a =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">mconcat</span></span><span> </span><span class="annot"><span class="annottext">([[String]] -&gt; [String]) -&gt; [[String]] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(AST g a -&gt; [String]) -&gt; [AST g a] -&gt; [[String]]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679094420"><span class="annot"><span class="annottext">c :: AST g a
+</span><a href="#local-6989586621679094420"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;\n&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679094419"><span class="hs-identifier hs-var">ind</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-string">&quot;child&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-string">&quot;{&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+-&gt; (AST g a -&gt; String) -&gt; (AST g a -&gt; String) -&gt; AST g a -&gt; String
+forall g a.
+Int
+-&gt; (AST g a -&gt; String) -&gt; (AST g a -&gt; String) -&gt; AST g a -&gt; String
+</span><a href="TikzExport.html#astToTikzRecursive"><span class="hs-identifier hs-var">astToTikzRecursive</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679094426"><span class="hs-identifier hs-var">i</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; String
+</span><a href="#local-6989586621679094425"><span class="hs-identifier hs-var">val</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; String
+</span><a href="#local-6989586621679094424"><span class="hs-identifier hs-var">cls</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094420"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-string">&quot;\n&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679094419"><span class="hs-identifier hs-var">ind</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-string">&quot;}&quot;</span></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[AST g a]
+</span><a href="#local-6989586621679094421"><span class="hs-identifier hs-var">cs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679094419"><span class="annot"><span class="annottext">ind :: String
+</span><a href="#local-6989586621679094419"><span class="hs-identifier hs-var hs-var">ind</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
+</span><a href="Util.html#genIndent"><span class="hs-identifier hs-var">genIndent</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; String) -&gt; Int -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="hs-number">2</span></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679094426"><span class="hs-identifier hs-var">i</span></a></span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="annot"><a href="TikzExport.html#tikzifyName"><span class="hs-identifier hs-type">tikzifyName</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-49"></span><span id="tikzifyName"><span class="annot"><span class="annottext">tikzifyName :: String -&gt; String
+</span><a href="TikzExport.html#tikzifyName"><span class="hs-identifier hs-var hs-var">tikzifyName</span></a></span></span><span> </span><span id="local-6989586621679094415"><span class="annot"><span class="annottext">s :: String
+</span><a href="#local-6989586621679094415"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679094414"><span class="annot"><span class="annottext">replace :: Char -&gt; String
+</span><a href="#local-6989586621679094414"><span class="hs-identifier hs-var hs-var">replace</span></a></span></span><span> </span><span class="hs-char">'_'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;\\_&quot;</span></span><span>
+</span><span id="line-51"></span><span>        </span><span class="annot"><a href="#local-6989586621679094414"><span class="hs-identifier hs-var">replace</span></a></span><span> </span><span class="hs-char">'-'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;-{}&quot;</span></span><span>
+</span><span id="line-52"></span><span>        </span><span class="annot"><a href="#local-6989586621679094414"><span class="hs-identifier hs-var">replace</span></a></span><span> </span><span id="local-6989586621679094413"><span class="annot"><span class="annottext">x :: Char
+</span><a href="#local-6989586621679094413"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679094413"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-53"></span><span>        </span><span class="hs-keyword">in</span><span>
+</span><span id="line-54"></span><span>    </span><span class="annot"><span class="annottext">[String] -&gt; String
+forall a. Monoid a =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">mconcat</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; [String] -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; String
+</span><a href="#local-6989586621679094414"><span class="hs-identifier hs-var">replace</span></a></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; String) -&gt; String -&gt; [String]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679094415"><span class="hs-identifier hs-var">s</span></a></span></pre></body></html>

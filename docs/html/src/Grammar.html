@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="">&#65279;-- | Module for representing context-free grammars.
+</span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Grammar</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- | Classification of nodes for feature traces and presence condition.</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- (See Section 3.1 in the paper.)</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">data</span><span> </span><span id="NodeType"><span class="annot"><a href="Grammar.html#NodeType"><span class="hs-identifier hs-var">NodeType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Mandatory"><span class="annot"><a href="Grammar.html#Mandatory"><span class="hs-identifier hs-var">Mandatory</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Optional"><span class="annot"><a href="Grammar.html#Optional"><span class="hs-identifier hs-var">Optional</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Wrapper"><span class="annot"><a href="Grammar.html#Wrapper"><span class="hs-identifier hs-var">Wrapper</span></a></span></span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679092922"><span id="local-6989586621679092924"><span id="local-6989586621679092926"><span class="annot"><span class="annottext">Int -&gt; NodeType -&gt; ShowS
+[NodeType] -&gt; ShowS
+NodeType -&gt; String
+(Int -&gt; NodeType -&gt; ShowS)
+-&gt; (NodeType -&gt; String) -&gt; ([NodeType] -&gt; ShowS) -&gt; Show NodeType
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [NodeType] -&gt; ShowS
+$cshowList :: [NodeType] -&gt; ShowS
+show :: NodeType -&gt; String
+$cshow :: NodeType -&gt; String
+showsPrec :: Int -&gt; NodeType -&gt; ShowS
+$cshowsPrec :: Int -&gt; NodeType -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679092917"><span id="local-6989586621679092919"><span class="annot"><span class="annottext">NodeType -&gt; NodeType -&gt; Bool
+(NodeType -&gt; NodeType -&gt; Bool)
+-&gt; (NodeType -&gt; NodeType -&gt; Bool) -&gt; Eq NodeType
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: NodeType -&gt; NodeType -&gt; Bool
+$c/= :: NodeType -&gt; NodeType -&gt; Bool
+== :: NodeType -&gt; NodeType -&gt; Bool
+$c== :: NodeType -&gt; NodeType -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- | Type class for context-free grammars.</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">class</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679092915"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span id="Grammar"><span class="annot"><a href="Grammar.html#Grammar"><span class="hs-identifier hs-var">Grammar</span></a></span></span><span> </span><span id="local-6989586621679092915"><span class="annot"><a href="#local-6989586621679092915"><span class="hs-identifier hs-type">g</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-comment">-- | Tells for each grammar symbol which node type it has (e.g., if it is 'Mandatory' in the AST).</span><span>
+</span><span id="line-11"></span><span>  </span><span id="nodetypeof"><span class="annot"><a href="Grammar.html#nodetypeof"><span class="hs-identifier hs-type">nodetypeof</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679092915"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Grammar.html#NodeType"><span class="hs-identifier hs-type">NodeType</span></a></span><span>
+</span><span id="line-12"></span></pre></body></html>

@@ -1,0 +1,1070 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="">&#65279;module EditPatterns where
+</span><span>
+</span><span id="line-3"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Example.html"><span class="hs-identifier">Example</span></a></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SimpleJava.html"><span class="hs-identifier">SimpleJava</span></a></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="UUID.html"><span class="hs-identifier">UUID</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier">UUID</span></a></span><span> </span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.State</span></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier">State</span></span><span> </span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">System.Terminal</span></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Feature.html"><span class="hs-identifier">Feature</span></a></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="FeatureTrace.html"><span class="hs-identifier">FeatureTrace</span></a></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="NullPropositions.html"><span class="hs-identifier">NullPropositions</span></a></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="FeatureTraceRecording.html"><span class="hs-identifier">FeatureTraceRecording</span></a></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="FeatureColour.html"><span class="hs-identifier">FeatureColour</span></a></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Edits.html"><span class="hs-identifier">Edits</span></a></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="AST.html"><span class="hs-identifier">AST</span></a></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Propositions.html"><span class="hs-identifier">Propositions</span></a></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Tree.html"><span class="hs-identifier">Tree</span></a></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">fromJust</span></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="annot"><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-type">feature_ULTRA_LCD</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Feature.html#Feature"><span class="hs-identifier hs-type">Feature</span></a></span><span>
+</span><span id="line-20"></span><span id="feature_ULTRA_LCD"><span class="annot"><span class="annottext">feature_ULTRA_LCD :: Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var hs-var">feature_ULTRA_LCD</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Feature -&gt; Feature
+</span><a href="Feature.html#toFeature"><span class="hs-identifier hs-var">toFeature</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;m&quot;</span></span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="annot"><a href="EditPatterns.html#feature_FOO"><span class="hs-identifier hs-type">feature_FOO</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Feature.html#Feature"><span class="hs-identifier hs-type">Feature</span></a></span><span>
+</span><span id="line-23"></span><span id="feature_FOO"><span class="annot"><span class="annottext">feature_FOO :: Feature
+</span><a href="EditPatterns.html#feature_FOO"><span class="hs-identifier hs-var hs-var">feature_FOO</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Feature -&gt; Feature
+</span><a href="Feature.html#toFeature"><span class="hs-identifier hs-var">toFeature</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;FOO&quot;</span></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="annot"><a href="EditPatterns.html#rootName"><span class="hs-identifier hs-type">rootName</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-26"></span><span id="rootName"><span class="annot"><span class="annottext">rootName :: Feature
+</span><a href="EditPatterns.html#rootName"><span class="hs-identifier hs-var hs-var">rootName</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;some file&quot;</span></span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="annot"><a href="EditPatterns.html#buildPCName"><span class="hs-identifier hs-type">buildPCName</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Feature.html#FeatureFormula"><span class="hs-identifier hs-type">FeatureFormula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-29"></span><span id="buildPCName"><span class="annot"><span class="annottext">buildPCName :: Feature -&gt; FeatureFormula -&gt; Feature
+</span><a href="EditPatterns.html#buildPCName"><span class="hs-identifier hs-var hs-var">buildPCName</span></a></span></span><span> </span><span id="local-6989586621679095479"><span class="annot"><span class="annottext">nodename :: Feature
+</span><a href="#local-6989586621679095479"><span class="hs-identifier hs-var">nodename</span></a></span></span><span> </span><span id="local-6989586621679095478"><span class="annot"><span class="annottext">f :: FeatureFormula
+</span><a href="#local-6989586621679095478"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot; (with \&quot;&quot;</span></span><span class="annot"><span class="annottext">Feature -&gt; Feature -&gt; Feature
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="annottext">Feature
+</span><a href="#local-6989586621679095479"><span class="hs-identifier hs-var">nodename</span></a></span><span class="annot"><span class="annottext">Feature -&gt; Feature -&gt; Feature
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="hs-string">&quot;\&quot; mapped to &quot;</span></span><span class="annot"><span class="annottext">Feature -&gt; Feature -&gt; Feature
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">FeatureFormula -&gt; Feature
+forall a. Show a =&gt; Maybe a -&gt; Feature
+</span><a href="NullPropositions.html#prettyPrint"><span class="hs-identifier hs-var">NullPropositions.prettyPrint</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+</span><a href="#local-6989586621679095478"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">Feature -&gt; Feature -&gt; Feature
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="hs-string">&quot;)&quot;</span></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span id="local-6989586621679095531"><span class="annot"><a href="EditPatterns.html#featurecolours"><span class="hs-identifier hs-type">featurecolours</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095531"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="FeatureColour.html#FeatureFormulaColourPalette"><span class="hs-identifier hs-type">FeatureFormulaColourPalette</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095531"><span class="hs-identifier hs-type">m</span></a></span></span><span>
+</span><span id="line-32"></span><span id="featurecolours"><span class="annot"><span class="annottext">featurecolours :: FeatureFormulaColourPalette m
+</span><a href="EditPatterns.html#featurecolours"><span class="hs-identifier hs-var hs-var">featurecolours</span></a></span></span><span> </span><span id="local-6989586621679095475"><span class="annot"><span class="annottext">p :: FeatureFormula
+</span><a href="#local-6989586621679095475"><span class="hs-identifier hs-var">p</span></a></span></span><span>
+</span><span id="line-33"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+</span><a href="#local-6989586621679095475"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureFormula -&gt; FeatureFormula -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; PropositionalFormula Feature
+forall a. PropositionalFormula a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PNot"><span class="hs-identifier hs-var">PNot</span></a></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; PropositionalFormula Feature)
+-&gt; PropositionalFormula Feature -&gt; PropositionalFormula Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">(Feature -&gt; PropositionalFormula Feature)
+-&gt; Feature -&gt; PropositionalFormula Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Color m
+forall (m :: * -&gt; *). MonadColorPrinter m =&gt; Color m
+</span><span class="hs-identifier hs-var">magenta</span></span><span>
+</span><span id="line-34"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+</span><a href="#local-6989586621679095475"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureFormula -&gt; FeatureFormula -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">(Feature -&gt; PropositionalFormula Feature)
+-&gt; Feature -&gt; PropositionalFormula Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Color m
+forall (m :: * -&gt; *). MonadColorPrinter m =&gt; Color m
+</span><span class="hs-identifier hs-var">green</span></span><span>
+</span><span id="line-35"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+</span><a href="#local-6989586621679095475"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureFormula -&gt; FeatureFormula -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">(Feature -&gt; PropositionalFormula Feature)
+-&gt; Feature -&gt; PropositionalFormula Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_FOO"><span class="hs-identifier hs-var">feature_FOO</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Color m
+forall (m :: * -&gt; *). MonadColorPrinter m =&gt; Color m
+</span><span class="hs-identifier hs-var">yellow</span></span><span>
+</span><span id="line-36"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Color m
+forall (m :: * -&gt; *). MonadColorPrinter m =&gt; Color m
+</span><span class="hs-identifier hs-var">white</span></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="annot"><a href="EditPatterns.html#emptyfile"><span class="hs-identifier hs-type">emptyfile</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SSJavaAST"><span class="hs-identifier hs-type">SSJavaAST</span></a></span><span>
+</span><span id="line-39"></span><span id="emptyfile"><span class="annot"><span class="annottext">emptyfile :: State UUID SSJavaAST
+</span><a href="EditPatterns.html#emptyfile"><span class="hs-identifier hs-var hs-var">emptyfile</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; State UUID SSJavaAST
+forall (t :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable t, Monad m) =&gt;
+t (m a) -&gt; m (t a)
+</span><span class="hs-identifier hs-var">sequence</span></span><span> </span><span class="annot"><span class="annottext">(Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+ -&gt; State UUID SSJavaAST)
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; State UUID SSJavaAST
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+-&gt; [Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))]
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+</span><a href="SimpleJava.html#sjava_file"><span class="hs-identifier hs-var">sjava_file</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#rootName"><span class="hs-identifier hs-var">rootName</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="annot"><a href="EditPatterns.html#lcd_setstatusalertpgm"><span class="hs-identifier hs-type">lcd_setstatusalertpgm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SSJavaAST"><span class="hs-identifier hs-type">SSJavaAST</span></a></span><span>
+</span><span id="line-42"></span><span id="lcd_setstatusalertpgm"><span class="annot"><span class="annottext">lcd_setstatusalertpgm :: State UUID SSJavaAST
+</span><a href="EditPatterns.html#lcd_setstatusalertpgm"><span class="hs-identifier hs-var hs-var">lcd_setstatusalertpgm</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; State UUID SSJavaAST
+forall (t :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable t, Monad m) =&gt;
+t (m a) -&gt; m (t a)
+</span><span class="hs-identifier hs-var">sequence</span></span><span> </span><span class="annot"><span class="annottext">(Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+ -&gt; State UUID SSJavaAST)
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; State UUID SSJavaAST
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+</span><a href="SimpleJava.html#sjava_exprstatement"><span class="hs-identifier hs-var">sjava_exprstatement</span></a></span><span> </span><span class="annot"><span class="annottext">(Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+ -&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature)))
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+-&gt; [Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))]
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+</span><a href="SimpleJava.html#sjava_funccall"><span class="hs-identifier hs-var">sjava_funccall</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;codeThenCase&quot;</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-comment">--[sjava_varref &quot;lcd_msg&quot;]</span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="annot"><a href="EditPatterns.html#alertstatuspgm"><span class="hs-identifier hs-type">alertstatuspgm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SSJavaAST"><span class="hs-identifier hs-type">SSJavaAST</span></a></span><span>
+</span><span id="line-45"></span><span id="alertstatuspgm"><span class="annot"><span class="annottext">alertstatuspgm :: State UUID SSJavaAST
+</span><a href="EditPatterns.html#alertstatuspgm"><span class="hs-identifier hs-var hs-var">alertstatuspgm</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; State UUID SSJavaAST
+forall (t :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable t, Monad m) =&gt;
+t (m a) -&gt; m (t a)
+</span><span class="hs-identifier hs-var">sequence</span></span><span> </span><span class="annot"><span class="annottext">(Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+ -&gt; State UUID SSJavaAST)
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; State UUID SSJavaAST
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+</span><a href="SimpleJava.html#sjava_exprstatement"><span class="hs-identifier hs-var">sjava_exprstatement</span></a></span><span> </span><span class="annot"><span class="annottext">(Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+ -&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature)))
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+-&gt; [Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))]
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+</span><a href="SimpleJava.html#sjava_funccall"><span class="hs-identifier hs-var">sjava_funccall</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;codeElseCase&quot;</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-comment">--[sjava_varref &quot;msg&quot;]</span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="annot"><a href="EditPatterns.html#somefunction"><span class="hs-identifier hs-type">somefunction</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SSJavaAST"><span class="hs-identifier hs-type">SSJavaAST</span></a></span><span>
+</span><span id="line-48"></span><span id="somefunction"><span class="annot"><span class="annottext">somefunction :: State UUID SSJavaAST
+</span><a href="EditPatterns.html#somefunction"><span class="hs-identifier hs-var hs-var">somefunction</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; State UUID SSJavaAST
+forall (t :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable t, Monad m) =&gt;
+t (m a) -&gt; m (t a)
+</span><span class="hs-identifier hs-var">sequence</span></span><span> </span><span class="annot"><span class="annottext">(Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+ -&gt; State UUID SSJavaAST)
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+-&gt; State UUID SSJavaAST
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+-&gt; Feature
+-&gt; [(Feature, Feature)]
+-&gt; [Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))]
+-&gt; Tree (StateT UUID Identity (Node SimpleJavaGrammar Feature))
+</span><a href="SimpleJava.html#sjava_methoddef"><span class="hs-identifier hs-var">sjava_methoddef</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;void&quot;</span></span><span> </span><span class="annot"><span class="hs-string">&quot;foo&quot;</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span id="local-6989586621679095527"><span class="annot"><a href="EditPatterns.html#createPatternExample"><span class="hs-identifier hs-type">createPatternExample</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095527"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SimpleJava.html#SSJavaAST"><span class="hs-identifier hs-type">SSJavaAST</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FeatureTraceRecording.html#History"><span class="hs-identifier hs-type">History</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095527"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span><span>
+</span><span id="line-51"></span><span id="createPatternExample"><span class="annot"><span class="annottext">createPatternExample :: Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExample"><span class="hs-identifier hs-var hs-var">createPatternExample</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FeatureTrace SimpleJavaGrammar Feature
+-&gt; Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+FeatureTrace SimpleJavaGrammar Feature
+-&gt; Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExampleWithStartTrace"><span class="hs-identifier hs-var">createPatternExampleWithStartTrace</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureTrace SimpleJavaGrammar Feature
+forall g a. FeatureTrace g a
+</span><a href="FeatureTrace.html#emptyTrace"><span class="hs-identifier hs-var">emptyTrace</span></a></span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span id="local-6989586621679095539"><span class="annot"><a href="EditPatterns.html#createPatternExampleWithStartTrace"><span class="hs-identifier hs-type">createPatternExampleWithStartTrace</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095539"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="FeatureTrace.html#FeatureTrace"><span class="hs-identifier hs-type">FeatureTrace</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SimpleJava.html#SSJavaAST"><span class="hs-identifier hs-type">SSJavaAST</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FeatureTraceRecording.html#History"><span class="hs-identifier hs-type">History</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095539"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span><span>
+</span><span id="line-54"></span><span id="createPatternExampleWithStartTrace"><span class="annot"><span class="annottext">createPatternExampleWithStartTrace :: FeatureTrace SimpleJavaGrammar Feature
+-&gt; Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExampleWithStartTrace"><span class="hs-identifier hs-var hs-var">createPatternExampleWithStartTrace</span></a></span></span><span> </span><span id="local-6989586621679095456"><span class="annot"><span class="annottext">startTrace :: FeatureTrace SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095456"><span class="hs-identifier hs-var">startTrace</span></a></span></span><span> </span><span id="local-6989586621679095455"><span class="annot"><span class="annottext">name :: Feature
+</span><a href="#local-6989586621679095455"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679095454"><span class="annot"><span class="annottext">start :: SSJavaAST
+</span><a href="#local-6989586621679095454"><span class="hs-identifier hs-var">start</span></a></span></span><span> </span><span id="local-6989586621679095453"><span class="annot"><span class="annottext">edits :: History SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095453"><span class="hs-identifier hs-var">edits</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-55"></span><span>    </span><span class="annot"><span class="annottext">Example :: forall (m :: * -&gt; *) g a.
+Feature
+-&gt; Version g a
+-&gt; History g a
+-&gt; FeatureFormulaColourPalette m
+-&gt; Example m g a
+</span><a href="Example.html#Example"><span class="hs-identifier hs-type hs-type">Example</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-56"></span><span>        </span><span class="annot"><span class="annottext">name :: Feature
+</span><a href="Example.html#name"><span class="hs-identifier hs-var">Example.name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="#local-6989586621679095455"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-57"></span><span>        </span><span class="annot"><span class="annottext">colours :: FeatureFormulaColourPalette m
+</span><a href="Example.html#colours"><span class="hs-identifier hs-var">colours</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FeatureFormulaColourPalette m
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+FeatureFormulaColourPalette m
+</span><a href="EditPatterns.html#featurecolours"><span class="hs-identifier hs-var">featurecolours</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-58"></span><span>        </span><span class="annot"><span class="annottext">startVersion :: Version SimpleJavaGrammar Feature
+</span><a href="Example.html#startVersion"><span class="hs-identifier hs-var">startVersion</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">FeatureTrace SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095456"><span class="hs-identifier hs-var">startTrace</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095454"><span class="hs-identifier hs-var">start</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-59"></span><span>        </span><span class="annot"><span class="annottext">history :: History SimpleJavaGrammar Feature
+</span><a href="Example.html#history"><span class="hs-identifier hs-var">history</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">History SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095453"><span class="hs-identifier hs-var">edits</span></a></span><span>
+</span><span id="line-60"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span id="local-6989586621679095519"><span class="annot"><a href="EditPatterns.html#addIfdef"><span class="hs-identifier hs-type">addIfdef</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095519"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095519"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-63"></span><span id="addIfdef"><span class="annot"><span class="annottext">addIfdef :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addIfdef"><span class="hs-identifier hs-var hs-var">addIfdef</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-64"></span><span>    </span><span id="local-6989586621679095445"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095445"><span class="hs-identifier hs-var">start</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#emptyfile"><span class="hs-identifier hs-var">emptyfile</span></a></span><span>
+</span><span id="line-65"></span><span>    </span><span id="local-6989586621679095444"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095444"><span class="hs-identifier hs-var">lcd</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#lcd_setstatusalertpgm"><span class="hs-identifier hs-var">lcd_setstatusalertpgm</span></a></span><span>
+</span><span id="line-66"></span><span>    </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Example m SimpleJavaGrammar Feature
+ -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExample"><span class="hs-identifier hs-var">createPatternExample</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;AddIfdef (general case)&quot;</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095445"><span class="hs-identifier hs-var">start</span></a></span><span>
+</span><span id="line-67"></span><span>        </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095444"><span class="hs-identifier hs-var">lcd</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095445"><span class="hs-identifier hs-var">start</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span id="local-6989586621679095441"><span class="annot"><a href="EditPatterns.html#addIfdefWithPC"><span class="hs-identifier hs-type">addIfdefWithPC</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095441"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095441"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-70"></span><span id="addIfdefWithPC"><span class="annot"><span class="annottext">addIfdefWithPC :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addIfdefWithPC"><span class="hs-identifier hs-var hs-var">addIfdefWithPC</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-71"></span><span>    </span><span id="local-6989586621679095439"><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095439"><span class="hs-identifier hs-var">plainAddIfdef</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addIfdef"><span class="hs-identifier hs-var">addIfdef</span></a></span><span>
+</span><span id="line-72"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679095438"><span class="annot"><span class="annottext">startTrace :: FeatureTrace SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095438"><span class="hs-identifier hs-var">startTrace</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679095437"><span class="annot"><span class="annottext">startAST :: SSJavaAST
+</span><a href="#local-6989586621679095437"><span class="hs-identifier hs-var">startAST</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; Version SimpleJavaGrammar Feature
+forall (m :: * -&gt; *) g a. Example m g a -&gt; Version g a
+</span><a href="Example.html#startVersion"><span class="hs-identifier hs-var hs-var">startVersion</span></a></span><span> </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095439"><span class="hs-identifier hs-var">plainAddIfdef</span></a></span><span>
+</span><span id="line-73"></span><span>        </span><span id="local-6989586621679095436"><span class="annot"><span class="annottext">fileNode :: Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095436"><span class="hs-identifier hs-var hs-var">fileNode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; Node SimpleJavaGrammar Feature
+forall a. Tree a -&gt; a
+</span><a href="Tree.html#element"><span class="hs-identifier hs-var">element</span></a></span><span> </span><span class="annot"><span class="annottext">(SSJavaAST -&gt; Node SimpleJavaGrammar Feature)
+-&gt; SSJavaAST -&gt; Node SimpleJavaGrammar Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Maybe SSJavaAST -&gt; SSJavaAST
+forall a. HasCallStack =&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromJust</span></span><span> </span><span class="annot"><span class="annottext">(Maybe SSJavaAST -&gt; SSJavaAST) -&gt; Maybe SSJavaAST -&gt; SSJavaAST
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleJavaGrammar -&gt; SSJavaAST -&gt; Maybe SSJavaAST
+forall g a. Eq g =&gt; g -&gt; AST g a -&gt; Maybe (AST g a)
+</span><a href="AST.html#findByGrammarType"><span class="hs-identifier hs-var">findByGrammarType</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleJavaGrammar
+</span><a href="SimpleJava.html#SJava_File"><span class="hs-identifier hs-var">SJava_File</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095437"><span class="hs-identifier hs-var">startAST</span></a></span><span>
+</span><span id="line-74"></span><span>        </span><span id="local-6989586621679095432"><span class="annot"><span class="annottext">ultraFormula :: FeatureFormula
+</span><a href="#local-6989586621679095432"><span class="hs-identifier hs-var hs-var">ultraFormula</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span>
+</span><span id="line-75"></span><span>    </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Example m SimpleJavaGrammar Feature
+ -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095439"><span class="hs-identifier hs-var">plainAddIfdef</span></a></span><span class="hs-special">{</span><span>
+</span><span id="line-76"></span><span>        </span><span class="annot"><span class="annottext">name :: Feature
+</span><a href="Example.html#name"><span class="hs-identifier hs-var">Example.name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;AddIfdef&quot;</span></span><span class="annot"><span class="annottext">Feature -&gt; Feature -&gt; Feature
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">Feature -&gt; FeatureFormula -&gt; Feature
+</span><a href="EditPatterns.html#buildPCName"><span class="hs-identifier hs-var">buildPCName</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature -&gt; Feature
+forall g a. Node g a -&gt; a
+</span><a href="AST.html#value"><span class="hs-identifier hs-var hs-var">value</span></a></span><span> </span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095436"><span class="hs-identifier hs-var">fileNode</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+</span><a href="#local-6989586621679095432"><span class="hs-identifier hs-var">ultraFormula</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-77"></span><span>        </span><span class="annot"><span class="annottext">startVersion :: Version SimpleJavaGrammar Feature
+</span><a href="Example.html#startVersion"><span class="hs-identifier hs-var">startVersion</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679095430"><span class="annot"><span class="annottext">v :: Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095430"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095430"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature
+-&gt; Node SimpleJavaGrammar Feature -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095436"><span class="hs-identifier hs-var">fileNode</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+</span><a href="#local-6989586621679095432"><span class="hs-identifier hs-var">ultraFormula</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">FeatureTrace SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095438"><span class="hs-identifier hs-var">startTrace</span></a></span><span> </span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095430"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095437"><span class="hs-identifier hs-var">startAST</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-78"></span><span>        </span><span class="annot"><span class="annottext">history :: History SimpleJavaGrammar Feature
+</span><a href="Example.html#history"><span class="hs-identifier hs-var">history</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679095429"><span class="annot"><span class="annottext">edit :: Edit SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095429"><span class="hs-identifier hs-var">edit</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679095428"><span class="annot"><span class="annottext">fc :: FeatureFormula
+</span><a href="#local-6989586621679095428"><span class="hs-identifier hs-var">fc</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Edit SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095429"><span class="hs-identifier hs-var">edit</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((Edit SimpleJavaGrammar Feature, FeatureFormula)
+ -&gt; (Edit SimpleJavaGrammar Feature, FeatureFormula))
+-&gt; History SimpleJavaGrammar Feature
+-&gt; History SimpleJavaGrammar Feature
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; History SimpleJavaGrammar Feature
+forall (m :: * -&gt; *) g a. Example m g a -&gt; History g a
+</span><a href="Example.html#history"><span class="hs-identifier hs-var hs-var">history</span></a></span><span> </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095439"><span class="hs-identifier hs-var">plainAddIfdef</span></a></span><span>
+</span><span id="line-79"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span id="local-6989586621679095426"><span class="annot"><a href="EditPatterns.html#addIfdefElse_IfBranch"><span class="hs-identifier hs-type">addIfdefElse_IfBranch</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095426"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095426"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-82"></span><span id="addIfdefElse_IfBranch"><span class="annot"><span class="annottext">addIfdefElse_IfBranch :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addIfdefElse_IfBranch"><span class="hs-identifier hs-var hs-var">addIfdefElse_IfBranch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addIfdef"><span class="hs-identifier hs-var">addIfdef</span></a></span><span> </span><span class="annot"><span class="annottext">State UUID (Example m SimpleJavaGrammar Feature)
+-&gt; (Example m SimpleJavaGrammar Feature
+    -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679095424"><span class="annot"><span class="annottext">ifbranch :: Example m SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095424"><span class="hs-identifier hs-var">ifbranch</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095424"><span class="hs-identifier hs-var">ifbranch</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">name :: Feature
+</span><a href="Example.html#name"><span class="hs-identifier hs-var">Example.name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;AddIfdefElse (if branch) (general case)&quot;</span></span><span class="hs-special">}</span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span id="local-6989586621679095423"><span class="annot"><a href="EditPatterns.html#addIfdefElse_IfBranchWithPC"><span class="hs-identifier hs-type">addIfdefElse_IfBranchWithPC</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095423"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095423"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-85"></span><span id="addIfdefElse_IfBranchWithPC"><span class="annot"><span class="annottext">addIfdefElse_IfBranchWithPC :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addIfdefElse_IfBranchWithPC"><span class="hs-identifier hs-var hs-var">addIfdefElse_IfBranchWithPC</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addIfdefWithPC"><span class="hs-identifier hs-var">addIfdefWithPC</span></a></span><span> </span><span class="annot"><span class="annottext">State UUID (Example m SimpleJavaGrammar Feature)
+-&gt; (Example m SimpleJavaGrammar Feature
+    -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679095421"><span class="annot"><span class="annottext">ifbranch :: Example m SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095421"><span class="hs-identifier hs-var">ifbranch</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095421"><span class="hs-identifier hs-var">ifbranch</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">name :: Feature
+</span><a href="Example.html#name"><span class="hs-identifier hs-var">Example.name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;AddIfdefElse (if branch)&quot;</span></span><span class="annot"><span class="annottext">Feature -&gt; Feature -&gt; Feature
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">Feature -&gt; FeatureFormula -&gt; Feature
+</span><a href="EditPatterns.html#buildPCName"><span class="hs-identifier hs-var">buildPCName</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#rootName"><span class="hs-identifier hs-var">rootName</span></a></span><span> </span><span class="annot"><span class="annottext">(FeatureFormula -&gt; Feature) -&gt; FeatureFormula -&gt; Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span class="hs-special">)</span><span class="hs-special">}</span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span id="local-6989586621679095420"><span class="annot"><a href="EditPatterns.html#addIfdefElse_ElseBranch"><span class="hs-identifier hs-type">addIfdefElse_ElseBranch</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095420"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095420"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-88"></span><span id="addIfdefElse_ElseBranch"><span class="annot"><span class="annottext">addIfdefElse_ElseBranch :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addIfdefElse_ElseBranch"><span class="hs-identifier hs-var hs-var">addIfdefElse_ElseBranch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-89"></span><span>    </span><span id="local-6989586621679095418"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095418"><span class="hs-identifier hs-var">start</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#emptyfile"><span class="hs-identifier hs-var">emptyfile</span></a></span><span>
+</span><span id="line-90"></span><span>    </span><span id="local-6989586621679095417"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095417"><span class="hs-identifier hs-var">alert</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#alertstatuspgm"><span class="hs-identifier hs-var">alertstatuspgm</span></a></span><span>
+</span><span id="line-91"></span><span>    </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Example m SimpleJavaGrammar Feature
+ -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExample"><span class="hs-identifier hs-var">createPatternExample</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;AddIfdefElse (else branch) (general case)&quot;</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095418"><span class="hs-identifier hs-var">start</span></a></span><span>
+</span><span id="line-92"></span><span>        </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095417"><span class="hs-identifier hs-var">alert</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095418"><span class="hs-identifier hs-var">start</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; PropositionalFormula Feature
+forall a. PropositionalFormula a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PNot"><span class="hs-identifier hs-var">PNot</span></a></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; PropositionalFormula Feature)
+-&gt; PropositionalFormula Feature -&gt; PropositionalFormula Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-93"></span><span>
+</span><span id="line-94"></span><span id="local-6989586621679095416"><span class="annot"><a href="EditPatterns.html#addIfdefElse_ElseBranchWithPC"><span class="hs-identifier hs-type">addIfdefElse_ElseBranchWithPC</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095416"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095416"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-95"></span><span id="addIfdefElse_ElseBranchWithPC"><span class="annot"><span class="annottext">addIfdefElse_ElseBranchWithPC :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addIfdefElse_ElseBranchWithPC"><span class="hs-identifier hs-var hs-var">addIfdefElse_ElseBranchWithPC</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-96"></span><span>    </span><span id="local-6989586621679095414"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095414"><span class="hs-identifier hs-var">start</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#emptyfile"><span class="hs-identifier hs-var">emptyfile</span></a></span><span>
+</span><span id="line-97"></span><span>    </span><span id="local-6989586621679095413"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095413"><span class="hs-identifier hs-var">alert</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#alertstatuspgm"><span class="hs-identifier hs-var">alertstatuspgm</span></a></span><span>
+</span><span id="line-98"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679095412"><span class="annot"><span class="annottext">context :: FeatureFormula
+</span><a href="#local-6989586621679095412"><span class="hs-identifier hs-var hs-var">context</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; PropositionalFormula Feature
+forall a. PropositionalFormula a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PNot"><span class="hs-identifier hs-var">PNot</span></a></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; PropositionalFormula Feature)
+-&gt; PropositionalFormula Feature -&gt; PropositionalFormula Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span>
+</span><span id="line-99"></span><span>    </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Example m SimpleJavaGrammar Feature
+ -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FeatureTrace SimpleJavaGrammar Feature
+-&gt; Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+FeatureTrace SimpleJavaGrammar Feature
+-&gt; Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExampleWithStartTrace"><span class="hs-identifier hs-var">createPatternExampleWithStartTrace</span></a></span><span>
+</span><span id="line-100"></span><span>        </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679095411"><span class="annot"><span class="annottext">v :: Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095411"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095411"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature
+-&gt; Node SimpleJavaGrammar Feature -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; Node SimpleJavaGrammar Feature
+forall a. Tree a -&gt; a
+</span><a href="Tree.html#element"><span class="hs-identifier hs-var">element</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095414"><span class="hs-identifier hs-var">start</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+</span><a href="#local-6989586621679095412"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-101"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="hs-string">&quot;AddIfdefElse (else branch)&quot;</span></span><span class="annot"><span class="annottext">Feature -&gt; Feature -&gt; Feature
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">Feature -&gt; FeatureFormula -&gt; Feature
+</span><a href="EditPatterns.html#buildPCName"><span class="hs-identifier hs-var">buildPCName</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature -&gt; Feature
+forall g a. Node g a -&gt; a
+</span><a href="AST.html#value"><span class="hs-identifier hs-var hs-var">value</span></a></span><span> </span><span class="annot"><span class="annottext">(Node SimpleJavaGrammar Feature -&gt; Feature)
+-&gt; Node SimpleJavaGrammar Feature -&gt; Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; Node SimpleJavaGrammar Feature
+forall a. Tree a -&gt; a
+</span><a href="Tree.html#element"><span class="hs-identifier hs-var">element</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095414"><span class="hs-identifier hs-var">start</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+</span><a href="#local-6989586621679095412"><span class="hs-identifier hs-var">context</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-102"></span><span>        </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095414"><span class="hs-identifier hs-var">start</span></a></span><span>
+</span><span id="line-103"></span><span>        </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095413"><span class="hs-identifier hs-var">alert</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095414"><span class="hs-identifier hs-var">start</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-104"></span><span>
+</span><span id="line-105"></span><span id="local-6989586621679095410"><span class="annot"><a href="EditPatterns.html#addIfdefWrapElse"><span class="hs-identifier hs-type">addIfdefWrapElse</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095410"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095410"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-106"></span><span id="addIfdefWrapElse"><span class="annot"><span class="annottext">addIfdefWrapElse :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addIfdefWrapElse"><span class="hs-identifier hs-var hs-var">addIfdefWrapElse</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-107"></span><span>    </span><span id="local-6989586621679095408"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095408"><span class="hs-identifier hs-var">file</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#emptyfile"><span class="hs-identifier hs-var">emptyfile</span></a></span><span>
+</span><span id="line-108"></span><span>    </span><span id="local-6989586621679095407"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095407"><span class="hs-identifier hs-var">lcd</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#lcd_setstatusalertpgm"><span class="hs-identifier hs-var">lcd_setstatusalertpgm</span></a></span><span>
+</span><span id="line-109"></span><span>    </span><span id="local-6989586621679095406"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095406"><span class="hs-identifier hs-var">alert</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#alertstatuspgm"><span class="hs-identifier hs-var">alertstatuspgm</span></a></span><span>
+</span><span id="line-110"></span><span>    </span><span class="hs-comment">-- The start tree already has the alert line in it.</span><span>
+</span><span id="line-111"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679095405"><span class="annot"><span class="annottext">start :: SSJavaAST
+</span><a href="#local-6989586621679095405"><span class="hs-identifier hs-var hs-var">start</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST
+forall g a. Edit g a -&gt; AST g a -&gt; AST g a
+</span><a href="Edits.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span><span> </span><span class="annot"><span class="annottext">(Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST)
+-&gt; Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095406"><span class="hs-identifier hs-var">alert</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095408"><span class="hs-identifier hs-var">file</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095408"><span class="hs-identifier hs-var">file</span></a></span><span> </span><span class="hs-keyword">in</span><span>
+</span><span id="line-112"></span><span>        </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Example m SimpleJavaGrammar Feature
+ -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExample"><span class="hs-identifier hs-var">createPatternExample</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;AddIfdefWrapElse&quot;</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095405"><span class="hs-identifier hs-var">start</span></a></span><span>
+</span><span id="line-113"></span><span>        </span><span class="annot"><span class="annottext">(History SimpleJavaGrammar Feature
+ -&gt; Example m SimpleJavaGrammar Feature)
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Edit SimpleJavaGrammar Feature]
+-&gt; [FeatureFormula] -&gt; History SimpleJavaGrammar Feature
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-114"></span><span>            </span><span class="annot"><span class="annottext">UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_del_tree"><span class="hs-identifier hs-var">edit_del_tree</span></a></span><span> </span><span class="annot"><span class="annottext">(UUID -&gt; Edit SimpleJavaGrammar Feature)
+-&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095406"><span class="hs-identifier hs-var">alert</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-115"></span><span>            </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095407"><span class="hs-identifier hs-var">lcd</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095408"><span class="hs-identifier hs-var">file</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span>
+</span><span id="line-116"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-117"></span><span>        </span><span class="hs-special">[</span><span>
+</span><span id="line-118"></span><span>            </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-119"></span><span>            </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span>
+</span><span id="line-120"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-121"></span><span>
+</span><span id="line-122"></span><span id="local-6989586621679095402"><span class="annot"><a href="EditPatterns.html#addIfdefWrapThen"><span class="hs-identifier hs-type">addIfdefWrapThen</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095402"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095402"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-123"></span><span id="addIfdefWrapThen"><span class="annot"><span class="annottext">addIfdefWrapThen :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addIfdefWrapThen"><span class="hs-identifier hs-var hs-var">addIfdefWrapThen</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-124"></span><span>    </span><span id="local-6989586621679095400"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095400"><span class="hs-identifier hs-var">file</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#emptyfile"><span class="hs-identifier hs-var">emptyfile</span></a></span><span>
+</span><span id="line-125"></span><span>    </span><span id="local-6989586621679095399"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095399"><span class="hs-identifier hs-var">lcd</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#lcd_setstatusalertpgm"><span class="hs-identifier hs-var">lcd_setstatusalertpgm</span></a></span><span>
+</span><span id="line-126"></span><span>    </span><span id="local-6989586621679095398"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095398"><span class="hs-identifier hs-var">alert</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#alertstatuspgm"><span class="hs-identifier hs-var">alertstatuspgm</span></a></span><span>
+</span><span id="line-127"></span><span>    </span><span class="hs-comment">-- The start tree already has the alert line in it.</span><span>
+</span><span id="line-128"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679095397"><span class="annot"><span class="annottext">start :: SSJavaAST
+</span><a href="#local-6989586621679095397"><span class="hs-identifier hs-var hs-var">start</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST
+forall g a. Edit g a -&gt; AST g a -&gt; AST g a
+</span><a href="Edits.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span><span> </span><span class="annot"><span class="annottext">(Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST)
+-&gt; Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095399"><span class="hs-identifier hs-var">lcd</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095400"><span class="hs-identifier hs-var">file</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095400"><span class="hs-identifier hs-var">file</span></a></span><span> </span><span class="hs-keyword">in</span><span>
+</span><span id="line-129"></span><span>        </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Example m SimpleJavaGrammar Feature
+ -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExample"><span class="hs-identifier hs-var">createPatternExample</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;AddIfdefWrapThen&quot;</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095397"><span class="hs-identifier hs-var">start</span></a></span><span>
+</span><span id="line-130"></span><span>        </span><span class="annot"><span class="annottext">(History SimpleJavaGrammar Feature
+ -&gt; Example m SimpleJavaGrammar Feature)
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Edit SimpleJavaGrammar Feature]
+-&gt; [FeatureFormula] -&gt; History SimpleJavaGrammar Feature
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-131"></span><span>            </span><span class="annot"><span class="annottext">UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_del_tree"><span class="hs-identifier hs-var">edit_del_tree</span></a></span><span> </span><span class="annot"><span class="annottext">(UUID -&gt; Edit SimpleJavaGrammar Feature)
+-&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095399"><span class="hs-identifier hs-var">lcd</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-132"></span><span>            </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095398"><span class="hs-identifier hs-var">alert</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095400"><span class="hs-identifier hs-var">file</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span>
+</span><span id="line-133"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-134"></span><span>        </span><span class="hs-special">[</span><span>
+</span><span id="line-135"></span><span>            </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; PropositionalFormula Feature
+forall a. PropositionalFormula a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PNot"><span class="hs-identifier hs-var">PNot</span></a></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; PropositionalFormula Feature)
+-&gt; PropositionalFormula Feature -&gt; PropositionalFormula Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-136"></span><span>            </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; PropositionalFormula Feature
+forall a. PropositionalFormula a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PNot"><span class="hs-identifier hs-var">PNot</span></a></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; PropositionalFormula Feature)
+-&gt; PropositionalFormula Feature -&gt; PropositionalFormula Feature
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span>
+</span><span id="line-137"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-138"></span><span>
+</span><span id="line-139"></span><span id="local-6989586621679095396"><span class="annot"><a href="EditPatterns.html#addNormalCode_nonvariational"><span class="hs-identifier hs-type">addNormalCode_nonvariational</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095396"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095396"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-140"></span><span id="addNormalCode_nonvariational"><span class="annot"><span class="annottext">addNormalCode_nonvariational :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addNormalCode_nonvariational"><span class="hs-identifier hs-var hs-var">addNormalCode_nonvariational</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-141"></span><span>    </span><span id="local-6989586621679095394"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095394"><span class="hs-identifier hs-var">start</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#emptyfile"><span class="hs-identifier hs-var">emptyfile</span></a></span><span>
+</span><span id="line-142"></span><span>    </span><span id="local-6989586621679095393"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095393"><span class="hs-identifier hs-var">lcd</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#lcd_setstatusalertpgm"><span class="hs-identifier hs-var">lcd_setstatusalertpgm</span></a></span><span>
+</span><span id="line-143"></span><span>    </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Example m SimpleJavaGrammar Feature
+ -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExample"><span class="hs-identifier hs-var">createPatternExample</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;AddNormalCode (non-variable)&quot;</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095394"><span class="hs-identifier hs-var">start</span></a></span><span>
+</span><span id="line-144"></span><span>        </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095393"><span class="hs-identifier hs-var">lcd</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095394"><span class="hs-identifier hs-var">start</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature
+forall a. PropositionalFormula a
+</span><a href="Propositions.html#PTrue"><span class="hs-identifier hs-var">PTrue</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-145"></span><span>
+</span><span id="line-146"></span><span id="local-6989586621679095391"><span class="annot"><a href="EditPatterns.html#addNormalCode_outerpc"><span class="hs-identifier hs-type">addNormalCode_outerpc</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095391"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095391"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-147"></span><span id="addNormalCode_outerpc"><span class="annot"><span class="annottext">addNormalCode_outerpc :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#addNormalCode_outerpc"><span class="hs-identifier hs-var hs-var">addNormalCode_outerpc</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-148"></span><span>    </span><span id="local-6989586621679095389"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095389"><span class="hs-identifier hs-var">file</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#emptyfile"><span class="hs-identifier hs-var">emptyfile</span></a></span><span>
+</span><span id="line-149"></span><span>    </span><span id="local-6989586621679095388"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095388"><span class="hs-identifier hs-var">foo</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#somefunction"><span class="hs-identifier hs-var">somefunction</span></a></span><span>
+</span><span id="line-150"></span><span>    </span><span id="local-6989586621679095387"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095387"><span class="hs-identifier hs-var">lcd</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#lcd_setstatusalertpgm"><span class="hs-identifier hs-var">lcd_setstatusalertpgm</span></a></span><span>
+</span><span id="line-151"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-152"></span><span>        </span><span id="local-6989586621679095386"><span class="annot"><span class="annottext">outer_pc :: FeatureFormula
+</span><a href="#local-6989586621679095386"><span class="hs-identifier hs-var hs-var">outer_pc</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_FOO"><span class="hs-identifier hs-var">feature_FOO</span></a></span><span>
+</span><span id="line-153"></span><span>        </span><span id="local-6989586621679095385"><span class="annot"><span class="annottext">start :: SSJavaAST
+</span><a href="#local-6989586621679095385"><span class="hs-identifier hs-var hs-var">start</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST
+forall g a. Edit g a -&gt; AST g a -&gt; AST g a
+</span><a href="Edits.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span><span> </span><span class="annot"><span class="annottext">(Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST)
+-&gt; Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095388"><span class="hs-identifier hs-var">foo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095389"><span class="hs-identifier hs-var">file</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095389"><span class="hs-identifier hs-var">file</span></a></span><span>
+</span><span id="line-154"></span><span>        </span><span id="local-6989586621679095384"><span class="annot"><span class="annottext">statementsOfFoo :: UUID
+</span><a href="#local-6989586621679095384"><span class="hs-identifier hs-var hs-var">statementsOfFoo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">(SSJavaAST -&gt; UUID)
+-&gt; (Maybe SSJavaAST -&gt; SSJavaAST) -&gt; Maybe SSJavaAST -&gt; UUID
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Maybe SSJavaAST -&gt; SSJavaAST
+forall a. HasCallStack =&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromJust</span></span><span> </span><span class="annot"><span class="annottext">(Maybe SSJavaAST -&gt; UUID) -&gt; Maybe SSJavaAST -&gt; UUID
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleJavaGrammar -&gt; SSJavaAST -&gt; Maybe SSJavaAST
+forall g a. Eq g =&gt; g -&gt; AST g a -&gt; Maybe (AST g a)
+</span><a href="AST.html#findByGrammarType"><span class="hs-identifier hs-var">findByGrammarType</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleJavaGrammar
+</span><a href="SimpleJava.html#SJava_Statements"><span class="hs-identifier hs-var">SJava_Statements</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095388"><span class="hs-identifier hs-var">foo</span></a></span><span>
+</span><span id="line-155"></span><span>        </span><span class="hs-keyword">in</span><span>
+</span><span id="line-156"></span><span>        </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Example m SimpleJavaGrammar Feature
+ -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FeatureTrace SimpleJavaGrammar Feature
+-&gt; Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+FeatureTrace SimpleJavaGrammar Feature
+-&gt; Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExampleWithStartTrace"><span class="hs-identifier hs-var">createPatternExampleWithStartTrace</span></a></span><span>
+</span><span id="line-157"></span><span>            </span><span class="hs-comment">-- change the start trace so that there is already a trace</span><span>
+</span><span id="line-158"></span><span>            </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679095381"><span class="annot"><span class="annottext">n :: Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095381"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095381"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature
+-&gt; Node SimpleJavaGrammar Feature -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; Node SimpleJavaGrammar Feature
+forall a. Tree a -&gt; a
+</span><a href="Tree.html#element"><span class="hs-identifier hs-var">element</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095388"><span class="hs-identifier hs-var">foo</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+</span><a href="#local-6989586621679095386"><span class="hs-identifier hs-var">outer_pc</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-159"></span><span>            </span><span class="annot"><span class="hs-string">&quot;AddNormalCode (with outer PC)&quot;</span></span><span>
+</span><span id="line-160"></span><span>            </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095385"><span class="hs-identifier hs-var">start</span></a></span><span>
+</span><span id="line-161"></span><span>            </span><span class="hs-comment">-- Here, any feature context would be feasible that is weaker than outer_pc (e.g., outer_pc itself).</span><span>
+</span><span id="line-162"></span><span>            </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095387"><span class="hs-identifier hs-var">lcd</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
+</span><a href="#local-6989586621679095384"><span class="hs-identifier hs-var">statementsOfFoo</span></a></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature
+forall a. PropositionalFormula a
+</span><a href="Propositions.html#PTrue"><span class="hs-identifier hs-var">PTrue</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-163"></span><span>            </span><span>
+</span><span id="line-164"></span><span>
+</span><span id="line-165"></span><span id="local-6989586621679095380"><span class="annot"><a href="EditPatterns.html#remNormalCode_null"><span class="hs-identifier hs-type">remNormalCode_null</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095380"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095380"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-166"></span><span id="remNormalCode_null"><span class="annot"><span class="annottext">remNormalCode_null :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#remNormalCode_null"><span class="hs-identifier hs-var hs-var">remNormalCode_null</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-167"></span><span>    </span><span id="local-6989586621679095378"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095378"><span class="hs-identifier hs-var">file</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#emptyfile"><span class="hs-identifier hs-var">emptyfile</span></a></span><span>
+</span><span id="line-168"></span><span>    </span><span id="local-6989586621679095377"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095377"><span class="hs-identifier hs-var">lcd</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#lcd_setstatusalertpgm"><span class="hs-identifier hs-var">lcd_setstatusalertpgm</span></a></span><span>
+</span><span id="line-169"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679095376"><span class="annot"><span class="annottext">start :: SSJavaAST
+</span><a href="#local-6989586621679095376"><span class="hs-identifier hs-var hs-var">start</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST
+forall g a. Edit g a -&gt; AST g a -&gt; AST g a
+</span><a href="Edits.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span><span> </span><span class="annot"><span class="annottext">(Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST)
+-&gt; Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095377"><span class="hs-identifier hs-var">lcd</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095378"><span class="hs-identifier hs-var">file</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095378"><span class="hs-identifier hs-var">file</span></a></span><span> </span><span class="hs-keyword">in</span><span>
+</span><span id="line-170"></span><span>        </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Example m SimpleJavaGrammar Feature
+ -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExample"><span class="hs-identifier hs-var">createPatternExample</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;RemNormalCode (without traces)&quot;</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095376"><span class="hs-identifier hs-var">start</span></a></span><span>
+</span><span id="line-171"></span><span>            </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_del_tree"><span class="hs-identifier hs-var">edit_del_tree</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095377"><span class="hs-identifier hs-var">lcd</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature
+forall a. PropositionalFormula a
+</span><a href="Propositions.html#PTrue"><span class="hs-identifier hs-var">PTrue</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-172"></span><span>
+</span><span id="line-173"></span><span id="local-6989586621679095375"><span class="annot"><a href="EditPatterns.html#remNormalCode_notnull"><span class="hs-identifier hs-type">remNormalCode_notnull</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095375"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095375"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-174"></span><span id="remNormalCode_notnull"><span class="annot"><span class="annottext">remNormalCode_notnull :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#remNormalCode_notnull"><span class="hs-identifier hs-var hs-var">remNormalCode_notnull</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-175"></span><span>    </span><span id="local-6989586621679095373"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095373"><span class="hs-identifier hs-var">file</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#emptyfile"><span class="hs-identifier hs-var">emptyfile</span></a></span><span>
+</span><span id="line-176"></span><span>    </span><span id="local-6989586621679095372"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095372"><span class="hs-identifier hs-var">lcd</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><a href="EditPatterns.html#lcd_setstatusalertpgm"><span class="hs-identifier hs-var">lcd_setstatusalertpgm</span></a></span><span>
+</span><span id="line-177"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span>
+</span><span id="line-178"></span><span>        </span><span id="local-6989586621679095371"><span class="annot"><span class="annottext">start :: SSJavaAST
+</span><a href="#local-6989586621679095371"><span class="hs-identifier hs-var hs-var">start</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST
+forall g a. Edit g a -&gt; AST g a -&gt; AST g a
+</span><a href="Edits.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span><span> </span><span class="annot"><span class="annottext">(Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST)
+-&gt; Edit SimpleJavaGrammar Feature -&gt; SSJavaAST -&gt; SSJavaAST
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095372"><span class="hs-identifier hs-var">lcd</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095373"><span class="hs-identifier hs-var">file</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095373"><span class="hs-identifier hs-var">file</span></a></span><span>
+</span><span id="line-179"></span><span>        </span><span id="local-6989586621679095370"><span class="annot"><span class="annottext">existingtrace :: FeatureFormula
+</span><a href="#local-6989586621679095370"><span class="hs-identifier hs-var hs-var">existingtrace</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula Feature -&gt; FeatureFormula)
+-&gt; PropositionalFormula Feature -&gt; FeatureFormula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Feature -&gt; PropositionalFormula Feature
+forall a. a -&gt; PropositionalFormula a
+</span><a href="Propositions.html#PVariable"><span class="hs-identifier hs-var">PVariable</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
+</span><a href="EditPatterns.html#feature_ULTRA_LCD"><span class="hs-identifier hs-var">feature_ULTRA_LCD</span></a></span><span>
+</span><span id="line-180"></span><span>        </span><span class="hs-keyword">in</span><span>
+</span><span id="line-181"></span><span>        </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Example m SimpleJavaGrammar Feature
+ -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FeatureTrace SimpleJavaGrammar Feature
+-&gt; Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+FeatureTrace SimpleJavaGrammar Feature
+-&gt; Feature
+-&gt; SSJavaAST
+-&gt; History SimpleJavaGrammar Feature
+-&gt; Example m SimpleJavaGrammar Feature
+</span><a href="EditPatterns.html#createPatternExampleWithStartTrace"><span class="hs-identifier hs-var">createPatternExampleWithStartTrace</span></a></span><span>
+</span><span id="line-182"></span><span>            </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679095369"><span class="annot"><span class="annottext">n :: Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095369"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095369"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Node SimpleJavaGrammar Feature
+-&gt; Node SimpleJavaGrammar Feature -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; Node SimpleJavaGrammar Feature
+forall a. Tree a -&gt; a
+</span><a href="Tree.html#element"><span class="hs-identifier hs-var">element</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095372"><span class="hs-identifier hs-var">lcd</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+</span><a href="#local-6989586621679095370"><span class="hs-identifier hs-var">existingtrace</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-183"></span><span>            </span><span class="annot"><span class="hs-string">&quot;RemNormalCode (with trace)&quot;</span></span><span>
+</span><span id="line-184"></span><span>            </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095371"><span class="hs-identifier hs-var">start</span></a></span><span>
+</span><span id="line-185"></span><span>            </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">UUID -&gt; Edit SimpleJavaGrammar Feature
+forall a g. Eq a =&gt; UUID -&gt; Edit g a
+</span><a href="Edits.html#edit_del_tree"><span class="hs-identifier hs-var">edit_del_tree</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+forall g a. AST g a -&gt; UUID
+</span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095372"><span class="hs-identifier hs-var">lcd</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-comment">{-null-}</span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-186"></span><span>
+</span><span id="line-187"></span><span class="hs-comment">{- This behaves the same as remNormalCode_notnull. -}</span><span>
+</span><span id="line-188"></span><span id="local-6989586621679095368"><span class="annot"><a href="EditPatterns.html#remIfdef"><span class="hs-identifier hs-type">remIfdef</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095368"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095368"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-189"></span><span id="remIfdef"><span class="annot"><span class="annottext">remIfdef :: State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#remIfdef"><span class="hs-identifier hs-var hs-var">remIfdef</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *).
+MonadColorPrinter m =&gt;
+State UUID (Example m SimpleJavaGrammar Feature)
+</span><a href="EditPatterns.html#remNormalCode_notnull"><span class="hs-identifier hs-var">remNormalCode_notnull</span></a></span><span> </span><span class="annot"><span class="annottext">State UUID (Example m SimpleJavaGrammar Feature)
+-&gt; (Example m SimpleJavaGrammar Feature
+    -&gt; State UUID (Example m SimpleJavaGrammar Feature))
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679095366"><span class="annot"><span class="annottext">r :: Example m SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095366"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+-&gt; State UUID (Example m SimpleJavaGrammar Feature)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095366"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">name :: Feature
+</span><a href="Example.html#name"><span class="hs-identifier hs-var">Example.name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;RemIfdef&quot;</span></span><span class="hs-special">}</span></pre></body></html>
