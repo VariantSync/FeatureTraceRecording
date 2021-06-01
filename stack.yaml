@@ -70,4 +70,4 @@ extra-deps:
 build:
   haddock-arguments:
     haddock-args:
-    - "-o ./docs/haddock"
+    - "-o ./docs/html_stack"
