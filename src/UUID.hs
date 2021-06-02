@@ -1,4 +1,5 @@
 -- | Module representing universable unique identifiers (UUID).
+-- We use these to identify nodes in abstract syntax trees ('AST') and track them across versions.
 module UUID where
 
 import Control.Monad.State

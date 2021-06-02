@@ -54,8 +54,8 @@ edit_identity = Edit {
     delta = \_ -> empty,
     name = "identity"}
 
-{-
-| An identity edit that will keep the given set of nodes as delta for the feature trace recording.
+{- |
+An identity edit that will keep the given set of nodes as delta for the feature trace recording.
 Upon recording, all given nodes will have their feature trace changed to the feature context.
 This function assumes that the given set of nodes is a subset of the nodes in the future edited tree.
 -}

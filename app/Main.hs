@@ -1,6 +1,6 @@
 module Main where
 
-import Control.Monad.State ( State, runState )
+import Control.Monad.State ( State )
 
 import UUID ( UUID )
 import Util (removeQuotes,  genIndent )
@@ -15,9 +15,7 @@ import NullPropositions
 import FeatureTrace 
 import FeatureTraceRecording
 import FeatureColour (FeatureFormulaColourPalette)
-
 import Example
-
 import TikzExport ( astToTikzWithTraceDefault )
 
 import StackPopAlice (example)
@@ -26,29 +24,44 @@ import EditPatterns
 
 import Data.List (intercalate)
 
--- Terminal printing ---------
-import Control.Concurrent ()
-
+-- imports for Terminal printing ---------
 import Data.Text.Prettyprint.Doc
     ( Doc, (<+>), annotate, hardline, Pretty(pretty) )
 import System.Terminal
 import Truthtable (generatetruthtablesfor)
 
+-- | Style defining how to print 'AST's.
+data CodePrintStyle
+    = ShowAST  -- ^ Prints the 'AST' by showing each 'Node' in the hierarchy in an XML-like format.
+    | ShowCode -- ^ Prints the 'AST' as the actual source code that it represents.
+    | ShowTikz -- ^ Print the 'AST' as tikz code to use for our paper.
+    deriving (Show)
+-- | Format defining whether to 'FeatureTrace's or presence conditions ('pc').
+data TraceDisplay
+    = Trace -- ^ Show the feature mapping of each node (i.e., the formula a node is directly annotated with).
+    | PC    -- ^ Show the presence condition of each node (i.e., the conjunction of its feature mapping with all feature mappings inherited from ancestors).
+    deriving (Show, Eq)
+-- | Style defining how to print 'FeatureTrace's.
+data TraceStyle
+    = Text   -- ^ Show feature mapping formulas as plain text.
+    | Colour -- ^ Encode features as colours to visualize feature mappings by colouring source code.
+    | None   -- ^ Do not show feature traces at all.
+    deriving (Show, Eq)
 
-data CodePrintStyle = ShowAST | ShowCode | ShowTikz deriving (Show)
-data TraceDisplay = Trace | PC deriving (Show, Eq)
-data TraceStyle = Text | Colour | None deriving (Show, Eq)
+{- |
+Format in which code and (recorded) feature mappings should be printed to the terminal.
+-}
 data OutputFormat = OutputFormat {
     codeStyle :: CodePrintStyle,
     traceDisplay :: TraceDisplay,
     traceStyle :: TraceStyle,
-    withTraceLines :: Bool
+    withTraceLines :: Bool -- ^ Whether there should be vertical lines next to the shown code on the left that indicate presence condtions.
 }
 
 -- Some presets for output formats:
 
 {- |
-The perspective of the developer who is editing code while traces are recorded in the background
+The perspective of the developer, who is editing code while traces are recorded in the background
 This is the format used in the figures in the paper.
 -}
 userFormat :: OutputFormat
@@ -72,7 +85,7 @@ userFormatDetailed = OutputFormat {
 }
 
 {- |
-Shows the Abstract Syntax Tree of the source code with feature traces as formulas.
+Shows the 'AST' of the source code with 'FeatureTrace's as formulas.
 -}
 astFormat :: OutputFormat
 astFormat = OutputFormat {
@@ -83,7 +96,7 @@ astFormat = OutputFormat {
 }
 
 {- |
-Tikz export of AST with traces.
+Tikz export of 'AST' with 'FeatureTrace's.
 Used for figures in the paper.
 -}
 tikzFormat :: OutputFormat
@@ -94,26 +107,32 @@ tikzFormat = OutputFormat {
     withTraceLines = False
 }
         
-{-
-| Select what to show here.
-By default, we will show the output of all exaples (Alice, Bob, and the edit patterns).
-Additionally, you might want to look at the truthtable of the ternary logic by Sobocinski we use.
+{- |
+Entry point of the demo.
+The main method will run and print the output of all examples (Alice, Bob, and the edit patterns).
+You can change the format of the printed source code and feature mappings by changing the @format@ parameter inside 'main'.
+Additionally, you might want to look at the truthtable of the ternary logic by Sobocinski we use (by uncommenting the line @showTruthtables@).
 -}
 main :: IO ()
-main = mconcat [
-    showExamples
-    -- , showTruthtables
-    ]
-
-showExamples :: IO ()
-showExamples = withTerminal $ runTerminalT $
-    {-
+main =
+    {- |
     Select your OutputFormat here.
     Above, there is a list of presets you can choose from.
     -}
-    let format = userFormat
-        run = runStepwise format
-    in
+    let format = userFormat in
+    do
+        showExamples format
+        -- showTruthtables
+
+{- |
+Runs the motivating example from the paper and examples for all edit patterns with the given 'OutputFormat'.
+First, runs Alice's example where she records feature traces upon editing the pop method of a class Stack in Java (Figure 1 in the paper).
+Second, shows how Bob could propagate Alice's edits and recorded feature traces to his variant as envisioned in future research.
+Third, shows an instance of each edit pattern from our evaluation.
+-}
+showExamples :: OutputFormat -> IO ()
+showExamples format = withTerminal $ runTerminalT $
+    let run = runStepwise format in
     do
         putDoc hardline
         headline "Running Feature Trace Recording Demo"
@@ -146,18 +165,21 @@ showExamples = withTerminal $ runTerminalT $
         run EditPatterns.remIfdef
     
 
+-- | Turns the given text into a headline in the terminal.
+-- We indicate headlines with a red background.
 headline :: (MonadColorPrinter m) => String -> m()
 headline text = putDoc $ hardline <+> (annotate (background red) $ pretty text) <+> hardline <+> hardline
 
-finalizeExample :: State UUID (Example m g a) -> Example m g a
-finalizeExample ex = fst $ runState ex 0
-
+-- | Runs the given 'Example' in the given 'OutputFormat' step by step (i.e., showing all intermediate results).
 runStepwise :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g) => OutputFormat -> State UUID (Example m g String) -> m ()
 runStepwise format ex =
     let example = finalizeExample ex
         result = printTraces format example (Example.runExampleWithDefaultFTR example) in
     (putDoc $ result <+> hardline) >> flush
 
+-- | Prints the given 'AST' with the given 'FeatureTrace's in the given 'OutputFormat'.
+-- If the 'OutputFormat' mandates to visualize feature mappings as colours (see 'TraceStyle'),
+-- the given 'FeatureFormulaColourPalette' will be used to assign colours to feature formulas.
 printASTWithTrace :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) =>
     OutputFormat -> FeatureFormulaColourPalette m -> AST g a -> FeatureTrace g a -> Doc (Attribute m)
 printASTWithTrace format featureColourPalette tree trace = 
@@ -183,11 +205,12 @@ printASTWithTrace format featureColourPalette tree trace =
                 None -> pretty.show
                 Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace n) $ show n)
                 Text -> pretty.(FeatureTrace.prettyPrint).(augmentWithTrace trace)) tree
-            ShowTikz -> pretty $ astToTikzWithTraceDefault trace tree
+            ShowTikz -> pretty $ astToTikzWithTraceDefault (trace, tree)
             ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
 
+-- | Prints the given list of versions that were produced from the given example.
 printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) =>
-    OutputFormat -> Example m g a -> [(FeatureTrace g a, AST g a)] -> Doc (Attribute m)
+    OutputFormat -> Example m g a -> [Version g a] -> Doc (Attribute m)
 printTraces format example tracesAndTrees = 
     let
         featureColourPalette = colours example
@@ -217,16 +240,23 @@ printTraces format example tracesAndTrees =
         (alsoShowInitialStateInHistory (history example))
         tracesAndTrees
 
+-- | Helper function to show the initial state of the given history in 'printTraces'.
+-- Prepends an identity edit and dummy 'FeatureContext'.
+-- The context could be anything and thus is set to 'Nothing' (/null/).
 alsoShowInitialStateInHistory :: History g a -> History g a
--- Prepend identity edit here to show initial tree. Prepend dummy feature context here as fc for initial tree. The context could be anything so Nothing is the simplest one.
 alsoShowInitialStateInHistory h = (edit_identity, Nothing):h
 
+-- | Helper function to help with type inference.
+-- Returns all atomic values of a 'PropositionalFormula' (over strings).
 propositional_values :: [PropositionalFormula String]
 propositional_values = lvalues
 
+-- | Helper function to help with type inference.
+-- Returns all atomic values of a 'NullableFormula' (over strings).
 nullableFormula_values :: [NullableFormula String]
 nullableFormula_values = lvalues
 
+-- | Prints truthtables for common operators in 'PropositionalFormula's and 'NullableFormulas' (not, and, or, implies, equiv)
 showTruthtables :: IO()
 showTruthtables = withTerminal $ runTerminalT $
     do
