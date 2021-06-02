@@ -2,7 +2,6 @@
 module Util where
 
 -- | Generates a string of /i/ spaces where /i/ is the given indent.
--- For example @genIndent 4@ returns @"    "@.
 genIndent :: Int -> String
 genIndent i = concat $ replicate i " "
 
@@ -16,7 +15,7 @@ safeFromJust (Just x) _ = x
 reversefoldr :: (a -> b -> b) -> b -> [a] -> b
 reversefoldr f zero container = foldr f zero $ reverse container
 
--- | Generates parenthesis aroung the given string iff the given bool is true.
+-- | Generates parenthesis around the given string iff the given bool is true.
 parenIf :: Bool -> String -> String
 parenIf True s = "("++s++")"
 parenIf False s = s
@@ -30,7 +29,7 @@ takeIf p (Just x)
     | p x = Just x
     | otherwise = Nothing
 
--- | Lifts a value to a Maybe based on a predicate.
+-- | Lifts a value to a 'Maybe' based on a predicate.
 -- Iff the element satisfies the predicate, the result is @Nothing@.
 -- Otherwise returns the @Just@ the element.
 nothingIf :: (a -> Bool) -> a -> Maybe a

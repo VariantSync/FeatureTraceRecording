@@ -306,7 +306,7 @@ module UUID
 -- | A universable unique identifiers (UUID) realised as an integer.
 type UUID = Int
 
--- | Computes successor UUID of the current UUID.
+-- | Computes the successor UUID of the current UUID.
 next :: State UUID ()
 
 -- | Converts a UUID to an int.
@@ -321,7 +321,7 @@ epsilon :: UUID
 module Util
 
 -- | Generates a string of <i>i</i> spaces where <i>i</i> is the given
---   indent. For example <tt>genIndent 4</tt> returns <tt>" "</tt>.
+--   indent.
 genIndent :: Int -> String
 
 -- | Returns <tt>x</tt> iff the given Maybe is <tt>Just x</tt>. Otherwise,
@@ -331,7 +331,7 @@ safeFromJust :: Maybe a -> (() -> a) -> a
 -- | Folds the given list after reversing it.
 reversefoldr :: (a -> b -> b) -> b -> [a] -> b
 
--- | Generates parenthesis aroung the given string iff the given bool is
+-- | Generates parenthesis around the given string iff the given bool is
 --   true.
 parenIf :: Bool -> String -> String
 
@@ -340,7 +340,7 @@ parenIf :: Bool -> String -> String
 --   <tt>Nothing</tt>.
 takeIf :: (a -> Bool) -> Maybe a -> Maybe a
 
--- | Lifts a value to a Maybe based on a predicate. Iff the element
+-- | Lifts a value to a <a>Maybe</a> based on a predicate. Iff the element
 --   satisfies the predicate, the result is <tt>Nothing</tt>. Otherwise
 --   returns the <tt>Just</tt> the element.
 nothingIf :: (a -> Bool) -> a -> Maybe a
@@ -396,12 +396,23 @@ findByNode :: (a -> Bool) -> Tree a -> Maybe (Tree a)
 --   given tree and has the second given tree as child. Throws an error iff
 --   no parent exists.
 parent :: Eq a => Tree a -> Tree a -> Maybe (Tree a)
+
+-- | Retrieves all nodes that are above the given node (second argument) in
+--   the given tree (first argument) (This is the transitive closure of
+--   <a>parent</a>.)
 ancestors :: Eq a => Tree a -> Tree a -> [Tree a]
 
 -- | Applies the given function to each node from bottom to top (i.e.,
 --   leaves are converted first, root last).
 manipulate :: (Tree a -> Tree a) -> Tree a -> Tree a
+
+-- | Removes all subtrees not meeting the imposed condition. The root
+--   remains untouched.
 filterTrees :: (Tree a -> Bool) -> Tree a -> Tree a
+
+-- | Removes all nodes not meeting the imposed condition. Children of
+--   removed nodes are moved up and become children of the parent of the
+--   removed node. The root remains untouched.
 filterNodes :: (Tree a -> Bool) -> Tree a -> Tree a
 
 -- | Pretty print function that folds the tree into a monoidial type
@@ -440,30 +451,31 @@ Node :: a -> g -> UUID -> Node g a
 -- | A unique identifier to trace nodes across several versions of ASTs.
 [uuid] :: Node g a -> UUID
 
--- | Type for abstract syntax trees. It is a tree whose nodes are
---   associated to a value, a grammar type and a UUID.
+-- | Type for abstract syntax trees (ASTs) representing source code. It is
+--   a tree in which each node represents a source code entity by a value,
+--   a grammar type and a <a>UUID</a>.
 type AST g a = Tree (Node g a)
 
 -- | Returns the node type of a nodes grammar type.
 optionaltype :: Grammar g => Node g a -> NodeType
 
--- | Creates a new node from a value and a type by generating a new UUID
---   for it.
+-- | Creates a new node from a value and a type by generating a new
+--   <a>UUID</a> for it.
 node :: Grammar g => a -> g -> State UUID (Node g a)
 
--- | Returns the UUID of an ast's root.
+-- | Returns the <a>UUID</a> of an <a>AST</a>s root.
 uuidOf :: AST g a -> UUID
 
--- | Finds a subtree in the given AST whose root has the given UUID.
---   Returns <tt>Nothing</tt> iff no such subtree exists.
+-- | Finds a subtree in the given <a>AST</a> whose root has the given
+--   <a>UUID</a>. Returns <tt>Nothing</tt> iff no such subtree exists.
 findById :: UUID -> AST g a -> Maybe (AST g a)
 
--- | Finds a subtree in the given AST whose root has the given value.
---   Returns <tt>Nothing</tt> iff no such subtree exists.
+-- | Finds a subtree in the given <a>AST</a> whose root has the given
+--   value. Returns <tt>Nothing</tt> iff no such subtree exists.
 findByValue :: Eq a => a -> AST g a -> Maybe (AST g a)
 
--- | Finds a subtree in the given AST whose root has the given grammar
---   type. Returns <tt>Nothing</tt> iff no such subtree exists.
+-- | Finds a subtree in the given <a>AST</a> whose root has the given
+--   grammar type. Returns <tt>Nothing</tt> iff no such subtree exists.
 findByGrammarType :: Eq g => g -> AST g a -> Maybe (AST g a)
 
 -- | Returns all ancestors of a given subtree (second argument) in the
@@ -672,6 +684,8 @@ type FeatureContext = FeatureFormula
 --   to version control or via IDE interaction (see Section 4.1 in the
 --   paper).
 type RecordedEdit g a = (Edit g a, FeatureContext)
+
+-- | We call a list of edits a change <a>History</a>.
 type History g a = [RecordedEdit g a]
 
 -- | We denote the state of a software system at any point in time as a
@@ -727,10 +741,10 @@ module DefaultFeatureTraceRecording
 --   propose in the paper. For each type of edit, we choose one of the four
 --   recording functions from R_ins, R_del, R_mov, and R_up. Next to these
 --   four functions, we support two more default recording function in this
---   library, r_id and r_trace. We use r_id for technical reasones (e.g.,
---   folds, printing) and it does nothing. We use r_trace to manually
---   change the feature mappings of a set of nodes without changing the
---   source code.
+--   library, <a>r_id</a> and <a>r_trace</a>. We use <a>r_id</a> for
+--   technical reasones (e.g., folds, printing) and it does nothing. We use
+--   <a>r_trace</a> to manually change the feature mappings of a set of
+--   nodes without changing the source code.
 defaultFeatureTraceRecording :: (Grammar g, Show a, Eq a) => FeatureTraceRecording g a
 
 -- | Sets the feature mapping of all mandatory AST nodes to <i>null</i>.
@@ -768,11 +782,16 @@ r_up :: (Eq a, Show a) => RecordingFunction g a
 module Example
 
 -- | An <a>Example</a> represents a single demo showcase of feature trace
---   recording. * <tt>m</tt> Monad defining colours which is used for
---   printing an examples output. * <tt>g</tt> Grammar of the example
---   (e.g., if the examples shows the development of Java or C++ or Haskell
---   source code). * <tt>a</tt> Value type of the artefacts in the
---   <a>AST</a>s (e.g., <tt>String</tt>).
+--   recording.
+--   
+--   <ul>
+--   <li><tt>m</tt>: Monad defining colours which is used for printing an
+--   examples output.</li>
+--   <li><tt>g</tt>: Grammar of the example (e.g., if the examples shows
+--   the development of Java or C++ or Haskell source code).</li>
+--   <li><tt>a</tt>: Value type of the artefacts in the <a>AST</a>s (e.g.,
+--   <tt>String</tt>).</li>
+--   </ul>
 data Example m g a
 Example :: String -> Version g a -> History g a -> FeatureFormulaColourPalette m -> Example m g a
 
@@ -922,13 +941,17 @@ sjava_statements :: [SJavaState] -> SJavaState
 
 -- | Wrap the given subtree in an expression statement. The given tree
 --   should be an expression. Pseudocode example: <tt>sjava_exprstatement
---   'x += 3 == 'x + 3;'</tt>.
+--   'x = 3 == 'x + 3;'</tt>.
 sjava_exprstatement :: SJavaState -> SJavaState
 
--- | Constructs an assignment where parameter (1) represents the left side
---   of the assignment (e.g., a variable that should be assigned a value),
---   (2) is the operator's name to use (e.g., <tt>"="</tt>), and (3) is the
---   expression to assign (e.g. "1 + 2").
+-- | Constructs an assignment where parameter
+--   
+--   <ol>
+--   <li>represents the left side of the assignment (e.g., a variable that
+--   should be assigned a value),</li>
+--   <li>is the operator's name to use (e.g., <tt>"="</tt>), and</li>
+--   <li>is the expression to assign (e.g. "1 + 2").</li>
+--   </ol>
 sjava_assignment :: SJavaState -> String -> SJavaState -> SJavaState
 
 -- | Constructs a return statement that returns the given expression.
@@ -1279,7 +1302,7 @@ propositional_values :: [PropositionalFormula String]
 nullableFormula_values :: [NullableFormula String]
 
 -- | Prints truthtables for common operators in
---   <a>PropositionalFormula</a>s and <tt>NullableFormulas</tt> (not, and,
+--   <a>PropositionalFormula</a>s and <a>NullableFormula</a>s (not, and,
 --   or, implies, equiv)
 showTruthtables :: IO ()
 instance GHC.Classes.Eq Main.TraceStyle

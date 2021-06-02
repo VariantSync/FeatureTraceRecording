@@ -66,8 +66,8 @@ findByNode p = Tree.find (\(Tree n _) -> p n)
 parent :: Eq a => Tree a -> Tree a -> Maybe(Tree a)
 parent root t = Tree.find (\(Tree _ children) -> elem t children) root
 
-{-
-| Retrieves all nodes that are above the given node (second argument) in the given tree (first argument)
+{- |
+Retrieves all nodes that are above the given node (second argument) in the given tree (first argument)
 (This is the transitive closure of 'parent'.)
 -}
 ancestors :: Eq a => Tree a -> Tree a -> [Tree a]
@@ -79,15 +79,15 @@ ancestors root t = case parent root t of
 manipulate :: (Tree a -> Tree a) -> Tree a -> Tree a
 manipulate f (Tree x children) = f (Tree x (fmap (manipulate f) children))
 
-{-
-| Removes all subtrees not meeting the imposed condition.
+{- |
+Removes all subtrees not meeting the imposed condition.
 The root remains untouched.
 -}
 filterTrees :: (Tree a -> Bool) -> Tree a -> Tree a
 filterTrees p = manipulate (\(Tree n c) -> Tree n (Data.List.filter p c))
 
-{-
-| Removes all nodes not meeting the imposed condition.
+{- |
+Removes all nodes not meeting the imposed condition.
 Children of removed nodes are moved up and become children of the parent of the removed node.
 The root remains untouched.
 -}

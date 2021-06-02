@@ -256,7 +256,7 @@ propositional_values = lvalues
 nullableFormula_values :: [NullableFormula String]
 nullableFormula_values = lvalues
 
--- | Prints truthtables for common operators in 'PropositionalFormula's and 'NullableFormulas' (not, and, or, implies, equiv)
+-- | Prints truthtables for common operators in 'PropositionalFormula's and 'NullableFormula's (not, and, or, implies, equiv)
 showTruthtables :: IO()
 showTruthtables = withTerminal $ runTerminalT $
     do

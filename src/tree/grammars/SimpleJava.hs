@@ -63,11 +63,12 @@ sjava_statements :: [SJavaState] -> SJavaState
 sjava_statements statements = Tree (node mempty SJava_Statements) statements
 
 -- | Wrap the given subtree in an expression statement. The given tree should be an expression.
--- Pseudocode example: @sjava_exprstatement 'x += 3  ==  'x + 3;'@.
+-- Pseudocode example: @sjava_exprstatement 'x = 3  ==  'x + 3;'@.
 sjava_exprstatement :: SJavaState -> SJavaState
 sjava_exprstatement expression = Tree (node mempty SJava_ExprStatement) [sjava_expr expression]
 
 -- | Constructs an assignment where parameter
+--
 -- (1) represents the left side of the assignment (e.g., a variable that should be assigned a value),
 -- (2) is the operator's name to use (e.g., @"="@), and
 -- (3) is the expression to assign (e.g. "1 + 2").
@@ -135,7 +136,7 @@ sjava_type val = Tree (node val SJava_Type) []
 sjava_file :: String -> [SJavaState] -> SJavaState
 sjava_file name content = Tree (node name SJava_File) content
 
-{- Define optionality for all node types in our Java grammar. -}
+-- | Define optionality for all node types in our Java grammar
 instance Grammar SimpleJavaGrammar where
     nodetypeof SJava_MethodDef = Optional
     nodetypeof SJava_Return = Optional --leaf

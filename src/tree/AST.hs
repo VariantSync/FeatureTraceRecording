@@ -28,33 +28,34 @@ instance Functor (Node g) where
 instance (Grammar g, Show a) => Show (Node g a) where
   show n = "("++(show $ uuid n)++", "++(show $ grammartype n)++", "++(show $ value n)++", "++(show $ optionaltype n)++")"
 
--- | Type for abstract syntax trees. It is a tree whose nodes are associated to a value, a grammar type and a UUID.
+-- | Type for abstract syntax trees (ASTs) representing source code.
+-- It is a tree in which each node represents a source code entity by a value, a grammar type and a 'UUID'.
 type AST g a = Tree (Node g a)
 
 -- | Returns the node type of a nodes grammar type.
 optionaltype :: Grammar g => Node g a -> NodeType
 optionaltype = nodetypeof.grammartype
 
--- | Creates a new node from a value and a type by generating a new UUID for it.
+-- | Creates a new node from a value and a type by generating a new 'UUID' for it.
 node :: Grammar g => a -> g -> State UUID (Node g a)
 node v vt = do
   next
   id <- get
   return Node {value = v, grammartype = vt, uuid = id}
 
--- | Returns the UUID of an ast's root.
+-- | Returns the 'UUID' of an 'AST's root.
 uuidOf :: AST g a -> UUID
 uuidOf = uuid . element
 
--- | Finds a subtree in the given AST whose root has the given UUID. Returns @Nothing@ iff no such subtree exists.
+-- | Finds a subtree in the given 'AST' whose root has the given 'UUID'. Returns @Nothing@ iff no such subtree exists.
 findById :: UUID -> AST g a -> Maybe (AST g a)
 findById i = Tree.find ((i==).uuidOf)
 
--- | Finds a subtree in the given AST whose root has the given value. Returns @Nothing@ iff no such subtree exists.
+-- | Finds a subtree in the given 'AST' whose root has the given value. Returns @Nothing@ iff no such subtree exists.
 findByValue :: (Eq a) => a -> AST g a -> Maybe (AST g a)
 findByValue v = findByNode (\n -> value n == v)
 
--- | Finds a subtree in the given AST whose root has the given grammar type. Returns @Nothing@ iff no such subtree exists.
+-- | Finds a subtree in the given 'AST' whose root has the given grammar type. Returns @Nothing@ iff no such subtree exists.
 findByGrammarType :: (Eq g) => g -> AST g a -> Maybe (AST g a)
 findByGrammarType r = findByNode ((r==).grammartype)
 

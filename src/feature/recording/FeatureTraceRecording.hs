@@ -1,8 +1,7 @@
 {- |
 Module: FeatureTraceRecording
 Description: Data types and interfaces for feature trace recording.
-Copyright: (c) Paul Maximilian Bittner, 2021
-License: GPL-3
+License: TODO: FeatureIDE
 Maintainer: paul.bittner@uni-ulm.de
 
 Data types and interfaces for feature trace recording.
@@ -22,6 +21,10 @@ Encapsulates an edit that was made under a given 'FeatureContext'.
 This relation might be established upon commit to version control or via IDE interaction (see Section 4.1 in the paper).
 -}
 type RecordedEdit g a = (Edit g a, FeatureContext)
+
+{- |
+We call a list of edits a change 'History'.
+-}
 type History g a = [RecordedEdit g a]
 
 {- |

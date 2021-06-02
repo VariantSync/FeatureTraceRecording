@@ -14,10 +14,12 @@ import FeatureColour (FeatureFormulaColourPalette)
 import Control.Monad.State ( State, runState )
 import UUID
 
--- | An 'Example' represents a single demo showcase of feature trace recording.
--- * @m@ Monad defining colours which is used for printing an examples output.
--- * @g@ Grammar of the example (e.g., if the examples shows the development of Java or C++ or Haskell source code).
--- * @a@ Value type of the artefacts in the 'AST's (e.g., @String@).
+{- | An 'Example' represents a single demo showcase of feature trace recording.
+
+- @m@: Monad defining colours which is used for printing an examples output.
+- @g@: Grammar of the example (e.g., if the examples shows the development of Java or C++ or Haskell source code).
+- @a@: Value type of the artefacts in the 'AST's (e.g., @String@).
+-}
 data Example m g a = Example {
     -- | The name of the example to identify it.
     name :: String,

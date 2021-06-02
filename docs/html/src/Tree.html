@@ -298,8 +298,8 @@ forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
 </span><a href="#local-6989586621679093504"><span class="hs-identifier hs-var">children</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Tree a
 </span><a href="#local-6989586621679093506"><span class="hs-identifier hs-var">root</span></a></span><span>
 </span><span id="line-68"></span><span>
-</span><span id="line-69"></span><span class="hs-comment">{-
-| Retrieves all nodes that are above the given node (second argument) in the given tree (first argument)
+</span><span id="line-69"></span><span class="hs-comment">{- |
+Retrieves all nodes that are above the given node (second argument) in the given tree (first argument)
 (This is the transitive closure of 'parent'.)
 -}</span><span>
 </span><span id="line-73"></span><span id="local-6989586621679093646"><span class="annot"><a href="Tree.html#ancestors"><span class="hs-identifier hs-type">ancestors</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679093646"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Tree.html#Tree"><span class="hs-identifier hs-type">Tree</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093646"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Tree.html#Tree"><span class="hs-identifier hs-type">Tree</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093646"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Tree.html#Tree"><span class="hs-identifier hs-type">Tree</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093646"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span></span><span>
@@ -340,8 +340,8 @@ forall a. (Tree a -&gt; Tree a) -&gt; Tree a -&gt; Tree a
 </span><a href="#local-6989586621679093497"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Tree a]
 </span><a href="#local-6989586621679093495"><span class="hs-identifier hs-var">children</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-81"></span><span>
-</span><span id="line-82"></span><span class="hs-comment">{-
-| Removes all subtrees not meeting the imposed condition.
+</span><span id="line-82"></span><span class="hs-comment">{- |
+Removes all subtrees not meeting the imposed condition.
 The root remains untouched.
 -}</span><span>
 </span><span id="line-86"></span><span id="local-6989586621679093494"><span class="annot"><a href="Tree.html#filterTrees"><span class="hs-identifier hs-type">filterTrees</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Tree.html#Tree"><span class="hs-identifier hs-type">Tree</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093494"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Tree.html#Tree"><span class="hs-identifier hs-type">Tree</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093494"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Tree.html#Tree"><span class="hs-identifier hs-type">Tree</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093494"><span class="hs-identifier hs-type">a</span></a></span></span><span>
@@ -360,8 +360,8 @@ forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
 </span><a href="#local-6989586621679093492"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">[Tree a]
 </span><a href="#local-6989586621679093490"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-88"></span><span>
-</span><span id="line-89"></span><span class="hs-comment">{-
-| Removes all nodes not meeting the imposed condition.
+</span><span id="line-89"></span><span class="hs-comment">{- |
+Removes all nodes not meeting the imposed condition.
 Children of removed nodes are moved up and become children of the parent of the removed node.
 The root remains untouched.
 -}</span><span>

@@ -16,9 +16,9 @@ import ListUtil
 {- |
 This is the default implementation of feature trace recording we propose in the paper.
 For each type of edit, we choose one of the four recording functions from R_ins, R_del, R_mov, and R_up.
-Next to these four functions, we support two more default recording function in this library, r_id and r_trace.
-We use r_id for technical reasones (e.g., folds, printing) and it does nothing.
-We use r_trace to manually change the feature mappings of a set of nodes without changing the source code.
+Next to these four functions, we support two more default recording function in this library, 'r_id' and 'r_trace'.
+We use 'r_id' for technical reasones (e.g., folds, printing) and it does nothing.
+We use 'r_trace' to manually change the feature mappings of a set of nodes without changing the source code.
 -}
 defaultFeatureTraceRecording :: (Grammar g, Show a, Eq a) => FeatureTraceRecording g a
 defaultFeatureTraceRecording typeOfEdit =
