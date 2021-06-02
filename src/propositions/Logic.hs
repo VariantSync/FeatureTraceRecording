@@ -1,45 +1,44 @@
-﻿-- {-# LANGUAGE MultiParamTypeClasses #-}
--- {-# LANGUAGE FlexibleInstances #-}
-
+﻿{-
+Module for the 'Logic' type class.
+-}
 module Logic where
 
+{-
+Type class to reason on logics.
+We use this type class to reason on propositional logic and the ternary logic by Sobocinski we use for feature trace recording.
+-}
 class Logic l where
+    -- | The atomic value representing /true/ in this logic.
     ltrue :: l
+    -- | The atomic value representing /false/ in this logic.
     lfalse :: l
+    -- | A list of all atomic values of this logic. Default implementation comprises 'ltrue' and 'lfalse'.
     lvalues :: [l]
     lvalues = [lfalse, ltrue]
 
+    -- | Negation of a logical formula.
     lnot :: l -> l
     lnot q = limplies q lfalse
+    -- | Conjunction of a list of logical formulas.
     land :: [l] -> l
     land = lnot.lor.map lnot
+    -- | Disjunction of a list of logical formulas.
     lor :: [l] -> l
     -- lor p q = limplies (limplies p q) q
     lor = lnot.land.map lnot
+    -- | Implication between two logical formulas.
+    -- The first argument @p@ is one the left side of the implication and the second argument 'q' is on the right (i.e., @p => q@).
     limplies :: l -> l -> l
     limplies p q = lor [lnot p, q]
+    -- | Equivalence between two logical formulas.
     lequals :: l -> l -> l
     lequals p q = land [limplies p q, limplies q p]
 
+    {- |
+    Evaluates a logical formula.
+    Arguments are
+    * a function assigning variables to values
+    * a formula to evaluate
+    This function should return an element of 'lvalues'.
+    -}
     leval :: (l -> l) -> l -> l
-
--- class Logic symbol value where
---     ltrue :: value
---     lfalse :: value
---     lvalues :: [value]
---     lvalues = [lfalse, ltrue]
-
---     lnot :: symbol -> symbol
---     lnot q = limplies q lfalse
---     land :: [symbol] -> symbol
---     land = lnot.lor.map lnot
---     lor :: [symbol] -> symbol
---     -- lor p q = limplies (limplies p q) q
---     lor = lnot.land.map lnot
---     limplies :: symbol -> symbol -> symbol
---     limplies p q = lor [lnot p, q]
---     lequals :: symbol -> symbol -> symbol
---     lequals p q = land [limplies p q, limplies q p]
-
---     leval :: (symbol -> value) -> symbol -> value
-
