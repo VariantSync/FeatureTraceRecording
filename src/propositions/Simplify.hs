@@ -14,10 +14,12 @@ import Data.List
 
 {- |
 This is a naive implementation for presence condition simplification as described in
-@A. von Rhein, A. Grebhahn, S. Apel, N. Siegmund, D. Beyer, and T. Berger.@
-@Presence-Condition Simplification in Highly Configurable Systems.@
-@In Proceedings of the IEEE/ACM International Conference on Software Engineering (ICSE), pages 178–188.@
-@IEEE Computer Society, May 2015.@
+@
+    A. von Rhein, A. Grebhahn, S. Apel, N. Siegmund, D. Beyer, and T. Berger.
+    Presence-Condition Simplification in Highly Configurable Systems.
+    In Proceedings of the IEEE/ACM International Conference on Software Engineering (ICSE), pages 178–188.
+    IEEE Computer Society, May 2015.
+@
 This function simplifies a propositional formula (second argument) within the context of another propositional formula (first argument).
 Assuming, that the first given formula is always satisfied (i.e., it is an axiom) this function simplifies the second formula.
 For example, in pseudo-code @removeRedundancy (A) (A and B) == B@ as @A@ is redundant in the second formula if its already satisfied in the first formula.

@@ -37,8 +37,8 @@ class Logic l where
     {- |
     Evaluates a logical formula.
     Arguments are
-    * a function assigning variables to values
-    * a formula to evaluate
+    (1) a function assigning variables to values
+    (2) a formula to evaluate
     This function should return an element of 'lvalues'.
     -}
     leval :: (l -> l) -> l -> l

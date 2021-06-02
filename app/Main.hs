@@ -115,7 +115,7 @@ Additionally, you might want to look at the truthtable of the ternary logic by S
 -}
 main :: IO ()
 main =
-    {- |
+    {-
     Select your OutputFormat here.
     Above, there is a list of presets you can choose from.
     -}
@@ -204,7 +204,7 @@ printASTWithTrace format featureColourPalette tree trace =
             ShowAST -> (case tracestyle of
                 None -> pretty.show
                 Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace n) $ show n)
-                Text -> pretty.(FeatureTrace.prettyPrint).(augmentWithTrace trace)) tree
+                Text -> pretty.(FeatureTrace.prettyPrint trace)) tree
             ShowTikz -> pretty $ astToTikzWithTraceDefault (trace, tree)
             ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
 
