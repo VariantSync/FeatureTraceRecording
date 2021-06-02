@@ -1,4 +1,8 @@
-﻿module StackPopAlice where
+﻿{- |
+Module for reproducing our motivating 'example' where Alice edits the @pop@ method of a class @Stack@ in Java.
+The example is described in detail in Section 2.1 of the paper and shown in Figure 1.
+-}
+module StackPopAlice where
 
 import Control.Monad.State ( State )
 import UUID ( UUID )
@@ -16,20 +20,18 @@ import Data.Maybe ( fromJust )
 
 import Example
 
--- feature_Stack :: Feature
--- feature_Stack = toFeature "Stack"
+-- | Feature @SafeStack@ from the paper.
 feature_SafeStack :: Feature
 feature_SafeStack = toFeature "SafeStack"
+
+-- | Feature @ImmutableStack@ from the paper.
 feature_ImmutableStack :: Feature
 feature_ImmutableStack = toFeature "ImmutableStack"
 
--- featureColourPalette :: MonadColorPrinter m => Feature -> Color m
--- featureColourPalette feature 
---     -- | feature == feature_Stack = yellow
---     | feature == feature_SafeStack = green
---     | feature == feature_ImmutableStack = yellow
---     | otherwise = red
-
+{- |
+Colours for features and feature formulas used in this example.
+We chose terminal colours as close the the colours used in the paper as possible.
+-}
 featurecolours :: MonadColorPrinter m => FeatureFormulaColourPalette m
 featurecolours p
     | p == (Just $ PNot $ PVariable $ feature_ImmutableStack) = magenta
@@ -37,27 +39,48 @@ featurecolours p
     | p == (Just $ PVariable $ feature_ImmutableStack) = yellow
     | otherwise = white
 
+-- | Initial 'AST' of the pop method (version (1)).
 startTree :: State UUID SSJavaAST
 startTree = sequence $
     sjava_methoddef "void" "pop" [] [
         sjava_exprstatement $ sjava_assignment (sjava_varref "storage[head--]") "=" (sjava_literal "null")
     ]
 
+{- |
+'AST' representing the condition checking for an empty stack.
+@if (!empty()) { }@
+-}
 condTree :: State UUID SSJavaAST
 condTree = sequence $ sjava_condition (sjava_unaryop "!" $ sjava_funccall "empty" []) []
 
+{- | 'AST' of the first line of code that was inserted in version (5) to implement feature ImmutableStack.
+@Stack<T> c = clone();@
+-}
 cloneDef :: State UUID SSJavaAST
 cloneDef = sequence $ sjava_exprstatement $ sjava_assignment (sjava_vardecl "Stack<T>" "c") "=" (sjava_funccall "clone" [])
 
+{- | 'AST' of the second line of code that was inserted in version (5) to implement feature ImmutableStack.
+@c.storage[c.head--] = null;@
+-}
 cloneStorage :: State UUID SSJavaAST
 cloneStorage = sequence $ sjava_exprstatement $ sjava_assignment (sjava_varref "c.storage[c.head--]") "=" (sjava_literal "null")
 
+{- | 'AST' of the third line of code that was inserted in version (5) to implement feature ImmutableStack.
+@return c;@
+-}
 cloneRetStatement :: State UUID SSJavaAST
 cloneRetStatement = sequence $ sjava_return $ sjava_varref "c"
 
+{- | New return type of the pop method in version (6).
+@Stack<T>@
+-}
 newReturnType :: String
 newReturnType = "Stack<T>"
 
+{-
+Example replaying our motivating example shown in Figure 1 and described in Section 2.1 in our paper.
+Alice works on the @pop@ method of a Java class @Stack@.
+-}
 example :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 example =
     do
