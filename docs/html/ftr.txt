@@ -3,8 +3,20 @@
 
 @package ftr
 
+
+-- | Module for type class <a>Defunctor</a> and some instances for Prelude
+--   types.
 module Defunctor
+
+-- | A <a>Defunctor</a> is a type that allows de-lifting functions from
+--   embellished types to functions on the types that are embellished. This
+--   can be seen sort of an inverse of a functor that is not always
+--   possible to construct.
 class Defunctor f
+
+-- | Inverse of fmap. Takes a function on embellished values (e.g., a
+--   functor or monad) and turns it into a plain function on values. This
+--   inversion is usually impossible or only a partial function.
 demap :: Defunctor f => (f a -> f b) -> a -> b
 instance Defunctor.Defunctor GHC.Maybe.Maybe
 instance Defunctor.Defunctor []
@@ -63,17 +75,44 @@ removeDuplicates :: Eq a => [a] -> [a]
 
 module Logic
 class Logic l
+
+-- | The atomic value representing <i>true</i> in this logic.
 ltrue :: Logic l => l
+
+-- | The atomic value representing <i>false</i> in this logic.
 lfalse :: Logic l => l
+
+-- | A list of all atomic values of this logic. Default implementation
+--   comprises <a>ltrue</a> and <a>lfalse</a>.
 lvalues :: Logic l => [l]
+
+-- | Negation of a logical formula.
 lnot :: Logic l => l -> l
+
+-- | Conjunction of a list of logical formulas.
 land :: Logic l => [l] -> l
+
+-- | Disjunction of a list of logical formulas.
 lor :: Logic l => [l] -> l
+
+-- | Implication between two logical formulas. The first argument
+--   <tt>p</tt> is one the left side of the implication and the second
+--   argument <tt>q</tt> is on the right (i.e., <tt>p =&gt; q</tt>).
 limplies :: Logic l => l -> l -> l
+
+-- | Equivalence between two logical formulas.
 lequals :: Logic l => l -> l -> l
+
+-- | Evaluates a logical formula. Arguments are (1) a function assigning
+--   variables to values (2) a formula to evaluate This function should
+--   return an element of <a>lvalues</a>.
 leval :: Logic l => (l -> l) -> l -> l
 
+
+-- | Definition and operations of propositional logic.
 module Propositions
+
+-- | Sum type similar to a grammar for building propositional formulas.
 data PropositionalFormula a
 PTrue :: PropositionalFormula a
 PFalse :: PropositionalFormula a
@@ -81,61 +120,187 @@ PVariable :: a -> PropositionalFormula a
 PNot :: PropositionalFormula a -> PropositionalFormula a
 PAnd :: [PropositionalFormula a] -> PropositionalFormula a
 POr :: [PropositionalFormula a] -> PropositionalFormula a
+
+-- | An assignment for propositional formulas, assigns variables to boolean
+--   values.
 type Assignment a = a -> Bool
+
+-- | Evaluates a propositional formula with the given variable assignment.
 eval :: Assignment a -> PropositionalFormula a -> Bool
+
+-- | Converts boolean values to their respective symbols in our definition
+--   of propositional logic.
 liftBool :: Bool -> PropositionalFormula a
+
+-- | Returns <i>true</i> iff the given propositional formula is the value
+--   <a>PTrue</a>.
 isPTrue :: PropositionalFormula a -> Bool
+
+-- | Returns <i>true</i> iff the given propositional formula is the value
+--   <a>PFalse</a>.
 isPFalse :: PropositionalFormula a -> Bool
+
+-- | Returns <i>true</i> iff the given propositional formula is a literal.
 isLiteral :: PropositionalFormula a -> Bool
+
+-- | Returns <i>true</i> iff the given propositional formula is in
+--   conjunctive normal form.
 isCNF :: PropositionalFormula a -> Bool
+
+-- | Converts the given propositional formula to conjunctive normal form.
 toCNF :: PropositionalFormula a -> PropositionalFormula a
+
+-- | Converts the given propositional formula to conjunctive normal form if
+--   it is not already in that form.
 lazyToCNF :: PropositionalFormula a -> PropositionalFormula a
+
+-- | Converts a <a>PropositionalFormula</a> in conjunctive normal form to a
+--   list of its clauses. The original formula can be reconstructed with
+--   PAnd (toClauseList x). Assumes that the given formula is in CNF.
 toCNFClauseList :: PropositionalFormula a -> [PropositionalFormula a]
+
+-- | Converts a <a>PropositionalFormula</a> in disjunctive normal form to a
+--   list of its clauses. Assumes that the given formula is in DNF.
 toDNFClauseList :: PropositionalFormula a -> [PropositionalFormula a]
+
+-- | Converts a <a>PropositionalFormula</a> to negation normal form.
 toNNF :: PropositionalFormula a -> PropositionalFormula a
+
+-- | Returns a list of disjunctions such that all possible combinations of
+--   the formulas in the input lists are considered. Like the cartesian
+--   product but instead of pairs (x, y) we produce POr [x, y].
 cartesianOr :: [PropositionalFormula a] -> [PropositionalFormula a] -> [PropositionalFormula a]
+
+-- | Simplifies the given <a>PropositionalFormula</a> with some basic rules
+--   (e.g., <tt>PNot PTrue -&gt; PFalse</tt>).
 simplify :: PropositionalFormula a -> PropositionalFormula a
+
+-- | Transforms a <a>PropositionalFormula</a> in CNF to a list of its
+--   clauses. Assumes that the given formula is in CNF. * The first
+--   argument is a functions resolving negation, i.e. it should take an
+--   <tt>a</tt> and give its negated version. * The second argument is a
+--   function creating the value of type <tt>a</tt> that should be
+--   associated with <i>false</i> (<a>PFalse</a>). For example, <tt>0</tt>
+--   could represent <i>false</i> in propositional formulas over numerals.
+--   (Note, if no such value exists, the <i>false</i> function is free to
+--   produce an error.) * The third argument is the function in CNF that
+--   should be clausified. If still confused, try the following call and
+--   look at the result: <tt> show $ clausifyCNF (x -&gt; "not "++x)
+--   "false" (toCNF p)</tt> where <tt>p</tt> is a propositional formula
+--   over strings.
 clausifyCNF :: Show a => (a -> a) -> (() -> a) -> PropositionalFormula a -> [[a]]
 instance GHC.Classes.Eq a => GHC.Classes.Eq (Propositions.PropositionalFormula a)
 instance Logic.Logic (Propositions.PropositionalFormula a)
 instance GHC.Base.Functor Propositions.PropositionalFormula
 instance GHC.Show.Show a => GHC.Show.Show (Propositions.PropositionalFormula a)
 
+
+-- | Definition and operations on the ternary logic with <i>null</i>. In
+--   the paper, we call formulas of this logic <i>nullable propositional
+--   formulas</i>. Reuses <a>PropositionalFormula</a>s.
 module NullPropositions
+
+-- | Data type for the ternary logic by Sobocinski. The <a>Nothing</a> case
+--   represents <i>null</i> as used in our paper.
 type NullableFormula a = Maybe (PropositionalFormula a)
+
+-- | Returns <tt>true</tt> iff the given formula is the value <i>null</i>.
 isnull :: NullableFormula a -> Bool
+
+-- | Returns <tt>false</tt> iff the given formula is the value <i>null</i>.
 notnull :: NullableFormula a -> Bool
+
+-- | Converts the given nullable formula to a propositional formula,
+--   assuming that the given formula is not <i>null</i>. Crashes otherwise.
 assure :: NullableFormula a -> PropositionalFormula a
+
+-- | Simplifies the given formula. Uses <a>simplify</a>.
 nullable_simplify :: NullableFormula a -> NullableFormula a
+
+-- | Pretty Printing for nullable objects such as the nullable
+--   propositional logic.
 prettyPrint :: Show a => Maybe a -> String
 instance Logic.Logic a => Logic.Logic (GHC.Maybe.Maybe a)
 
 module Feature
+
+-- | Features are represented by a unique name.
 type Feature = String
+
+-- | Construct a feature from a name.
 toFeature :: String -> Feature
+
+-- | <a>PropositionalFormula</a> over <a>Feature</a>s
 type NonNullFeatureFormula = PropositionalFormula Feature
+
+-- | Nullable <a>PropositionalFormula</a> over <a>Feature</a>s
 type FeatureFormula = NullableFormula Feature
 
+
+-- | Module for colouring features and feature formulas. We use this
+--   colouring for visualizing features when printing to terminal.
 module FeatureColour
+
+-- | A <a>ColourPalette</a> assigns values of type <tt>a</tt> to
+--   <a>Color</a>s.
 type ColourPalette a m = a -> Color m
+
+-- | A <a>FeatureColourPalette</a> is a <a>ColourPalette</a> for
+--   <a>Feature</a>s.
 type FeatureColourPalette m = ColourPalette Feature m
-type FeatureFormulaColourPalette m = FeatureFormula -> Color m
+
+-- | A <a>FeatureFormulaColourPalette</a> is a <a>ColourPalette</a> for
+--   <a>FeatureFormula</a>s.
+type FeatureFormulaColourPalette m = ColourPalette FeatureFormula m
+
+-- | Lifts a colour palette over features (<a>FeatureColourPalette</a>) to
+--   a palette over formulas (<a>FeatureFormulaColourPalette</a>).
 defaultFeatureFormulaColouring :: MonadColorPrinter m => FeatureColourPalette m -> FeatureFormulaColourPalette m
 
+
+-- | Generation of truth tables for <a>Logic</a>s.
 module Truthtable
+
+-- | For a unary operator and a set of values, produces all results when
+--   applying that operator to that set of values.
 unarytable :: Logic a => (a -> a) -> [a] -> [a]
+
+-- | Builds the cartesions product of two lists.
 cartesian :: [a] -> [b] -> [(a, b)]
+
+-- | For a binary operator and a set of values, produces all results when
+--   applying that operator to all combinations of values.
 binarytable :: Logic a => (a -> a -> a) -> [a] -> [a]
+
+-- | Creates a function of two arguments by reusing a function on lists.
 binarify :: ([a] -> b) -> a -> a -> b
+
+-- | Appends spaces to the given string until it has length <tt>i</tt>
+--   (first argument).
 hfillto :: Int -> String -> String
+
+-- | Default value for width of lines when printing truth tables.
 defaultlinewidth :: Int
+
+-- | <a>hfillto</a> with <a>defaultlinewidth</a>
 defaulthfillto :: String -> String
+
+-- | For a list of values and a unary operator, generates a truth table
+--   with the given name.
 prettyunarytable :: (Logic a, Show a) => [a] -> (a -> a) -> String -> String
+
+-- | For a list of values and a binary operator, generates a truth table
+--   with the given name.
 prettybinarytable :: (Logic a, Show a) => [a] -> (a -> a -> a) -> String -> String
+
+-- | Generates a truthtable for all common operators of a logic (not, and,
+--   or, implies, equals) for the given set of values.
 generatetruthtablesfor :: (Logic a, Show a) => [a] -> String
 
 
--- | Module representing universable unique identifiers (UUID).
+-- | Module representing universable unique identifiers (UUID). We use
+--   these to identify nodes in abstract syntax trees (<tt>AST</tt>) and
+--   track them across versions.
 module UUID
 
 -- | A universable unique identifiers (UUID) realised as an integer.
@@ -311,33 +476,99 @@ instance GHC.Base.Functor (AST.Node g)
 instance (Grammar.Grammar g, GHC.Show.Show a) => GHC.Show.Show (AST.Node g a)
 
 module SAT
+
+-- | Returns <i>true</i> iff the given propositional formula is
+--   satisfiable.
 sat :: (Show a, Ord a) => PropositionalFormula a -> Bool
+
+-- | Returns a satisfying assignment <tt>Just a</tt> for the given
+--   propositional formula iff the formula is satisfiable. Returns
+--   <tt>Nothing</tt> otherwise.
 satAssignment :: (Show a, Ord a) => PropositionalFormula a -> Maybe (Assignment a)
+
+-- | Returns <tt>Nothing</tt> iff the given formula is a tautology.
+--   Otherwise, returns a counterexample (i.e., an assignment under which
+--   the given formula evaluates to <i>false</i>).
 tautCounterExample :: (Show a, Ord a) => PropositionalFormula a -> Maybe (Assignment a)
+
+-- | Returns <i>true</i> iff the given propositional formula is a
+--   tautology.
 taut :: (Show a, Ord a) => PropositionalFormula a -> Bool
+
+-- | Returns <i>true</i> iff the given formula is not satisfiable (i.e.,
+--   there is no assignment making it true).
 contradicts :: (Show a, Ord a) => PropositionalFormula a -> Bool
+
+-- | Converts the given formula to a list of clauses (first argument). Each
+--   clause is represented as a list of literals where literals are
+--   represented as integers. Negative literals indicate negation of
+--   variables. For example, the literal <tt>-3</tt> translates to <tt>PNot
+--   x</tt>, where <tt>x</tt> is the variable represented by <tt>3</tt>.
+--   The mapping from integers to variables is returned as a bimap in the
+--   second argument.
 toIntCNF :: Ord a => PropositionalFormula a -> ([[Int]], Bimap a Int)
 
+
+-- | Functions for simplification of propositional formulas.
 module Simplify
+
+-- | This is a naive implementation for presence condition simplification
+--   as described in <tt> A. von Rhein, A. Grebhahn, S. Apel, N. Siegmund,
+--   D. Beyer, and T. Berger. Presence-Condition Simplification in Highly
+--   Configurable Systems. In Proceedings of the IEEE/ACM International
+--   Conference on Software Engineering (ICSE), pages 178–188. IEEE
+--   Computer Society, May 2015. </tt> This function simplifies a
+--   propositional formula (second argument) within the context of another
+--   propositional formula (first argument). Assuming, that the first given
+--   formula is always satisfied (i.e., it is an axiom) this function
+--   simplifies the second formula. For example, in pseudo-code
+--   <tt>removeRedundancy (A) (A and B) == B</tt> as <tt>A</tt> is
+--   redundant in the second formula if its already satisfied in the first
+--   formula.
 removeRedundancy :: (Ord a, Show a) => PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
 
-module FeatureTrace
-type FeatureTrace g a = Node g a -> FeatureFormula
-emptyTrace :: FeatureTrace g a
-simplifyFeatureTrace :: (Grammar g, Show a, Eq a) => FeatureTrace g a -> AST g a -> FeatureTrace g a
-simplifyFeatureTraceOfNodes :: (Grammar g, Show a, Eq a) => FeatureTrace g a -> AST g a -> Set (Node g a) -> FeatureTrace g a
-pc :: (Grammar g, Show a, Eq a) => AST g a -> FeatureTrace g a -> Node g a -> FeatureFormula
-pc_parentpart :: (Grammar g, Show a, Eq a) => AST g a -> FeatureTrace g a -> Node g a -> FeatureFormula
-augmentWithTrace :: (Node g a -> FeatureFormula) -> AST g a -> Tree (FeatureFormula, Node g a)
-prettyPrint :: (Grammar g, Show a) => Tree (FeatureFormula, Node g a) -> String
 
-module TikzExport
-astToTikzWithTraceDefault :: (Eq a, Show a, Grammar g) => FeatureTrace g a -> AST g a -> String
-featuresToTikzClass :: FeatureFormula -> String
-astToTikzWithTrace :: (AST g a -> String) -> (AST g a -> Node g a -> FeatureTrace g a -> String) -> FeatureTrace g a -> AST g a -> String
-astToTikz :: (AST g a -> String) -> (AST g a -> String) -> AST g a -> String
-astToTikzRecursive :: Int -> (AST g a -> String) -> (AST g a -> String) -> AST g a -> String
-tikzifyName :: String -> String
+-- | Module for feature traces and presence conditions.
+module FeatureTrace
+
+-- | A feature trace (or feature mapping) assigns a nullable propositional
+--   formula over features to each node in an <a>AST</a>. (See Definition
+--   3.1 in the paper).
+type FeatureTrace g a = Node g a -> FeatureFormula
+
+-- | A feature trace with no information. It assigns <i>null</i>
+--   (<a>Nothing</a>) to each node. This feature trace serves as a possible
+--   starting point for feature trace recording (e.g., when no domain
+--   knowledge was documented in a software project).
+emptyTrace :: FeatureTrace g a
+
+-- | Simplifies a feature trace over a given <a>AST</a>. A feature formula
+--   of a node can be simplified w.r.t. to the feature mappings of all its
+--   ancestors. For example, when the root of a tree is mapped to <i>A</i>,
+--   no descendant has to be mapped to <i>A</i> anymore as they inherit
+--   <i>A</i> in their presence condition (<a>pc</a>).
+simplifyFeatureTrace :: (Grammar g, Show a, Eq a) => FeatureTrace g a -> AST g a -> FeatureTrace g a
+
+-- | Simplifies the feature mappings for all nodes in the given set from
+--   the given AST. The given set is assumed to be a subset of the nodes in
+--   the tree. For further information, see <a>simplifyFeatureTrace</a>.
+simplifyFeatureTraceOfNodes :: (Grammar g, Show a, Eq a) => FeatureTrace g a -> AST g a -> Set (Node g a) -> FeatureTrace g a
+
+-- | Calculates the presence condition of a node (third argument) in the
+--   given tree (first argument) with the given feature traces (second
+--   argument). See Equation 1 in the paper.
+pc :: (Grammar g, Show a, Eq a) => AST g a -> FeatureTrace g a -> Node g a -> FeatureFormula
+
+-- | Calculates the parental part of the presence condition of a node
+--   (third argument) in the given tree (first argument) with the given
+--   feature traces (second argument). Crashes when the given node is not
+--   in the given tree. (This should be more helpful for debugging instead
+--   of just returning Nothing.)
+pc_parentpart :: (Grammar g, Show a, Eq a) => AST g a -> FeatureTrace g a -> Node g a -> FeatureFormula
+
+-- | Pretty print the <a>AST</a> and annotate all nodes with their feature
+--   mappings.
+prettyPrint :: (Grammar g, Show a) => FeatureTrace g a -> AST g a -> String
 
 
 -- | Module for edits to ASTs.
@@ -396,6 +627,12 @@ foldEditScript :: EditScript g a -> AST g a -> AST g a
 -- | The identity of edits. Does nothing and has an empty delta for all
 --   trees.
 edit_identity :: Edit g a
+
+-- | An identity edit that will keep the given set of nodes as delta for
+--   the feature trace recording. Upon recording, all given nodes will have
+--   their feature trace changed to the feature context. This function
+--   assumes that the given set of nodes is a subset of the nodes in the
+--   future edited tree.
 edit_trace_only :: Set (Node g a) -> Edit g a
 
 -- | Inserts a subtree into another tree. The given tree (first argument)
@@ -422,36 +659,153 @@ instance GHC.Show.Show Edits.EditType
 instance GHC.Classes.Eq Edits.EditType
 instance GHC.Show.Show (Edits.Edit g a)
 
+
+-- | Data types and interfaces for feature trace recording.
 module FeatureTraceRecording
+
+-- | The feature context is a nullable propositional formula over features
+--   to tag edits to source code with the feature that was edited.
 type FeatureContext = FeatureFormula
+
+-- | Encapsulates an edit that was made under a given
+--   <a>FeatureContext</a>. This relation might be established upon commit
+--   to version control or via IDE interaction (see Section 4.1 in the
+--   paper).
 type RecordedEdit g a = (Edit g a, FeatureContext)
 type History g a = [RecordedEdit g a]
+
+-- | We denote the state of a software system at any point in time as a
+--   <a>Version</a>. We describe a version by the software artefacts in
+--   terms of an <a>AST</a> and the according <a>FeatureTrace</a>s we have
+--   at that version.
 type Version g a = (FeatureTrace g a, AST g a)
+
+-- | Type of recording functions for individual edit types. In the paper,
+--   these edits are referred to as R_ins, R_del, R_mov, and R_up. Instead
+--   of passing the delta, we give the entire edit as input to the function
+--   from which the delta can be calculated.
 type RecordingFunction g a = RecordedEdit g a -> Version g a -> FeatureTrace g a
+
+-- | Abstraction over Algorithm 1 in the paper. For different use cases and
+--   to prevent future errors, feature trace recording is configurable. In
+--   a framework-like manner, it gives us an implementation for a recording
+--   function identified by edit typs.
 type FeatureTraceRecording g a = EditType -> RecordingFunction g a
+
+-- | Runs the given <a>FeatureTraceRecording</a> implementation starting at
+--   the given <a>Version</a>. All edits in the given <a>History</a> will
+--   be applied to the given version yielding the new version after that
+--   history.
 runFTR :: (Show a, Eq a) => FeatureTraceRecording g a -> Version g a -> History g a -> Version g a
+
+-- | Similar to <a>runFTR</a> but also returns all intermediate results.
 runFTRWithIntermediateSteps :: (Show a, Eq a) => FeatureTraceRecording g a -> Version g a -> History g a -> [Version g a]
 
-module DefaultFeatureTraceRecording
-defaultFeatureTraceRecording :: (Grammar g, Show a, Eq a) => FeatureTraceRecording g a
-nullifyMandatory :: Grammar g => RecordingFunction g a -> RecordingFunction g a
-removeTheRedundanciesWeIntroduced :: (Grammar g, Eq a, Show a) => RecordingFunction g a -> RecordingFunction g a
-ftr_id :: RecordingFunction g a
-ftr_trace :: Eq a => RecordingFunction g a
-ftr_ins :: (Show a, Eq a) => RecordingFunction g a
-ftr_del :: (Grammar g, Eq a, Show a) => RecordingFunction g a
-ftr_move :: (Show a, Eq a) => RecordingFunction g a
-ftr_up :: (Eq a, Show a) => RecordingFunction g a
 
+-- | Facilities for exporting <a>AST</a>s to Tikz code as a String. We use
+--   this export to generate the <a>AST</a> figure in the paper (Figure 5).
+module TikzExport
+
+-- | Default implementation to export an AST with feature traces. The
+--   returned String is the tikz code that can be copied to a tex document.
+astToTikzWithTraceDefault :: (Eq a, Show a, Grammar g) => Version g a -> String
+featuresToTikzClass :: FeatureFormula -> String
+astToTikzWithTrace :: (AST g a -> String) -> (AST g a -> Node g a -> FeatureTrace g a -> String) -> Version g a -> String
+astToTikz :: (AST g a -> String) -> (AST g a -> String) -> AST g a -> String
+astToTikzRecursive :: Int -> (AST g a -> String) -> (AST g a -> String) -> AST g a -> String
+
+-- | Converts a string to a valid string inside tikz (e.g., escaping
+--   certaing characters such as <tt>_</tt>).
+tikzifyName :: String -> String
+
+
+-- | Implementation of feature trace recording as proposed in the paper
+--   (Section 4.2).
+module DefaultFeatureTraceRecording
+
+-- | This is the default implementation of feature trace recording we
+--   propose in the paper. For each type of edit, we choose one of the four
+--   recording functions from R_ins, R_del, R_mov, and R_up. Next to these
+--   four functions, we support two more default recording function in this
+--   library, r_id and r_trace. We use r_id for technical reasones (e.g.,
+--   folds, printing) and it does nothing. We use r_trace to manually
+--   change the feature mappings of a set of nodes without changing the
+--   source code.
+defaultFeatureTraceRecording :: (Grammar g, Show a, Eq a) => FeatureTraceRecording g a
+
+-- | Sets the feature mapping of all mandatory AST nodes to <i>null</i>.
+nullifyMandatory :: Grammar g => RecordingFunction g a -> RecordingFunction g a
+
+-- | This simplifies feature traces with respect to presence conditions.
+--   See <a>simplifyFeatureTrace</a> and <a>removeRedundancy</a> for
+--   further information.
+removeTheRedundanciesWeIntroduced :: (Grammar g, Eq a, Show a) => RecordingFunction g a -> RecordingFunction g a
+
+-- | Feature trace recording for identity edit: When nothing is changed,
+--   nothing has to be recorded.
+r_id :: RecordingFunction g a
+
+-- | Feature trace recording on an identity edit with non-empty delta. This
+--   function allows changing feature traces manually (i.e., without actual
+--   source code changes). Have a look at <a>edit_trace_only</a> for
+--   further information.
+r_trace :: Eq a => RecordingFunction g a
+
+-- | Equation 2 in the paper: R_ins records feature traces upon insertions.
+r_ins :: (Show a, Eq a) => RecordingFunction g a
+
+-- | Equation 2 in the paper: R_del records feature traces upon deletions.
+r_del :: (Grammar g, Eq a, Show a) => RecordingFunction g a
+
+-- | Equation 3 in the paper: R_move records feature traces upon moves.
+r_move :: (Show a, Eq a) => RecordingFunction g a
+
+-- | Equation 5 in the paper: R_up records feature traces upon updates.
+r_up :: (Eq a, Show a) => RecordingFunction g a
+
+
+-- | Module for creating demos of feature trace recording.
 module Example
+
+-- | An <a>Example</a> represents a single demo showcase of feature trace
+--   recording. * <tt>m</tt> Monad defining colours which is used for
+--   printing an examples output. * <tt>g</tt> Grammar of the example
+--   (e.g., if the examples shows the development of Java or C++ or Haskell
+--   source code). * <tt>a</tt> Value type of the artefacts in the
+--   <a>AST</a>s (e.g., <tt>String</tt>).
 data Example m g a
 Example :: String -> Version g a -> History g a -> FeatureFormulaColourPalette m -> Example m g a
+
+-- | The name of the example to identify it.
 [name] :: Example m g a -> String
+
+-- | The version of the source code (as <a>AST</a>) and
+--   <a>FeatureTrace</a>s when the recording is started.
 [startVersion] :: Example m g a -> Version g a
+
+-- | The history of edits upon which to record feature traces when applied
+--   to <a>startVersion</a>.
 [history] :: Example m g a -> History g a
+
+-- | A colour scheme for displaying features and feature formula.
 [colours] :: Example m g a -> FeatureFormulaColourPalette m
+
+-- | Runs and example with the given <a>FeatureTraceRecording</a>
+--   implementation, yielding a list of all intermediate versions. The last
+--   element in the returned list is the <a>AST</a> and
+--   <a>FeatureTrace</a>s to which the <a>startVersion</a> was changed when
+--   aplying all edits in <a>history</a> of the <a>Example</a>.
 runExample :: (Grammar g, Show a, Eq a) => FeatureTraceRecording g a -> Example m g a -> [Version g a]
+
+-- | Runs the given example with the default implementation of
+--   <a>FeatureTraceRecording</a> (<a>defaultFeatureTraceRecording</a>). Is
+--   equivalent to <tt>runExample defaultFeatureTraceRecording</tt>.
 runExampleWithDefaultFTR :: (Grammar g, Show a, Eq a) => Example m g a -> [Version g a]
+
+-- | Evaluates all <a>UUID</a>s in the example, starting with <tt>0</tt>.
+--   Use this after building an <a>AST</a> whose <tt>Node</tt>s yet have to
+--   be assigned <a>UUID</a>s.
+finalizeExample :: State UUID (Example m g a) -> Example m g a
 
 
 -- | Module for pretty printing of ASTs.
@@ -622,68 +976,240 @@ instance GHC.Classes.Eq SimpleJava.SimpleJavaGrammar
 instance Grammar.Grammar SimpleJava.SimpleJavaGrammar
 instance ASTPrettyPrinter.ASTPrettyPrinter SimpleJava.SimpleJavaGrammar
 
+
+-- | Module for reproducing our motivating <a>example</a> where Alice edits
+--   the <tt>pop</tt> method of a class <tt>Stack</tt> in Java. The example
+--   is described in detail in Section 2.1 of the paper and shown in Figure
+--   1.
 module StackPopAlice
+
+-- | Feature <tt>SafeStack</tt> from the paper.
 feature_SafeStack :: Feature
+
+-- | Feature <tt>ImmutableStack</tt> from the paper.
 feature_ImmutableStack :: Feature
+
+-- | Colours for features and feature formulas used in this example. We
+--   chose terminal colours as close the the colours used in the paper as
+--   possible.
 featurecolours :: MonadColorPrinter m => FeatureFormulaColourPalette m
+
+-- | Initial <a>AST</a> of the pop method (version (1)).
 startTree :: State UUID SSJavaAST
+
+-- | <a>AST</a> representing the condition checking for an empty stack.
+--   <tt>if (!empty()) { }</tt>
 condTree :: State UUID SSJavaAST
+
+-- | <a>AST</a> of the first line of code that was inserted in version (5)
+--   to implement feature ImmutableStack. <tt>Stack<a>T</a> c =
+--   clone();</tt>
 cloneDef :: State UUID SSJavaAST
+
+-- | <a>AST</a> of the second line of code that was inserted in version (5)
+--   to implement feature ImmutableStack. <tt>c.storage[c.head--] =
+--   null;</tt>
 cloneStorage :: State UUID SSJavaAST
+
+-- | <a>AST</a> of the third line of code that was inserted in version (5)
+--   to implement feature ImmutableStack. <tt>return c;</tt>
 cloneRetStatement :: State UUID SSJavaAST
+
+-- | New return type of the pop method in version (6).
+--   <tt>Stack<a>T</a></tt>
 newReturnType :: String
 example :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
 
+
+-- | Module for reproducing Bob's part of our motivating <a>example</a>.
+--   Bob propagates applicable edits by Alice to his variant. The example
+--   is described in detail in Section 2.2 of the paper and shown in Figure
+--   3.
 module StackPopBob
+
+-- | Colours for features and feature formulas used in this example. We
+--   chose terminal colours as close the the colours used in the paper as
+--   possible.
 featureColourPalette :: MonadColorPrinter m => FeatureFormulaColourPalette m -> FeatureFormulaColourPalette m
+
+-- | Example replaying our Bob's part of our motivating example shown in
+--   Figure 3 and described in Section 2.2 in our paper. Bob propagates
+--   Alice's changes on the <tt>pop</tt> method to his variant. This
+--   example directly reuses the first two edits of Alice and appends an
+--   artifical noop edit (<a>edit_trace_only</a>) to update the feature
+--   mappings that were recorded upon Alice's edits that were not
+--   applicable to Bob's variant but induced further feature mappings.
 example :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
 
+
+-- | This module provides <a>Example</a>s to reproduce each edit pattern we
+--   inspected in the evaluation of feature trace recording (Section 5 in
+--   our paper). As each pattern describes a possible <i>type</i> of edit
+--   and not an edit itself, each example shows one possible instance for a
+--   pattern (not the pattern itself as this is not possible). For some
+--   patterns, we thus /have to) show multiple examples as described in the
+--   paper. Most notably, distinguishing between the case when no feature
+--   traces are present (<i>in general</i> case) and the case when an
+--   optional outer scope of the edit code fragment is already mapped to
+--   the target feature mapping.
 module EditPatterns
-feature_ULTRA_LCD :: Feature
+
+-- | A dummy feature that is edited in each example. We name it <tt>m</tt>
+--   (mapping) here according to the variable used in the paper.
+feature_m :: Feature
+
+-- | Another dummy feature that can be edited.
 feature_FOO :: Feature
+
+-- | Name for the <a>AST</a> root of each example instance. We use file
+--   nodes to represent the roots of the <a>AST</a>s.
 rootName :: String
+
+-- | Describe the feature mapping of a node with the given name as text.
 buildPCName :: String -> FeatureFormula -> String
+
+-- | Colours for features and feature formulas used in the pattern
+--   examples.
 featurecolours :: MonadColorPrinter m => FeatureFormulaColourPalette m
+
+-- | <a>AST</a> representing an empty file.
 emptyfile :: State UUID SSJavaAST
-lcd_setstatusalertpgm :: State UUID SSJavaAST
-alertstatuspgm :: State UUID SSJavaAST
+
+-- | <a>AST</a> representing the source code in the <i>then</i> branch of a
+--   preprocessor annotation.
+code_then :: State UUID SSJavaAST
+
+-- | <a>AST</a> representing the source code in the <i>else</i> branch of a
+--   preprocessor annotation.
+code_else :: State UUID SSJavaAST
+
+-- | <a>AST</a> representing a method 'void foo()'.
 somefunction :: State UUID SSJavaAST
+
+-- | Create an <a>Example</a> for a specific pattern. Calls
+--   <a>createPatternExampleWithStartTrace</a> and defaults its first
+--   argument to an empty feature trace that assigns <i>null</i> to every
+--   node (<a>emptyTrace</a>).
 createPatternExample :: MonadColorPrinter m => String -> SSJavaAST -> History SimpleJavaGrammar String -> Example m SimpleJavaGrammar String
 createPatternExampleWithStartTrace :: MonadColorPrinter m => FeatureTrace SimpleJavaGrammar String -> String -> SSJavaAST -> History SimpleJavaGrammar String -> Example m SimpleJavaGrammar String
+
+-- | <a>Example</a> instance of the <i>AddIfdef</i> pattern in general
+--   case.
 addIfdef :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>AddIfdef</i> pattern when an outer
+--   optional scope is already mapped to the target feature mapping.
 addIfdefWithPC :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>AddIfdefElse</i> pattern in general
+--   case. As <i>AddIfdefElse</i> has to be reproduced using two variants,
+--   we need two different examples here, one for the <i>then</i>-branch
+--   and one for the <i>else</i>-branch. This is the <a>Example</a> of the
+--   <i>then</i> branch.
 addIfdefElse_IfBranch :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>AddIfdefElse</i> pattern when an
+--   outer optional scope is already mapped to the target feature mapping.
+--   As <i>AddIfdefElse</i> has to be reproduced using two variants, we
+--   need two different examples here, one for the <i>then</i>-branch and
+--   one for the <i>else</i>-branch. This is the <a>Example</a> of the
+--   <i>then</i> branch.
 addIfdefElse_IfBranchWithPC :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>AddIfdefElse</i> pattern in general
+--   case. As <i>AddIfdefElse</i> has to be reproduced using two variants,
+--   we need two different examples here, one for the <i>then</i>-branch
+--   and one for the <i>else</i>-branch. This is the <a>Example</a> of the
+--   <i>else</i> branch.
 addIfdefElse_ElseBranch :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>AddIfdefElse</i> pattern when an
+--   outer optional scope is already mapped to the target feature mapping.
+--   As <i>AddIfdefElse</i> has to be reproduced using two variants, we
+--   need two different examples here, one for the <i>then</i>-branch and
+--   one for the <i>else</i>-branch. This is the <a>Example</a> of the
+--   <i>else</i> branch.
 addIfdefElse_ElseBranchWithPC :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>AddIfdefWrapElse</i> pattern.
 addIfdefWrapElse :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>AddIfdefWrapThen</i> pattern.
 addIfdefWrapThen :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>AddNormalCode</i> pattern where
+--   non-variational code is added (code mapped to <i>true</i>).
 addNormalCode_nonvariational :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>AddNormalCode</i> pattern when an
+--   outer optional scope is already mapped to the target feature mapping.
 addNormalCode_outerpc :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>RemNormalCode</i> pattern when no
+--   feature traces are present initially.
 remNormalCode_null :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>RemNormalCode</i> pattern when
+--   feature traces are present initally.
 remNormalCode_notnull :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
+
+-- | <a>Example</a> instance of the <i>RemIfdef</i> pattern. This behaves
+--   the same as <a>remNormalCode_notnull</a>.
 remIfdef :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
 
 module Main
+
+-- | Style defining how to print <a>AST</a>s.
 data CodePrintStyle
+
+-- | Prints the <a>AST</a> by showing each <a>Node</a> in the hierarchy in
+--   an XML-like format.
 ShowAST :: CodePrintStyle
+
+-- | Prints the <a>AST</a> as the actual source code that it represents.
 ShowCode :: CodePrintStyle
+
+-- | Print the <a>AST</a> as tikz code to use for our paper.
 ShowTikz :: CodePrintStyle
+
+-- | Format defining whether to <a>FeatureTrace</a>s or presence conditions
+--   (<a>pc</a>).
 data TraceDisplay
+
+-- | Show the feature mapping of each node (i.e., the formula a node is
+--   directly annotated with).
 Trace :: TraceDisplay
+
+-- | Show the presence condition of each node (i.e., the conjunction of its
+--   feature mapping with all feature mappings inherited from ancestors).
 PC :: TraceDisplay
+
+-- | Style defining how to print <a>FeatureTrace</a>s.
 data TraceStyle
+
+-- | Show feature mapping formulas as plain text.
 Text :: TraceStyle
+
+-- | Encode features as colours to visualize feature mappings by colouring
+--   source code.
 Colour :: TraceStyle
+
+-- | Do not show feature traces at all.
 None :: TraceStyle
+
+-- | Format in which code and (recorded) feature mappings should be printed
+--   to the terminal.
 data OutputFormat
 OutputFormat :: CodePrintStyle -> TraceDisplay -> TraceStyle -> Bool -> OutputFormat
 [codeStyle] :: OutputFormat -> CodePrintStyle
 [traceDisplay] :: OutputFormat -> TraceDisplay
 [traceStyle] :: OutputFormat -> TraceStyle
+
+-- | Whether there should be vertical lines next to the shown code on the
+--   left that indicate presence condtions.
 [withTraceLines] :: OutputFormat -> Bool
 
--- | The perspective of the developer who is editing code while traces are
+-- | The perspective of the developer, who is editing code while traces are
 --   recorded in the background This is the format used in the figures in
 --   the paper.
 userFormat :: OutputFormat
@@ -694,22 +1220,67 @@ userFormat :: OutputFormat
 --   coloured lines on the left.
 userFormatDetailed :: OutputFormat
 
--- | Shows the Abstract Syntax Tree of the source code with feature traces
---   as formulas.
+-- | Shows the <a>AST</a> of the source code with <a>FeatureTrace</a>s as
+--   formulas.
 astFormat :: OutputFormat
 
--- | Tikz export of AST with traces. Used for figures in the paper.
+-- | Tikz export of <a>AST</a> with <a>FeatureTrace</a>s. Used for figures
+--   in the paper.
 tikzFormat :: OutputFormat
+
+-- | Entry point of the demo. The main method will run and print the output
+--   of all examples (Alice, Bob, and the edit patterns). You can change
+--   the format of the printed source code and feature mappings by changing
+--   the <tt>format</tt> parameter inside <a>main</a>. Additionally, you
+--   might want to look at the truthtable of the ternary logic by
+--   Sobocinski we use (by uncommenting the line <tt>showTruthtables</tt>).
 main :: IO ()
-showExamples :: IO ()
+
+-- | Runs the motivating example from the paper and examples for all edit
+--   patterns with the given <a>OutputFormat</a>. First, runs Alice's
+--   example where she records feature traces upon editing the pop method
+--   of a class Stack in Java (Figure 1 in the paper). Second, shows how
+--   Bob could propagate Alice's edits and recorded feature traces to his
+--   variant as envisioned in future research. Third, shows an instance of
+--   each edit pattern from our evaluation.
+showExamples :: OutputFormat -> IO ()
+
+-- | Turns the given text into a headline in the terminal. We indicate
+--   headlines with a red background.
 headline :: MonadColorPrinter m => String -> m ()
-finalizeExample :: State UUID (Example m g a) -> Example m g a
+
+-- | Runs the given <a>Example</a> in the given <a>OutputFormat</a> step by
+--   step (i.e., showing all intermediate results).
 runStepwise :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g) => OutputFormat -> State UUID (Example m g String) -> m ()
+
+-- | Prints the given <a>AST</a> with the given <a>FeatureTrace</a>s in the
+--   given <a>OutputFormat</a>. If the <a>OutputFormat</a> mandates to
+--   visualize feature mappings as colours (see <a>TraceStyle</a>), the
+--   given <a>FeatureFormulaColourPalette</a> will be used to assign
+--   colours to feature formulas.
 printASTWithTrace :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) => OutputFormat -> FeatureFormulaColourPalette m -> AST g a -> FeatureTrace g a -> Doc (Attribute m)
-printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) => OutputFormat -> Example m g a -> [(FeatureTrace g a, AST g a)] -> Doc (Attribute m)
+
+-- | Prints the given list of versions that were produced from the given
+--   example.
+printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) => OutputFormat -> Example m g a -> [Version g a] -> Doc (Attribute m)
+
+-- | Helper function to show the initial state of the given history in
+--   <a>printTraces</a>. Prepends an identity edit and dummy
+--   <a>FeatureContext</a>. The context could be anything and thus is set
+--   to <a>Nothing</a> (<i>null</i>).
 alsoShowInitialStateInHistory :: History g a -> History g a
+
+-- | Helper function to help with type inference. Returns all atomic values
+--   of a <a>PropositionalFormula</a> (over strings).
 propositional_values :: [PropositionalFormula String]
+
+-- | Helper function to help with type inference. Returns all atomic values
+--   of a <a>NullableFormula</a> (over strings).
 nullableFormula_values :: [NullableFormula String]
+
+-- | Prints truthtables for common operators in
+--   <a>PropositionalFormula</a>s and <tt>NullableFormulas</tt> (not, and,
+--   or, implies, equiv)
 showTruthtables :: IO ()
 instance GHC.Classes.Eq Main.TraceStyle
 instance GHC.Show.Show Main.TraceStyle

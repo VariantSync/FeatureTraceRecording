@@ -1,30 +1,29 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">NullPropositions</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-2"></span><span>
-</span><span id="line-3"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Logic.html"><span class="hs-identifier">Logic</span></a></span><span>
-</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Propositions.html"><span class="hs-identifier">Propositions</span></a></span><span>
-</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Defunctor.html"><span class="hs-identifier">Defunctor</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Defunctor.html#Defunctor"><span class="hs-identifier">Defunctor</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Defunctor.html#demap"><span class="hs-identifier">demap</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">)</span><span>
-</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">catMaybes</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">fromJust</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">isNothing</span></span><span class="hs-special">)</span><span>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{- |
+Definition and operations on the ternary logic with /null/.
+In the paper, we call formulas of this logic /nullable propositional formulas/.
+Reuses 'PropositionalFormula's.
+-}</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">NullPropositions</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-7"></span><span>
-</span><span id="line-8"></span><span class="hs-comment">-- The Nothing case represents null</span><span>
-</span><span id="line-9"></span><span class="hs-keyword">type</span><span> </span><span id="NullableFormula"><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-var">NullableFormula</span></a></span></span><span> </span><span id="local-6989586621679093318"><span class="annot"><a href="#local-6989586621679093318"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Propositions.html#PropositionalFormula"><span class="hs-identifier hs-type">PropositionalFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093318"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-10"></span><span class="hs-comment">-- data NullableFormula a = </span><span>
-</span><span id="line-11"></span><span class="hs-comment">--       PNull</span><span>
-</span><span id="line-12"></span><span class="hs-comment">--     | PTrue</span><span>
-</span><span id="line-13"></span><span class="hs-comment">--     | PFalse</span><span>
-</span><span id="line-14"></span><span class="hs-comment">--     | PVariable a</span><span>
-</span><span id="line-15"></span><span class="hs-comment">--     | PNot (PropositionalFormula a)</span><span>
-</span><span id="line-16"></span><span class="hs-comment">--     | PAnd [PropositionalFormula a]</span><span>
-</span><span id="line-17"></span><span class="hs-comment">--     | POr [PropositionalFormula a]</span><span>
-</span><span id="line-18"></span><span class="hs-comment">--     deriving (Eq)</span><span>
-</span><span id="line-19"></span><span>
-</span><span id="line-20"></span><span id="local-6989586621679093353"><span class="annot"><a href="NullPropositions.html#isnull"><span class="hs-identifier hs-type">isnull</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-type">NullableFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093353"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span></span><span>
-</span><span id="line-21"></span><span id="isnull"><span class="annot"><span class="annottext">isnull :: NullableFormula a -&gt; Bool
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Logic.html"><span class="hs-identifier">Logic</span></a></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Propositions.html"><span class="hs-identifier">Propositions</span></a></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Defunctor.html"><span class="hs-identifier">Defunctor</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Defunctor.html#Defunctor"><span class="hs-identifier">Defunctor</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Defunctor.html#demap"><span class="hs-identifier">demap</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">catMaybes</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">fromJust</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">isNothing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- | Data type for the ternary logic by Sobocinski.</span><span>
+</span><span id="line-14"></span><span class="hs-comment">--  The 'Nothing' case represents /null/ as used in our paper.</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">type</span><span> </span><span id="NullableFormula"><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-var">NullableFormula</span></a></span></span><span> </span><span id="local-6989586621679093178"><span class="annot"><a href="#local-6989586621679093178"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Propositions.html#PropositionalFormula"><span class="hs-identifier hs-type">PropositionalFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093178"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-comment">-- | Returns @true@ iff the given formula is the value /null/.</span><span>
+</span><span id="line-18"></span><span id="local-6989586621679093213"><span class="annot"><a href="NullPropositions.html#isnull"><span class="hs-identifier hs-type">isnull</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-type">NullableFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093213"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span></span><span>
+</span><span id="line-19"></span><span id="isnull"><span class="annot"><span class="annottext">isnull :: NullableFormula a -&gt; Bool
 </span><a href="NullPropositions.html#isnull"><span class="hs-identifier hs-var hs-var">isnull</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NullableFormula a -&gt; Bool
 forall a. Maybe a -&gt; Bool
 </span><span class="hs-identifier hs-var">isNothing</span></span><span>
-</span><span id="line-22"></span><span>
-</span><span id="line-23"></span><span id="local-6989586621679093316"><span class="annot"><a href="NullPropositions.html#notnull"><span class="hs-identifier hs-type">notnull</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-type">NullableFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093316"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span></span><span>
-</span><span id="line-24"></span><span id="notnull"><span class="annot"><span class="annottext">notnull :: NullableFormula a -&gt; Bool
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-comment">-- | Returns @false@ iff the given formula is the value /null/.</span><span>
+</span><span id="line-22"></span><span id="local-6989586621679093176"><span class="annot"><a href="NullPropositions.html#notnull"><span class="hs-identifier hs-type">notnull</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-type">NullableFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093176"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span></span><span>
+</span><span id="line-23"></span><span id="notnull"><span class="annot"><span class="annottext">notnull :: NullableFormula a -&gt; Bool
 </span><a href="NullPropositions.html#notnull"><span class="hs-identifier hs-var hs-var">notnull</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
 </span><span class="hs-identifier hs-var">not</span></span><span class="annot"><span class="annottext">(Bool -&gt; Bool)
 -&gt; (NullableFormula a -&gt; Bool) -&gt; NullableFormula a -&gt; Bool
@@ -32,46 +31,51 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">NullableFormula a -&gt; Bool
 forall a. NullableFormula a -&gt; Bool
 </span><a href="NullPropositions.html#isnull"><span class="hs-identifier hs-var">isnull</span></a></span><span>
-</span><span id="line-25"></span><span>
-</span><span id="line-26"></span><span id="local-6989586621679093312"><span class="annot"><a href="NullPropositions.html#assure"><span class="hs-identifier hs-type">assure</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-type">NullableFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093312"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Propositions.html#PropositionalFormula"><span class="hs-identifier hs-type">PropositionalFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093312"><span class="hs-identifier hs-type">a</span></a></span></span><span>
-</span><span id="line-27"></span><span id="assure"><span class="annot"><span class="annottext">assure :: NullableFormula a -&gt; PropositionalFormula a
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-comment">-- | Converts the given nullable formula to a propositional formula, assuming that the given formula is not /null/.</span><span>
+</span><span id="line-26"></span><span class="hs-comment">-- Crashes otherwise.</span><span>
+</span><span id="line-27"></span><span id="local-6989586621679093172"><span class="annot"><a href="NullPropositions.html#assure"><span class="hs-identifier hs-type">assure</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-type">NullableFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093172"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Propositions.html#PropositionalFormula"><span class="hs-identifier hs-type">PropositionalFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093172"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-28"></span><span id="assure"><span class="annot"><span class="annottext">assure :: NullableFormula a -&gt; PropositionalFormula a
 </span><a href="NullPropositions.html#assure"><span class="hs-identifier hs-var hs-var">assure</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NullableFormula a -&gt; PropositionalFormula a
 forall a. HasCallStack =&gt; Maybe a -&gt; a
 </span><span class="hs-identifier hs-var">fromJust</span></span><span>
-</span><span id="line-28"></span><span>
-</span><span id="line-29"></span><span id="local-6989586621679093310"><span class="annot"><a href="NullPropositions.html#nullable_simplify"><span class="hs-identifier hs-type">nullable_simplify</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-type">NullableFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093310"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-type">NullableFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093310"><span class="hs-identifier hs-type">a</span></a></span></span><span>
-</span><span id="line-30"></span><span id="nullable_simplify"><span class="annot"><span class="annottext">nullable_simplify :: NullableFormula a -&gt; NullableFormula a
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- | Simplifies the given formula. Uses 'Propositions.simplify'.</span><span>
+</span><span id="line-31"></span><span id="local-6989586621679093170"><span class="annot"><a href="NullPropositions.html#nullable_simplify"><span class="hs-identifier hs-type">nullable_simplify</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-type">NullableFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093170"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="NullPropositions.html#NullableFormula"><span class="hs-identifier hs-type">NullableFormula</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093170"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-32"></span><span id="nullable_simplify"><span class="annot"><span class="annottext">nullable_simplify :: NullableFormula a -&gt; NullableFormula a
 </span><a href="NullPropositions.html#nullable_simplify"><span class="hs-identifier hs-var hs-var">nullable_simplify</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(PropositionalFormula a -&gt; PropositionalFormula a)
 -&gt; NullableFormula a -&gt; NullableFormula a
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">PropositionalFormula a -&gt; PropositionalFormula a
 forall a. PropositionalFormula a -&gt; PropositionalFormula a
 </span><a href="Propositions.html#simplify"><span class="hs-identifier hs-var">Propositions.simplify</span></a></span><span>
-</span><span id="line-31"></span><span>
-</span><span id="line-32"></span><span id="local-6989586621679093307"><span class="annot"><a href="NullPropositions.html#prettyPrint"><span class="hs-identifier hs-type">prettyPrint</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679093307"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679093307"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span><span>
-</span><span id="line-33"></span><span id="prettyPrint"><span class="annot"><span class="annottext">prettyPrint :: Maybe a -&gt; String
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- | Pretty Printing for nullable objects such as the nullable propositional logic.</span><span>
+</span><span id="line-35"></span><span id="local-6989586621679093167"><span class="annot"><a href="NullPropositions.html#prettyPrint"><span class="hs-identifier hs-type">prettyPrint</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679093167"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679093167"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span><span>
+</span><span id="line-36"></span><span id="prettyPrint"><span class="annot"><span class="annottext">prettyPrint :: Maybe a -&gt; String
 </span><a href="NullPropositions.html#prettyPrint"><span class="hs-identifier hs-var hs-var">prettyPrint</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;null&quot;</span></span><span> </span><span class="hs-comment">-- null, none, nothing, empty, unknown</span><span>
-</span><span id="line-34"></span><span class="annot"><a href="NullPropositions.html#prettyPrint"><span class="hs-identifier hs-var">prettyPrint</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679093305"><span class="annot"><span class="annottext">p :: a
-</span><a href="#local-6989586621679093305"><span class="hs-identifier hs-var">p</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+</span><span id="line-37"></span><span class="annot"><a href="NullPropositions.html#prettyPrint"><span class="hs-identifier hs-var">prettyPrint</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679093165"><span class="annot"><span class="annottext">p :: a
+</span><a href="#local-6989586621679093165"><span class="hs-identifier hs-var">p</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679093305"><span class="hs-identifier hs-var">p</span></a></span><span>
-</span><span id="line-35"></span><span>
-</span><span id="line-36"></span><span class="hs-comment">-- instance Logic a b =&gt; Logic a (Maybe b) where</span><span>
-</span><span id="line-37"></span><span id="local-6989586621679093303"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679093292"><span id="local-6989586621679093294"><span id="local-6989586621679093296"><span class="annot"><a href="Logic.html#Logic"><span class="hs-identifier hs-type">Logic</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093303"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Logic.html#Logic"><span class="hs-identifier hs-type">Logic</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679093303"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-38"></span><span>    </span><span id="local-6989586621679093289"><span class="annot"><span class="annottext">ltrue :: Maybe a
+</span><a href="#local-6989586621679093165"><span class="hs-identifier hs-var">p</span></a></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- 'Logic's over 'Maybe' are againt logics in the sense of the ternary logic by Sobocinski.</span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- In particular, 'NullableFormula' is thus a 'Logic'.</span><span>
+</span><span id="line-41"></span><span id="local-6989586621679093163"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679093152"><span id="local-6989586621679093154"><span id="local-6989586621679093156"><span class="annot"><a href="Logic.html#Logic"><span class="hs-identifier hs-type">Logic</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679093163"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Logic.html#Logic"><span class="hs-identifier hs-type">Logic</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679093163"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-42"></span><span>    </span><span id="local-6989586621679093149"><span class="annot"><span class="annottext">ltrue :: Maybe a
 </span><a href="Logic.html#ltrue"><span class="hs-identifier hs-var hs-var hs-var hs-var">ltrue</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
 forall a. a -&gt; Maybe a
 </span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">a
 forall l. Logic l =&gt; l
 </span><a href="Logic.html#ltrue"><span class="hs-identifier hs-var">ltrue</span></a></span><span>
-</span><span id="line-39"></span><span>    </span><span id="local-6989586621679093287"><span class="annot"><span class="annottext">lfalse :: Maybe a
+</span><span id="line-43"></span><span>    </span><span id="local-6989586621679093147"><span class="annot"><span class="annottext">lfalse :: Maybe a
 </span><a href="Logic.html#lfalse"><span class="hs-identifier hs-var hs-var hs-var hs-var">lfalse</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
 forall a. a -&gt; Maybe a
 </span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">a
 forall l. Logic l =&gt; l
 </span><a href="Logic.html#lfalse"><span class="hs-identifier hs-var">lfalse</span></a></span><span>
-</span><span id="line-40"></span><span>    </span><span id="local-6989586621679093285"><span class="annot"><span class="annottext">lvalues :: [Maybe a]
+</span><span id="line-44"></span><span>    </span><span id="local-6989586621679093145"><span class="annot"><span class="annottext">lvalues :: [Maybe a]
 </span><a href="Logic.html#lvalues"><span class="hs-identifier hs-var hs-var hs-var hs-var">lvalues</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe a
 forall a. Maybe a
 </span><span class="hs-identifier hs-var">Nothing</span></span><span class="annot"><span class="annottext">Maybe a -&gt; [Maybe a] -&gt; [Maybe a]
@@ -83,42 +87,42 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[a]
 forall l. Logic l =&gt; [l]
 </span><a href="Logic.html#lvalues"><span class="hs-identifier hs-var">lvalues</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-41"></span><span>    </span><span>
-</span><span id="line-42"></span><span>    </span><span id="local-6989586621679093282"><span class="annot"><span class="annottext">lnot :: Maybe a -&gt; Maybe a
+</span><span id="line-45"></span><span>    </span><span>
+</span><span id="line-46"></span><span>    </span><span id="local-6989586621679093142"><span class="annot"><span class="annottext">lnot :: Maybe a -&gt; Maybe a
 </span><a href="Logic.html#lnot"><span class="hs-identifier hs-var hs-var hs-var hs-var">lnot</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(a -&gt; a) -&gt; Maybe a -&gt; Maybe a
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; a
 forall l. Logic l =&gt; l -&gt; l
 </span><a href="Logic.html#lnot"><span class="hs-identifier hs-var">lnot</span></a></span><span>
-</span><span id="line-43"></span><span>    </span><span id="local-6989586621679093280"><span class="annot"><span class="annottext">land :: [Maybe a] -&gt; Maybe a
-</span><a href="Logic.html#land"><span class="hs-identifier hs-var hs-var hs-var hs-var">land</span></a></span></span><span> </span><span id="local-6989586621679093278"><span class="annot"><span class="annottext">l :: [Maybe a]
-</span><a href="#local-6989586621679093278"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[Maybe a] -&gt; [a]
+</span><span id="line-47"></span><span>    </span><span id="local-6989586621679093140"><span class="annot"><span class="annottext">land :: [Maybe a] -&gt; Maybe a
+</span><a href="Logic.html#land"><span class="hs-identifier hs-var hs-var hs-var hs-var">land</span></a></span></span><span> </span><span id="local-6989586621679093138"><span class="annot"><span class="annottext">l :: [Maybe a]
+</span><a href="#local-6989586621679093138"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[Maybe a] -&gt; [a]
 forall a. [Maybe a] -&gt; [a]
 </span><span class="hs-identifier hs-var">catMaybes</span></span><span> </span><span class="annot"><span class="annottext">[Maybe a]
-</span><a href="#local-6989586621679093278"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-44"></span><span>        </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe a
+</span><a href="#local-6989586621679093138"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-48"></span><span>        </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe a
 forall a. Maybe a
 </span><span class="hs-identifier hs-var">Nothing</span></span><span>
-</span><span id="line-45"></span><span>        </span><span class="hs-special">[</span><span id="local-6989586621679093277"><span class="annot"><span class="annottext">p :: a
-</span><a href="#local-6989586621679093277"><span class="hs-identifier hs-var">p</span></a></span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
+</span><span id="line-49"></span><span>        </span><span class="hs-special">[</span><span id="local-6989586621679093137"><span class="annot"><span class="annottext">p :: a
+</span><a href="#local-6989586621679093137"><span class="hs-identifier hs-var">p</span></a></span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
 forall a. a -&gt; Maybe a
 </span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679093277"><span class="hs-identifier hs-var">p</span></a></span><span>
-</span><span id="line-46"></span><span>        </span><span id="local-6989586621679093276"><span class="annot"><span class="annottext">justs :: [a]
-</span><a href="#local-6989586621679093276"><span class="hs-identifier hs-var">justs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
+</span><a href="#local-6989586621679093137"><span class="hs-identifier hs-var">p</span></a></span><span>
+</span><span id="line-50"></span><span>        </span><span id="local-6989586621679093136"><span class="annot"><span class="annottext">justs :: [a]
+</span><a href="#local-6989586621679093136"><span class="hs-identifier hs-var">justs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
 forall a. a -&gt; Maybe a
 </span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Maybe a) -&gt; a -&gt; Maybe a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; a
 forall l. Logic l =&gt; [l] -&gt; l
 </span><a href="Logic.html#land"><span class="hs-identifier hs-var">land</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679093276"><span class="hs-identifier hs-var">justs</span></a></span><span>
-</span><span id="line-47"></span><span>
-</span><span id="line-48"></span><span>    </span><span id="local-6989586621679093275"><span class="annot"><span class="annottext">leval :: (Maybe a -&gt; Maybe a) -&gt; Maybe a -&gt; Maybe a
-</span><a href="Logic.html#leval"><span class="hs-identifier hs-var hs-var hs-var hs-var">leval</span></a></span></span><span> </span><span id="local-6989586621679093273"><span class="annot"><span class="annottext">config :: Maybe a -&gt; Maybe a
-</span><a href="#local-6989586621679093273"><span class="hs-identifier hs-var">config</span></a></span></span><span> </span><span id="local-6989586621679093272"><span class="annot"><span class="annottext">m :: Maybe a
-</span><a href="#local-6989586621679093272"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe a
-</span><a href="#local-6989586621679093272"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe a -&gt; (a -&gt; Maybe a) -&gt; Maybe a
+</span><a href="#local-6989586621679093136"><span class="hs-identifier hs-var">justs</span></a></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span>    </span><span id="local-6989586621679093135"><span class="annot"><span class="annottext">leval :: (Maybe a -&gt; Maybe a) -&gt; Maybe a -&gt; Maybe a
+</span><a href="Logic.html#leval"><span class="hs-identifier hs-var hs-var hs-var hs-var">leval</span></a></span></span><span> </span><span id="local-6989586621679093133"><span class="annot"><span class="annottext">config :: Maybe a -&gt; Maybe a
+</span><a href="#local-6989586621679093133"><span class="hs-identifier hs-var">config</span></a></span></span><span> </span><span id="local-6989586621679093132"><span class="annot"><span class="annottext">m :: Maybe a
+</span><a href="#local-6989586621679093132"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe a
+</span><a href="#local-6989586621679093132"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe a -&gt; (a -&gt; Maybe a) -&gt; Maybe a
 forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
 </span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
 forall a. a -&gt; Maybe a
@@ -129,4 +133,4 @@ forall l. Logic l =&gt; (l -&gt; l) -&gt; l -&gt; l
 </span><a href="Logic.html#leval"><span class="hs-identifier hs-var">leval</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Maybe a -&gt; Maybe a) -&gt; a -&gt; a
 forall (f :: * -&gt; *) a b. Defunctor f =&gt; (f a -&gt; f b) -&gt; a -&gt; b
 </span><a href="Defunctor.html#demap"><span class="hs-identifier hs-var">demap</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe a -&gt; Maybe a
-</span><a href="#local-6989586621679093273"><span class="hs-identifier hs-var">config</span></a></span><span class="hs-special">)</span></span></pre></body></html>
+</span><a href="#local-6989586621679093133"><span class="hs-identifier hs-var">config</span></a></span><span class="hs-special">)</span></span></pre></body></html>
