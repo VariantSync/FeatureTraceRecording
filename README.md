@@ -2,7 +2,7 @@
 
 [![Language](https://img.shields.io/badge/Language-Haskell-purple)](https://www.haskell.org/)
 [![Documentation](https://img.shields.io/badge/Documentation-Read-purple)][documentation]
-[![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](https://choosealicense.com/licenses/lgpl-3.0/)
+[![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](LICENSE.LGPL3)
 
 Artifact repository for the paper _Feature Trace Recording_, accepted at _ESEC/FSE 2021_.
 Authors are [Paul Maximilian Bittner][paul], [Alexander Schultheiß][alexander], [Thomas Thüm][thomas], [Timo Kehrer][timo], [Jeffrey M. Young][jeffrey], and [Lukas Linsbauer][lukas].
@@ -12,7 +12,7 @@ The library is accompanied with a demo application that uses the library to repr
 
 
 ## How to Run the Demo
-Our library is written in Haskell and uses the _Stack_ build system.
+Our library is written in Haskell and uses the _Stack_ build system (see [REQUIREMENTS.md](REQUIREMENTS.md)).
 Instructions for installing Stack, building our library and running the demo are given in the [INSTALL.md](INSTALL.md).
 
 
