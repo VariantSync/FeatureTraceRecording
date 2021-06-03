@@ -1,3 +1,6 @@
+# This shell scripts generates the documentation website for this library.
+# It runs haddock (the haskell documentation generation tool) on all relevant files.
+
 # find all files for which we want go generate documentation (demo in app and library in src)
 # xargs appends that for us to the stack command
 find app src -name "*.hs" | xargs stack exec -- haddock --package-name=ftr --html --quickjump --hoogle --hyperlinked-source --odir=docs
