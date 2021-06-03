@@ -1,7 +1,7 @@
 ﻿## Installing Stack
 
 As explained in the [REQUIREMENTS.md](REQUIREMENTS.md), the [_Stack_][stack] build system is our only installation requirement.
-Detailed installation instruction are given on the respective [installation webpage][stackinstall].
+Detailed installation instructions for many operating systems are given on the respective [installation webpage][stackinstall].
 
 - Linux: You can install stack via `sudo apt-get install haskell-stack` (or `sudo pacman -S stack` if you are using pacman).
 Further instructions for installing stack including specific linux distributions are given [here][stackinstall].
