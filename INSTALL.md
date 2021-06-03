@@ -23,19 +23,39 @@ You can then build the library and run the demo as follows:
 stack run
 ```
 
-## Expected Output
+## What Is There to See
+Our demo runs several independent examples.
+Each example is separated by a red headline and consists of a series of edits applied to a source code fragment.
+For each edit, we first show its type and the feature context under which that edit was made:
 
-The demo will run three examples as described in the [README](README.md):
+    ==== Run ins_tree(11, 4, 0) under context = "SafeStack" giving us ====
 
-1. Alice's part of the motivating example shown in Figure 1 in the paper.
-2. Bob's part of the motivating example shown in Figure 3 in the paper.
-3. Examples of Edit Patterns from the Evaluation (Section 5).
+where an abstract syntax tree (AST) whose root has ID 11 is inserted below node 4 in the current AST at index 0 under feature context "SafeStack".
+(The first edit will always be `identity` under context `null`. This is a technical detail necessary to show the initial state of the example.)
+Afterwards, the code that is a result of this edit is shown, similar to Figure 1 in the paper:
+
+![Alice](meta/pop_v2.png)
+
+## Expected Output / If You Cannot Get it Running
+
+By default, the following examples are executed in this order:
+
+1. Motivating example
+    - Alice's part of the motivating example shown in Figure 1 in the paper.
+    - Bob's part of the motivating example shown in Figure 3 in the paper. As the synchronisation of code and feature traces across clones is subject to future work, this example simulates how we envision the synchronisation.
+2. Examples of edit patterns from the evaluation (Section 5): For each pattern we show how to reproduce it in the general case and when an outer scope (eg., a method) is already assigned the target mapping. We omitted AddIfdef* as it is just a repitition of AddIfdef with arbitrary contexts and code fragments. As AddIfdefElse has to be reproduced using two variants, we need two different examples here, one for the if-branch and one for the else-branch.
 
 If you see the following output after `stack run`, the build process and execution of the demo were successful.
-The colours in your terminal might deviate from the following screenshots:
+The colours in your terminal might deviate from the following screenshots.
+The following screenshots also display the entire default output of the demo in case you were not able to install the stack or get the demo running.
 
+First, the output for Figure 1 in the paper is shown. Alice performs several edits to the `pop` method.
 ![Alice](meta/Alice.png)
+
+Second, the propagation of Alice's changes to Bob's variant is shown. As the synchronisation of code and feature traces across clones is subject to future work, this example simulates how we envision the synchronisation.
 ![Bob](meta/Bob.png)
+
+Third, our tool reproduces the edit patterns described in the paper (Section 5).
 ![Patterns](meta/Patterns.png)
 
 [stack]: https://docs.haskellstack.org/en/stable/README/

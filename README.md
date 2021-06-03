@@ -10,51 +10,11 @@ Authors are [Paul Maximilian Bittner][paul], [Alexander Schultheiß][alexander],
 The artefact mainly consists of a library written in the Haskell language that implements feature trace recording.
 The library is accompanied with a demo application that uses the library to reproduce our motivating example (Alice and Bob using feature trace recording in Section 2 in our paper) as well as examples of the edit patterns we used to evaluate feature trace recording (Section 5).
 
-## How to Run the Project
+
+## How to Run the Demo
 Our library is written in Haskell and uses the _Stack_ build system.
-Instructions for installing stack can be found [here](https://docs.haskellstack.org/en/stable/README/).
-On linux, `sudo apt-get install haskell-stack` (or `sudo pacman -S stack` if you are using pacman) should do the job.
-After you installed stack, please open a terminal and navigate to the repository's directory (the directory containing this `README.md`).
-Our demo prints coloured text to the terminal, so it might not be compatible with every terminal.
-We tested it within the Windows Terminal, Windows Powershell, Windows Subsystem for Linux (WSL) and the default terminal on Manjaro.
-(It might not work with Git Bash.)
-You can then run the demo as follows:
+Instructions for installing Stack, building our library and running the demo are given in the [INSTALL.md](INSTALL.md).
 
-    cd <path/to/this/repository>
-    stack run
-
-## What Is There to See
-Our demo runs several independent examples.
-Each example is separated by a red headline and consists of a series of edits applied to a source code fragment.
-For each edit, we first show its type and the feature context under which that edit was made:
-
-    ==== Run ins_tree(11, 4, 0) under context = "SafeStack" giving us ====
-
-where an abstract syntax tree (AST) whose root has ID 11 is inserted below node 4 in the current AST at index 0 under feature context "SafeStack".
-(The first edit will always be `identity` under context `null`. This is a technical detail necessary to show the initial state of the example.)
-Afterwards, the code that is a result of this edit is shown (similar to Figure 1 in the paper):
-
-```java
-void pop() {
-    if (!empty()) {
-    }
-    storage[head--] = null;
-}
-```
-
-By default, the following examples are executed in this order:
-
-1. Motivating Example
-    - Alice's part of the motivating example shown in Figure 1 in the paper.
-    - Bob's part of the motivating example shown in Figure 3 in the paper. As the synchronisation of code and feature traces across clones is subject to future work, this example simulates how we envision the synchronisation.
-2. Examples of Edit Patterns from the Evaluation (Section 5): For each pattern we show how to reproduce it in the general case and when an outer scope (eg., a method) is already assigned the target mapping. We omitted AddIfdef* as it is just a repitition of AddIfdef with arbitrary contexts and code fragments. As AddIfdefElse has to be reproduced using two variants, we need two different examples here, one for the if-branch and one for the else-branch.
-
-## If You Cannot Get it Running ...
-..., you can find screenshots of the demo's output in the `meta` folder:
-
-- [meta/Alice.png](meta/Alice.png): Shows the output for Figure 1 in the paper. Alice performs several edits to the `pop` method.
-- [meta/Bob.png](meta/Bob.png): Shows how synchronising Alice's changes to Bob's variant would look like. As the synchronisation of code and feature traces across clones is subject to future work, this example simulates how we envision the synchronisation.
-- [meta/Patterns.png](meta/Patterns.png): Shows how our tool can reproduce the edit patterns described in the paper.
 
 ## Documentation
 
