@@ -58,7 +58,7 @@ By default, the following examples are executed in this order:
 
 ## Documentation
 
-A detailed documentation can be found in 'docs/index.html' and can be browsed on the [Github page][documentation].
+A detailed documentation can be found in `docs/index.html` and can be browsed on the [Github page][documentation].
 
 Some interesting code locations are:
 - `showExamples` function in [`app/Main.hs`](app/Main.hs): Here you can choose which examples to run and in which format the source code should be displayed. Choose from:
