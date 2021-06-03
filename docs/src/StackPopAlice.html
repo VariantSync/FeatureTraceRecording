@@ -40,12 +40,12 @@
 Colours for features and feature formulas used in this example.
 We chose terminal colours as close the the colours used in the paper as possible.
 -}</span><span>
-</span><span id="line-39"></span><span id="local-6989586621679095065"><span class="annot"><a href="StackPopAlice.html#featurecolours"><span class="hs-identifier hs-type">featurecolours</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095065"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="FeatureColour.html#FeatureFormulaColourPalette"><span class="hs-identifier hs-type">FeatureFormulaColourPalette</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095065"><span class="hs-identifier hs-type">m</span></a></span></span><span>
+</span><span id="line-39"></span><span id="local-6989586621679095076"><span class="annot"><a href="StackPopAlice.html#featurecolours"><span class="hs-identifier hs-type">featurecolours</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095076"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="FeatureColour.html#FeatureFormulaColourPalette"><span class="hs-identifier hs-type">FeatureFormulaColourPalette</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095076"><span class="hs-identifier hs-type">m</span></a></span></span><span>
 </span><span id="line-40"></span><span id="featurecolours"><span class="annot"><span class="annottext">featurecolours :: FeatureFormulaColourPalette m
-</span><a href="StackPopAlice.html#featurecolours"><span class="hs-identifier hs-var hs-var">featurecolours</span></a></span></span><span> </span><span id="local-6989586621679095044"><span class="annot"><span class="annottext">p :: FeatureFormula
-</span><a href="#local-6989586621679095044"><span class="hs-identifier hs-var">p</span></a></span></span><span>
+</span><a href="StackPopAlice.html#featurecolours"><span class="hs-identifier hs-var hs-var">featurecolours</span></a></span></span><span> </span><span id="local-6989586621679095055"><span class="annot"><span class="annottext">p :: FeatureFormula
+</span><a href="#local-6989586621679095055"><span class="hs-identifier hs-var">p</span></a></span></span><span>
 </span><span id="line-41"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
-</span><a href="#local-6989586621679095044"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureFormula -&gt; FeatureFormula -&gt; Bool
+</span><a href="#local-6989586621679095055"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureFormula -&gt; FeatureFormula -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
 forall a. a -&gt; Maybe a
@@ -67,7 +67,7 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall (m :: * -&gt; *). MonadColorPrinter m =&gt; Color m
 </span><span class="hs-identifier hs-var">magenta</span></span><span>
 </span><span id="line-42"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
-</span><a href="#local-6989586621679095044"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureFormula -&gt; FeatureFormula -&gt; Bool
+</span><a href="#local-6989586621679095055"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureFormula -&gt; FeatureFormula -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
 forall a. a -&gt; Maybe a
@@ -84,7 +84,7 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall (m :: * -&gt; *). MonadColorPrinter m =&gt; Color m
 </span><span class="hs-identifier hs-var">cyan</span></span><span>
 </span><span id="line-43"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">FeatureFormula
-</span><a href="#local-6989586621679095044"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureFormula -&gt; FeatureFormula -&gt; Bool
+</span><a href="#local-6989586621679095055"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">FeatureFormula -&gt; FeatureFormula -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PropositionalFormula Feature -&gt; FeatureFormula
 forall a. a -&gt; Maybe a
@@ -278,28 +278,28 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 Example replaying our motivating example shown in Figure 1 and described in Section 2.1 in our paper.
 Alice works on the @pop@ method of a Java class @Stack@.
 -}</span><span>
-</span><span id="line-88"></span><span id="local-6989586621679095019"><span class="annot"><a href="StackPopAlice.html#example"><span class="hs-identifier hs-type">example</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095019"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095019"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-88"></span><span id="local-6989586621679095030"><span class="annot"><a href="StackPopAlice.html#example"><span class="hs-identifier hs-type">example</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadColorPrinter</span></span><span> </span><span class="annot"><a href="#local-6989586621679095030"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Example.html#Example"><span class="hs-identifier hs-type">Example</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679095030"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="SimpleJava.html#SimpleJavaGrammar"><span class="hs-identifier hs-type">SimpleJavaGrammar</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span></span><span>
 </span><span id="line-89"></span><span id="example"><span class="annot"><span class="annottext">example :: State UUID (Example m SimpleJavaGrammar Feature)
 </span><a href="StackPopAlice.html#example"><span class="hs-identifier hs-var hs-var">example</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-90"></span><span>    </span><span class="hs-keyword">do</span><span>
-</span><span id="line-91"></span><span>        </span><span id="local-6989586621679095017"><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095017"><span class="hs-identifier hs-var">tree_start</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><span id="line-91"></span><span>        </span><span id="local-6989586621679095028"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095028"><span class="hs-identifier hs-var">tree_start</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
 </span><a href="StackPopAlice.html#startTree"><span class="hs-identifier hs-var">StackPopAlice.startTree</span></a></span><span>
-</span><span id="line-92"></span><span>        </span><span id="local-6989586621679095016"><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095016"><span class="hs-identifier hs-var">tree_cond</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><span id="line-92"></span><span>        </span><span id="local-6989586621679095027"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095027"><span class="hs-identifier hs-var">tree_cond</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
 </span><a href="StackPopAlice.html#condTree"><span class="hs-identifier hs-var">StackPopAlice.condTree</span></a></span><span>
-</span><span id="line-93"></span><span>        </span><span id="local-6989586621679095015"><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095015"><span class="hs-identifier hs-var">tree_clonedef</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><span id="line-93"></span><span>        </span><span id="local-6989586621679095026"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095026"><span class="hs-identifier hs-var">tree_clonedef</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
 </span><a href="StackPopAlice.html#cloneDef"><span class="hs-identifier hs-var">StackPopAlice.cloneDef</span></a></span><span>
-</span><span id="line-94"></span><span>        </span><span id="local-6989586621679095014"><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095014"><span class="hs-identifier hs-var">tree_clonestorage</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><span id="line-94"></span><span>        </span><span id="local-6989586621679095025"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095025"><span class="hs-identifier hs-var">tree_clonestorage</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
 </span><a href="StackPopAlice.html#cloneStorage"><span class="hs-identifier hs-var">StackPopAlice.cloneStorage</span></a></span><span>
-</span><span id="line-95"></span><span>        </span><span id="local-6989586621679095013"><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095013"><span class="hs-identifier hs-var">tree_cloneretstatement</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
+</span><span id="line-95"></span><span>        </span><span id="local-6989586621679095024"><span class="annot"><span class="annottext">SSJavaAST
+</span><a href="#local-6989586621679095024"><span class="hs-identifier hs-var">tree_cloneretstatement</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State UUID SSJavaAST
 </span><a href="StackPopAlice.html#cloneRetStatement"><span class="hs-identifier hs-var">StackPopAlice.cloneRetStatement</span></a></span><span>
 </span><span id="line-96"></span><span>        </span><span class="hs-keyword">let</span><span>
-</span><span id="line-97"></span><span>            </span><span id="local-6989586621679095012"><span class="annot"><span class="annottext">id_tree_start_body :: UUID
-</span><a href="#local-6989586621679095012"><span class="hs-identifier hs-var hs-var">id_tree_start_body</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+</span><span id="line-97"></span><span>            </span><span id="local-6989586621679095023"><span class="annot"><span class="annottext">id_tree_start_body :: UUID
+</span><a href="#local-6989586621679095023"><span class="hs-identifier hs-var hs-var">id_tree_start_body</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
 forall g a. AST g a -&gt; UUID
 </span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">(SSJavaAST -&gt; UUID)
 -&gt; (Maybe SSJavaAST -&gt; SSJavaAST) -&gt; Maybe SSJavaAST -&gt; UUID
@@ -312,9 +312,9 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall g a. Eq g =&gt; g -&gt; AST g a -&gt; Maybe (AST g a)
 </span><a href="AST.html#findByGrammarType"><span class="hs-identifier hs-var">findByGrammarType</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleJavaGrammar
 </span><a href="SimpleJava.html#SJava_Statements"><span class="hs-identifier hs-var">SJava_Statements</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095017"><span class="hs-identifier hs-var">tree_start</span></a></span><span>
-</span><span id="line-98"></span><span>            </span><span id="local-6989586621679095007"><span class="annot"><span class="annottext">id_tree_start_storage :: UUID
-</span><a href="#local-6989586621679095007"><span class="hs-identifier hs-var hs-var">id_tree_start_storage</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+</span><a href="#local-6989586621679095028"><span class="hs-identifier hs-var">tree_start</span></a></span><span>
+</span><span id="line-98"></span><span>            </span><span id="local-6989586621679095018"><span class="annot"><span class="annottext">id_tree_start_storage :: UUID
+</span><a href="#local-6989586621679095018"><span class="hs-identifier hs-var hs-var">id_tree_start_storage</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
 forall g a. AST g a -&gt; UUID
 </span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">(SSJavaAST -&gt; UUID)
 -&gt; (Maybe SSJavaAST -&gt; SSJavaAST) -&gt; Maybe SSJavaAST -&gt; UUID
@@ -327,9 +327,9 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall g a. Eq g =&gt; g -&gt; AST g a -&gt; Maybe (AST g a)
 </span><a href="AST.html#findByGrammarType"><span class="hs-identifier hs-var">findByGrammarType</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleJavaGrammar
 </span><a href="SimpleJava.html#SJava_ExprStatement"><span class="hs-identifier hs-var">SJava_ExprStatement</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095017"><span class="hs-identifier hs-var">tree_start</span></a></span><span>
-</span><span id="line-99"></span><span>            </span><span id="local-6989586621679095005"><span class="annot"><span class="annottext">id_tree_cond_body :: UUID
-</span><a href="#local-6989586621679095005"><span class="hs-identifier hs-var hs-var">id_tree_cond_body</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+</span><a href="#local-6989586621679095028"><span class="hs-identifier hs-var">tree_start</span></a></span><span>
+</span><span id="line-99"></span><span>            </span><span id="local-6989586621679095016"><span class="annot"><span class="annottext">id_tree_cond_body :: UUID
+</span><a href="#local-6989586621679095016"><span class="hs-identifier hs-var hs-var">id_tree_cond_body</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
 forall g a. AST g a -&gt; UUID
 </span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">(SSJavaAST -&gt; UUID)
 -&gt; (Maybe SSJavaAST -&gt; SSJavaAST) -&gt; Maybe SSJavaAST -&gt; UUID
@@ -342,9 +342,9 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall g a. Eq g =&gt; g -&gt; AST g a -&gt; Maybe (AST g a)
 </span><a href="AST.html#findByGrammarType"><span class="hs-identifier hs-var">findByGrammarType</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleJavaGrammar
 </span><a href="SimpleJava.html#SJava_Statements"><span class="hs-identifier hs-var">SJava_Statements</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095016"><span class="hs-identifier hs-var">tree_cond</span></a></span><span>
-</span><span id="line-100"></span><span>            </span><span id="local-6989586621679095004"><span class="annot"><span class="annottext">id_tree_start_ret :: UUID
-</span><a href="#local-6989586621679095004"><span class="hs-identifier hs-var hs-var">id_tree_start_ret</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
+</span><a href="#local-6989586621679095027"><span class="hs-identifier hs-var">tree_cond</span></a></span><span>
+</span><span id="line-100"></span><span>            </span><span id="local-6989586621679095015"><span class="annot"><span class="annottext">id_tree_start_ret :: UUID
+</span><a href="#local-6989586621679095015"><span class="hs-identifier hs-var hs-var">id_tree_start_ret</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID
 forall g a. AST g a -&gt; UUID
 </span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">(SSJavaAST -&gt; UUID)
 -&gt; (Maybe SSJavaAST -&gt; SSJavaAST) -&gt; Maybe SSJavaAST -&gt; UUID
@@ -357,7 +357,7 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall g a. Eq g =&gt; g -&gt; AST g a -&gt; Maybe (AST g a)
 </span><a href="AST.html#findByGrammarType"><span class="hs-identifier hs-var">findByGrammarType</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleJavaGrammar
 </span><a href="SimpleJava.html#SJava_Type"><span class="hs-identifier hs-var">SJava_Type</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095017"><span class="hs-identifier hs-var">tree_start</span></a></span><span>
+</span><a href="#local-6989586621679095028"><span class="hs-identifier hs-var">tree_start</span></a></span><span>
 </span><span id="line-101"></span><span>        </span><span class="annot"><span class="annottext">Example m SimpleJavaGrammar Feature
 -&gt; State UUID (Example m SimpleJavaGrammar Feature)
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
@@ -369,59 +369,59 @@ Feature
 -&gt; Example m g a
 </span><a href="Example.html#Example"><span class="hs-identifier hs-type hs-type">Example</span></a></span><span> </span><span class="hs-special">{</span><span>
 </span><span id="line-102"></span><span>            </span><span class="annot"><span class="annottext">name :: Feature
-</span><a href="#local-6989586621679095000"><span class="hs-identifier hs-var">Example.name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;Motivating Example: Alice works on Stack.pop&quot;</span></span><span class="hs-special">,</span><span>
+</span><a href="#local-6989586621679095011"><span class="hs-identifier hs-var">Example.name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;Motivating Example: Alice works on Stack.pop&quot;</span></span><span class="hs-special">,</span><span>
 </span><span id="line-103"></span><span>            </span><span class="annot"><span class="annottext">colours :: FeatureFormulaColourPalette m
-</span><a href="#local-6989586621679094999"><span class="hs-identifier hs-var">Example.colours</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FeatureFormulaColourPalette m
+</span><a href="#local-6989586621679095010"><span class="hs-identifier hs-var">Example.colours</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FeatureFormulaColourPalette m
 forall (m :: * -&gt; *).
 MonadColorPrinter m =&gt;
 FeatureFormulaColourPalette m
 </span><a href="StackPopAlice.html#featurecolours"><span class="hs-identifier hs-var">featurecolours</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-104"></span><span>            </span><span class="annot"><span class="annottext">startVersion :: Version SimpleJavaGrammar Feature
-</span><a href="#local-6989586621679094998"><span class="hs-identifier hs-var">Example.startVersion</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">FeatureTrace SimpleJavaGrammar Feature
+</span><a href="#local-6989586621679095009"><span class="hs-identifier hs-var">Example.startVersion</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">FeatureTrace SimpleJavaGrammar Feature
 forall g a. FeatureTrace g a
 </span><a href="FeatureTrace.html#emptyTrace"><span class="hs-identifier hs-var">emptyTrace</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095017"><span class="hs-identifier hs-var">tree_start</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><a href="#local-6989586621679095028"><span class="hs-identifier hs-var">tree_start</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
 </span><span id="line-105"></span><span>            </span><span class="annot"><span class="annottext">history :: History SimpleJavaGrammar Feature
-</span><a href="#local-6989586621679094996"><span class="hs-identifier hs-var">history</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Edit SimpleJavaGrammar Feature]
+</span><a href="#local-6989586621679095007"><span class="hs-identifier hs-var">history</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Edit SimpleJavaGrammar Feature]
 -&gt; [FeatureFormula] -&gt; History SimpleJavaGrammar Feature
 forall a b. [a] -&gt; [b] -&gt; [(a, b)]
 </span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-comment">-- Edits</span><span>
 </span><span id="line-106"></span><span>                </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
 forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
 </span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095016"><span class="hs-identifier hs-var">tree_cond</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
-</span><a href="#local-6989586621679095012"><span class="hs-identifier hs-var">id_tree_start_body</span></a></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span>
+</span><a href="#local-6989586621679095027"><span class="hs-identifier hs-var">tree_cond</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
+</span><a href="#local-6989586621679095023"><span class="hs-identifier hs-var">id_tree_start_body</span></a></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span>
 </span><span id="line-107"></span><span>              </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UUID -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
 forall g a.
 (Grammar g, Eq a, Show a) =&gt;
 UUID -&gt; UUID -&gt; UUID -&gt; Edit g a
 </span><a href="Edits.html#edit_move_tree"><span class="hs-identifier hs-var">edit_move_tree</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
-</span><a href="#local-6989586621679095007"><span class="hs-identifier hs-var">id_tree_start_storage</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
-</span><a href="#local-6989586621679095005"><span class="hs-identifier hs-var">id_tree_cond_body</span></a></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span>
+</span><a href="#local-6989586621679095018"><span class="hs-identifier hs-var">id_tree_start_storage</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
+</span><a href="#local-6989586621679095016"><span class="hs-identifier hs-var">id_tree_cond_body</span></a></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span>
 </span><span id="line-108"></span><span>              </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UUID -&gt; Edit SimpleJavaGrammar Feature
 forall a g. Eq a =&gt; UUID -&gt; Edit g a
 </span><a href="Edits.html#edit_del_tree"><span class="hs-identifier hs-var">edit_del_tree</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
-</span><a href="#local-6989586621679095007"><span class="hs-identifier hs-var">id_tree_start_storage</span></a></span><span>
+</span><a href="#local-6989586621679095018"><span class="hs-identifier hs-var">id_tree_start_storage</span></a></span><span>
 </span><span id="line-109"></span><span>              </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
 forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
 </span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095014"><span class="hs-identifier hs-var">tree_clonestorage</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
-</span><a href="#local-6989586621679095005"><span class="hs-identifier hs-var">id_tree_cond_body</span></a></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span>
+</span><a href="#local-6989586621679095025"><span class="hs-identifier hs-var">tree_clonestorage</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
+</span><a href="#local-6989586621679095016"><span class="hs-identifier hs-var">id_tree_cond_body</span></a></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span>
 </span><span id="line-110"></span><span>              </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
 forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
 </span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095015"><span class="hs-identifier hs-var">tree_clonedef</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
-</span><a href="#local-6989586621679095012"><span class="hs-identifier hs-var">id_tree_start_body</span></a></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span>
+</span><a href="#local-6989586621679095026"><span class="hs-identifier hs-var">tree_clonedef</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
+</span><a href="#local-6989586621679095023"><span class="hs-identifier hs-var">id_tree_start_body</span></a></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span>
 </span><span id="line-111"></span><span>              </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">SSJavaAST -&gt; UUID -&gt; UUID -&gt; Edit SimpleJavaGrammar Feature
 forall a g. Eq a =&gt; AST g a -&gt; UUID -&gt; UUID -&gt; Edit g a
 </span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">SSJavaAST
-</span><a href="#local-6989586621679095013"><span class="hs-identifier hs-var">tree_cloneretstatement</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
-</span><a href="#local-6989586621679095012"><span class="hs-identifier hs-var">id_tree_start_body</span></a></span><span> </span><span class="annot"><span class="hs-number">2</span></span><span>
+</span><a href="#local-6989586621679095024"><span class="hs-identifier hs-var">tree_cloneretstatement</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
+</span><a href="#local-6989586621679095023"><span class="hs-identifier hs-var">id_tree_start_body</span></a></span><span> </span><span class="annot"><span class="hs-number">2</span></span><span>
 </span><span id="line-112"></span><span>              </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UUID
 -&gt; SimpleJavaGrammar -&gt; Feature -&gt; Edit SimpleJavaGrammar Feature
 forall g a. (Grammar g, Show a, Eq a) =&gt; UUID -&gt; g -&gt; a -&gt; Edit g a
 </span><a href="Edits.html#edit_update"><span class="hs-identifier hs-var">edit_update</span></a></span><span> </span><span class="annot"><span class="annottext">UUID
-</span><a href="#local-6989586621679095004"><span class="hs-identifier hs-var">id_tree_start_ret</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleJavaGrammar
+</span><a href="#local-6989586621679095015"><span class="hs-identifier hs-var">id_tree_start_ret</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleJavaGrammar
 </span><a href="SimpleJava.html#SJava_Type"><span class="hs-identifier hs-var">SJava_Type</span></a></span><span> </span><span class="annot"><span class="annottext">Feature
 </span><a href="StackPopAlice.html#newReturnType"><span class="hs-identifier hs-var">newReturnType</span></a></span><span>
 </span><span id="line-113"></span><span>            </span><span class="hs-special">]</span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-comment">-- corresponding feature contexts</span><span>

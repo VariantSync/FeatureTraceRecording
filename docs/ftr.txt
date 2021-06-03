@@ -764,14 +764,14 @@ tikzifyName :: String -> String
 --   (Section 4.2).
 module DefaultFeatureTraceRecording
 
--- | This is the default implementation of feature trace recording we
---   propose in the paper. For each type of edit, we choose one of the four
---   recording functions from R_ins, R_del, R_mov, and R_up. Next to these
---   four functions, we support two more default recording function in this
---   library, <a>r_id</a> and <a>r_trace</a>. We use <a>r_id</a> for
---   technical reasones (e.g., folds, printing) and it does nothing. We use
---   <a>r_trace</a> to manually change the feature mappings of a set of
---   nodes without changing the source code.
+-- | This is the default implementation of feature trace recording as
+--   proposed in our paper. For each type of edit, we choose one of the
+--   four recording functions from R_ins, R_del, R_mov, and R_up. Next to
+--   these four functions, we support two more default recording function
+--   in this library, <a>r_id</a> and <a>r_trace</a>. We use <a>r_id</a>
+--   for technical reasons (e.g., folds, printing) and it does not affect
+--   the mappings. We use <a>r_trace</a> to manually change the feature
+--   mappings of a set of nodes without changing the source code.
 defaultFeatureTraceRecording :: (Grammar g, Show a, Eq a) => FeatureTraceRecording g a
 
 -- | Sets the feature mapping of all mandatory AST nodes to <i>null</i>.
@@ -1098,10 +1098,10 @@ example :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String
 --   our paper). As each pattern describes a possible <i>type</i> of edit
 --   and not an edit itself, each example shows one possible instance for a
 --   pattern (not the pattern itself as this is not possible). For some
---   patterns, we thus /have to) show multiple examples as described in the
---   paper. Most notably, distinguishing between the case when no feature
---   traces are present (<i>in general</i> case) and the case when an
---   optional outer scope of the edit code fragment is already mapped to
+--   patterns, we thus <i>have to</i> show multiple examples as described
+--   in the paper. Most notably, distinguishing between the case when no
+--   feature traces are present (<i>in general</i> case) and the case when
+--   an optional outer scope of the edit code fragment is already mapped to
 --   the target feature mapping.
 module EditPatterns
 

@@ -1,4 +1,4 @@
-﻿{- |
+{- |
 Description: Examples for edit patterns used in our evaluation.
 License: GNU LGPLv3
 Maintainer: paul.bittner@uni-ulm.de
@@ -7,7 +7,7 @@ This module provides 'Example's to reproduce each edit pattern we inspected in t
 of feature trace recording (Section 5 in our paper).
 As each pattern describes a possible /type/ of edit and not an edit itself, each example shows
 one possible instance for a pattern (not the pattern itself as this is not possible).
-For some patterns, we thus /have to) show multiple examples as described in the paper.
+For some patterns, we thus /have to/ show multiple examples as described in the paper.
 Most notably, distinguishing between the case when no feature traces are present (/in general/ case)
 and the case when an optional outer scope of the edit code fragment is already mapped to the target feature mapping.
 -}

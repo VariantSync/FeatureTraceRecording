@@ -17,14 +17,14 @@ We use these to identify nodes in abstract syntax trees ('AST') and track them a
 </span><span id="line-17"></span><span class="annot"><a href="UUID.html#next"><span class="hs-identifier hs-type">next</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
 </span><span id="line-18"></span><span id="next"><span class="annot"><span class="annottext">next :: State UUID ()
 </span><a href="UUID.html#next"><span class="hs-identifier hs-var hs-var">next</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-19"></span><span>    </span><span id="local-6989586621679093353"><span class="annot"><span class="annottext">UUID
-</span><a href="#local-6989586621679093353"><span class="hs-identifier hs-var">num</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StateT UUID Identity UUID
+</span><span id="line-19"></span><span>    </span><span id="local-6989586621679093364"><span class="annot"><span class="annottext">UUID
+</span><a href="#local-6989586621679093364"><span class="hs-identifier hs-var">num</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StateT UUID Identity UUID
 forall s (m :: * -&gt; *). MonadState s m =&gt; m s
 </span><span class="hs-identifier hs-var">get</span></span><span>
 </span><span id="line-20"></span><span>    </span><span class="annot"><span class="annottext">UUID -&gt; State UUID ()
 forall s (m :: * -&gt; *). MonadState s m =&gt; s -&gt; m ()
 </span><span class="hs-identifier hs-var">put</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">UUID
-</span><a href="#local-6989586621679093353"><span class="hs-identifier hs-var">num</span></a></span><span> </span><span class="annot"><span class="annottext">UUID -&gt; UUID -&gt; UUID
+</span><a href="#local-6989586621679093364"><span class="hs-identifier hs-var">num</span></a></span><span> </span><span class="annot"><span class="annottext">UUID -&gt; UUID -&gt; UUID
 forall a. Num a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="hs-number">1</span></span><span class="hs-special">)</span><span>
 </span><span id="line-21"></span><span>    </span><span class="annot"><span class="annottext">() -&gt; State UUID ()
