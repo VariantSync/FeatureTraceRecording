@@ -20,13 +20,16 @@ extra-source-files:
 description:         README.md
 
 dependencies:
+# BSD-3-Clause
 - base >= 4.7 && < 5
 - mtl
 - containers >= 0.6.2.1
-- picosat >= 0.1.6
 - bimap
 - terminal >= 0.2.0.0
+# BSD-2-Clause
 - prettyprinter >= 1.6.2
+# MIT
+- picosat >= 0.1.6
 # - bytestring
 # - utf8-string
 
