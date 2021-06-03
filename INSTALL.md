@@ -3,7 +3,7 @@
 As explained in the [REQUIREMENTS.md](REQUIREMENTS.md), the [_Stack_][stack] build system is our only installation requirement.
 Detailed installation instructions for many operating systems are given on the respective [installation webpage][stackinstall].
 
-- Linux: You can install stack via `sudo apt-get install haskell-stack` (or `sudo pacman -S stack` if you are using pacman).
+- Linux: You can install stack via `curl -sSL https://get.haskellstack.org/ | sh` or `wget -qO- https://get.haskellstack.org/ | sh` (Alternatively, if you are using an Ubuntu-based distro, you can get it with apt `sudo apt-get install haskell-stack`, or `sudo pacman -S stack` if you are using an Arch-based distro).
 Further instructions for installing stack including specific linux distributions are given [here][stackinstall].
 - Windows 64-bit: Go to the [stack installation page][stackinstall]. Download and run the _Windows 64-bit Installer_.
 - MacOS: Please follow the instructions on the [installation webpage][stackinstall].
