@@ -1,7 +1,7 @@
 # Feature Trace Recording
 
 [![Language](https://img.shields.io/badge/Language-Haskell-purple)](https://www.haskell.org/)
-[![Documentation](https://img.shields.io/badge/Documentation-Read-purple)](docs/html/index.html)
+[![Documentation](https://img.shields.io/badge/Documentation-Read-purple)][documentation]
 [![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](https://choosealicense.com/licenses/lgpl-3.0/)
 
 Artifact repository for the paper _Feature Trace Recording_, accepted at _ESEC/FSE 2021_.
@@ -50,15 +50,15 @@ By default, the following examples are executed in this order:
 2. Examples of Edit Patterns from the Evaluation (Section 5): For each pattern we show how to reproduce it in the general case and when an outer scope (eg., a method) is already assigned the target mapping. We omitted AddIfdef* as it is just a repitition of AddIfdef with arbitrary contexts and code fragments. As AddIfdefElse has to be reproduced using two variants, we need two different examples here, one for the if-branch and one for the else-branch.
 
 ## If You Cannot Get it Running ...
-..., you can find screenshots of the demo's output in the docs folder:
+..., you can find screenshots of the demo's output in the `meta` folder:
 
-- [docs/Alice.png](docs/Alice.png): Shows the output for Figure 1 in the paper. Alice performs several edits to the `pop` method.
-- [docs/Bob.png](docs/Bob.png): Shows how synchronising Alice's changes to Bob's variant would look like. As the synchronisation of code and feature traces across clones is subject to future work, this example simulates how we envision the synchronisation.
-- [docs/Patterns.png](docs/Patterns.png): Shows how our tool can reproduce the edit patterns described in the paper.
+- [meta/Alice.png](meta/Alice.png): Shows the output for Figure 1 in the paper. Alice performs several edits to the `pop` method.
+- [meta/Bob.png](meta/Bob.png): Shows how synchronising Alice's changes to Bob's variant would look like. As the synchronisation of code and feature traces across clones is subject to future work, this example simulates how we envision the synchronisation.
+- [meta/Patterns.png](meta/Patterns.png): Shows how our tool can reproduce the edit patterns described in the paper.
 
 ## Documentation
 
-A detailed documentation can be found in [docs/html/index.html](docs/html/index.html).
+A detailed documentation can be found in 'docs/index.html' and can be browsed on the [Github page][documentation].
 
 Some interesting code locations are:
 - `showExamples` function in [`app/Main.hs`](app/Main.hs): Here you can choose which examples to run and in which format the source code should be displayed. Choose from:
@@ -78,7 +78,7 @@ Some interesting code locations are:
 - [`app/examples/`](app/examples/): In this directory, the source code for the examples can be found. The motivating example from the paper is implemented in [`StackPopAlice.hs`](app/examples/StackPopAlice.hs) and [`StackPopBob.hs`](app/examples/StackPopBob.hs). The reproduction of the edit patterns used in our evaluation can be found in [`EditPatterns.hs`](app/examples/EditPatterns.hs).
 
 - [`src/propositions/NullPropositions.hs`](src/propositions/NullPropositions.hs): Operators for the ternary logic with `null`.
-We provide truthtables for the logic in [docs/Truthtable.md](docs/Truthtable.md).
+We provide truthtables for the logic in [meta/Truthtable.md](meta/Truthtable.md).
 The implementation is based on our implementation for propositional logic in [`src/propositions/Propositions.hs`](src/propositions/Propositions.hs).
 You can inspect the truth tables for the ternary logic by uncommenting the respective line (`showTruthtables`) in the `main` function in [`app/Main.hs`](app/Main.hs) and running the project again.
 
@@ -89,3 +89,5 @@ You can inspect the truth tables for the ternary logic by uncommenting the respe
 [timo]: https://www.informatik.hu-berlin.de/de/forschung/gebiete/mse/mitarb/kehrerti.html
 [jeffrey]: https://www.uni-ulm.de/in/sp/team/former-employees-and-doctorands/jeffrey-young/
 [lukas]: https://www.tu-braunschweig.de/isf/team/lukas-linsbauer
+
+[documentation]: https://pmbittner.github.io/FeatureTraceRecording/
