@@ -1,4 +1,10 @@
-﻿-- | A collection of functions that modify lists.
+﻿{- |
+Description: A collection of functions that modify lists.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+A collection of functions that modify lists.
+-}
 module ListUtil where
 
 -- | Returns the head of the given list as Just or Nothing, iff the list is empty.

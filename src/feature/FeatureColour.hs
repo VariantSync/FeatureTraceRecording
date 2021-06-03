@@ -1,4 +1,8 @@
 ﻿{- |
+Description: Module for colouring features and feature formulas.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
 Module for colouring features and feature formulas.
 We use this colouring for visualizing features when printing to terminal.
 -}

@@ -1,4 +1,8 @@
 ﻿{- |
+Description: Facilities for exporting 'AST's to Tikz code as a String.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
 Facilities for exporting 'AST's to Tikz code as a String.
 We use this export to generate the 'AST' figure in the paper (Figure 5).
 -}

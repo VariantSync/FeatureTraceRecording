@@ -1,4 +1,10 @@
--- | Module for edits to ASTs.
+{- |
+Description: Module for 'Edit's to 'AST's.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+Module for 'Edit's to 'AST's.
+-}
 module Edits where
 
 import UUID

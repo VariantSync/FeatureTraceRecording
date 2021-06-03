@@ -1,4 +1,10 @@
--- | A module containing various utility functions.
+{- |
+Description: A module containing various utility functions.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+A module containing various utility functions.
+-}
 module Util where
 
 -- | Generates a string of /i/ spaces where /i/ is the given indent.

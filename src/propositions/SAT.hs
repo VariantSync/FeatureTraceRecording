@@ -1,5 +1,9 @@
-{-
-Module for sat solving over 'PropositionalFormula's.
+{- |
+Description: Module for sat solving on 'PropositionalFormula's.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+Module for sat solving on 'PropositionalFormula's.
 Uses the picosat library.
 -}
 module SAT (
@@ -112,9 +116,10 @@ intifyFormulas m formulas = foldM intifyFormulas_fold (m, []) (reverse formulas)
 {- |
 The folding function for 'intifyFormulas'.
 It takes the current progress of the fold @(mi, cis)@ and a formula to intify @c@:
-* @mi@  - The current mapping from values a to ints.
-* @cis@ - A list of already intified formulas
-* @c@   - A formula of values @a@ that has to be intified and merged into @(mi, cis)@.
+
+* @mi@: The current mapping from values a to ints.
+* @cis@: A list of already intified formulas
+* @c@: A formula of values @a@ that has to be intified and merged into @(mi, cis)@.
 -}
 intifyFormulas_fold :: (Ord a) => (Bimap a Int, [PropositionalFormula Int]) -> PropositionalFormula a -> State UUID (Bimap a Int, [PropositionalFormula Int])
 intifyFormulas_fold (mi, cis) c = do

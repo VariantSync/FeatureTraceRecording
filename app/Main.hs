@@ -1,3 +1,10 @@
+{- |
+Description: Module of the @main@ function to run demos and print meta-information.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+Module of the @main@ function to run demos and print meta-information.
+-}
 module Main where
 
 import Control.Monad.State ( State )

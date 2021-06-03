@@ -1,4 +1,8 @@
 ﻿{- |
+Description: Motivating Example: Simulating propagation of Alice's edits on Stack.pop to Bob's clone
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
 Module for reproducing Bob's part of our motivating 'example'.
 Bob propagates applicable edits by Alice to his variant.
 The example is described in detail in Section 2.2 of the paper and shown in Figure 3.
@@ -45,7 +49,7 @@ example =
             popVersion3 = foldEditScript (fst <$> alicesEditsToSyncDirectly) startTree
             in
         return Example {
-            Example.name = "Motivating Example: Simulating synchronisation of Alice's edits on Stack.pop to Bob's clone",
+            Example.name = "Motivating Example: Simulating propagation of Alice's edits on Stack.pop to Bob's clone",
             Example.colours = StackPopBob.featureColourPalette $ colours alice,
             Example.startVersion = startVersion,
             Example.history = 

@@ -1,4 +1,8 @@
 ﻿{- |
+Description: Module for creating demos of feature trace recording.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
 Module for creating demos of feature trace recording.
 -}
 module Example where

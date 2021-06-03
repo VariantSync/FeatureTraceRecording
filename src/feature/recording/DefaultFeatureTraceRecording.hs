@@ -1,4 +1,8 @@
 ﻿{- |
+Description: Implementation of feature trace recording as proposed in the paper.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
 Implementation of feature trace recording as proposed in the paper (Section 4.2).
 -}
 module DefaultFeatureTraceRecording where

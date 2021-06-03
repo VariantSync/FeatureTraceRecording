@@ -1,6 +1,10 @@
 
 {- |
-Module for feature traces and presence conditions.
+Description: Data types and functions for feature traces and presence conditions.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+Data types and functions for feature traces and presence conditions.
 -}
 module FeatureTrace where
 

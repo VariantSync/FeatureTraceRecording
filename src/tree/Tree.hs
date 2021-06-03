@@ -1,6 +1,12 @@
 {-# LANGUAGE DeriveTraversable #-}
 
--- | Implementation of a rose tree (i.e., a tree whose nodes can have an arbitrary amount of children, including 0).
+{- |
+Description: Implementation of a rose tree we use for 'AST's.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+Implementation of a rose tree (i.e., a tree whose nodes can have an arbitrary amount of children, including 0) we use for 'AST's .
+-}
 module Tree where
 
 import Data.List

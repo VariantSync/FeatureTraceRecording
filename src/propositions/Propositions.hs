@@ -1,4 +1,8 @@
 {- |
+Description: Definition and operations of propositional logic.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
 Definition and operations of propositional logic.
 -}
 module Propositions where
@@ -167,13 +171,17 @@ simplify p = p
 {- |
 Transforms a 'PropositionalFormula' in CNF to a list of its clauses.
 Assumes that the given formula is in CNF.
+
 * The first argument is a functions resolving negation, i.e. it should take an 'a' and give its negated version.
 * The second argument is a function creating the value of type @a@ that should be associated with /false/ ('PFalse').
 For example, @0@ could represent /false/ in propositional formulas over numerals.
 (Note, if no such value exists, the /false/ function is free to produce an error.)
 * The third argument is the function in CNF that should be clausified.
+
 If still confused, try the following call and look at the result:
-@    show $ clausifyCNF (\x -> "not "++x) "false" (toCNF p)@
+@
+    show $ clausifyCNF (\x -> "not "++x) "false" (toCNF p)
+@
 where @p@ is a propositional formula over strings.
 -}
 clausifyCNF :: (Show a) => (a -> a) -> (() -> a) -> PropositionalFormula a -> [[a]]
@@ -199,7 +207,7 @@ clausifyCNF negator false or@(POr literals) = if isCNF or
 --     show (PAnd cs) = parenIf (length cs > 1) (intercalate " ^ " $ map show cs)
 --     show (POr cs) = parenIf (length cs > 1) (intercalate " v " $ map show cs)
 
--- | Nice UTF8 styled expressions for printing propositional operators.
+-- | UTF-8 characters for printing propositional operators.
 instance Show a => Show (PropositionalFormula a) where
     show PTrue = "⊤"
     show PFalse = "⊥"

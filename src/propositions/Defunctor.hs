@@ -1,5 +1,10 @@
 ﻿{- |
+Description: Type class for de-lifting functions from embellished types.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
 Module for type class 'Defunctor' and some instances for Prelude types.
+'Defunctor's can de-lift functions from embellished types to plain types.
 -}
 module Defunctor where
 

@@ -1,4 +1,8 @@
 ﻿{- |
+Description: Examples for edit patterns used in our evaluation.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
 This module provides 'Example's to reproduce each edit pattern we inspected in the evaluation
 of feature trace recording (Section 5 in our paper).
 As each pattern describes a possible /type/ of edit and not an edit itself, each example shows

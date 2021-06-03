@@ -1,10 +1,13 @@
 {- |
-Module: FeatureTraceRecording
 Description: Data types and interfaces for feature trace recording.
-License: TODO: FeatureIDE
+License: GNU LGPLv3
 Maintainer: paul.bittner@uni-ulm.de
 
-Data types and interfaces for feature trace recording.
+Data types and framework for feature trace recording.
+This module provides functions to run feature trace recording as well as the datatypes required to
+implement custom feature trace recording algorithms (i.e., variations of Algorithm 1 in the paper)
+and functions (i.e., supporting new edit types or adapting/replacing the default recording functions
+for different use cases).
 -}
 module FeatureTraceRecording where
 
@@ -43,7 +46,7 @@ type RecordingFunction g a = RecordedEdit g a -> Version g a -> FeatureTrace g a
 {- |
 Abstraction over Algorithm 1 in the paper.
 For different use cases and to prevent future errors, feature trace recording is configurable.
-In a framework-like manner, it gives us an implementation for a recording function identified by edit typs.
+In a framework-like manner, it gives us an implementation for a recording function identified by edit types.
 -}
 type FeatureTraceRecording g a = EditType -> RecordingFunction g a
 

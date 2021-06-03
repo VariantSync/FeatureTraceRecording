@@ -1,4 +1,8 @@
 ﻿{- |
+Description: Motivating Example: Alice works on Stack.pop
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
 Module for reproducing our motivating 'example' where Alice edits the @pop@ method of a class @Stack@ in Java.
 The example is described in detail in Section 2.1 of the paper and shown in Figure 1.
 -}

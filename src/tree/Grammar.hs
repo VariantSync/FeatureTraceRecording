@@ -1,4 +1,10 @@
-﻿-- | Module for representing context-free grammars.
+﻿{- |
+Description: Type class for context-free grammars.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+Type class for context-free grammars.
+-}
 module Grammar where
 
 -- | Classification of nodes for feature traces and presence condition.

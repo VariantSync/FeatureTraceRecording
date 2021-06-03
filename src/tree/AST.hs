@@ -1,4 +1,11 @@
--- | Module for Abstract Syntax Trees (ASTs) that are 'Tree's with a fixed node type.
+{- |
+Description: Data types and operations for Abstract Syntax Trees ('AST's).
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+Data types and operations for Abstract Syntax Trees (ASTs).
+'AST's are that 'Tree's with a fixed 'Node' type.
+-}
 module AST where
 
 import UUID
@@ -6,13 +13,13 @@ import Tree
 import Grammar
 import Control.Monad.State
 
--- | Node type of ASTs.
+-- | Node type of 'AST's.
 data Node g a = Node {
   -- | The value that is encapsulated by a node. Most of the time this is a @String@ referring to source code statements.
   value::a,
   -- | The grammar rule this node was parsed from. @g@ should be an instance of 'Grammar'.
   grammartype::g,
-  -- | A unique identifier to trace nodes across several versions of ASTs.
+  -- | A unique identifier to trace nodes across several versions of 'AST's.
   uuid::UUID
 }
 
@@ -28,7 +35,7 @@ instance Functor (Node g) where
 instance (Grammar g, Show a) => Show (Node g a) where
   show n = "("++(show $ uuid n)++", "++(show $ grammartype n)++", "++(show $ value n)++", "++(show $ optionaltype n)++")"
 
--- | Type for abstract syntax trees (ASTs) representing source code.
+-- | Type for abstract syntax trees ('AST's) representing source code.
 -- It is a tree in which each node represents a source code entity by a value, a grammar type and a 'UUID'.
 type AST g a = Tree (Node g a)
 

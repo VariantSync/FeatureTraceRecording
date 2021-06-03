@@ -1,4 +1,8 @@
 {- |
+Description: Definition and operations on the ternary logic with /null/.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
 Definition and operations on the ternary logic with /null/.
 In the paper, we call formulas of this logic /nullable propositional formulas/.
 Reuses 'PropositionalFormula's.
@@ -36,7 +40,8 @@ prettyPrint :: (Show a) => Maybe a -> String
 prettyPrint Nothing = "null" -- null, none, nothing, empty, unknown
 prettyPrint (Just p) = show p
 
--- 'Logic's over 'Maybe' are againt logics in the sense of the ternary logic by Sobocinski.
+-- | Any 'Logic' can be lifted to a logic on 'Maybe'.
+-- This adds a new value 'Nothing' to the values of the given logic.
 -- In particular, 'NullableFormula' is thus a 'Logic'.
 instance Logic a => Logic (Maybe a) where
     ltrue = Just ltrue

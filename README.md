@@ -1,5 +1,9 @@
 # Feature Trace Recording
 
+[![Language](https://img.shields.io/badge/Language-Haskell-purple)](https://www.haskell.org/)
+[![Documentation](https://img.shields.io/badge/Documentation-Read-purple)](docs/html/index.html)
+[![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](https://choosealicense.com/licenses/lgpl-3.0/)
+
 Artifact repository for the paper _Feature Trace Recording_, accepted at _ESEC/FSE 2021_.
 Authors are [Paul Maximilian Bittner][paul], [Alexander Schultheiß][alexander], [Thomas Thüm][thomas], [Timo Kehrer][timo], [Jeffrey M. Young][jeffrey], and [Lukas Linsbauer][lukas].
 
@@ -30,11 +34,13 @@ where an abstract syntax tree (AST) whose root has ID 11 is inserted below node 
 (The first edit will always be `identity` under context `null`. This is a technical detail necessary to show the initial state of the example.)
 Afterwards, the code that is a result of this edit is shown (similar to Figure 1 in the paper):
 
-    void pop() {
-        if (!empty()) {
-        }
-        storage[head--] = null;
+```java
+void pop() {
+    if (!empty()) {
     }
+    storage[head--] = null;
+}
+```
 
 By default, the following examples are executed in this order:
 
@@ -50,8 +56,11 @@ By default, the following examples are executed in this order:
 - [docs/Bob.png](docs/Bob.png): Shows how synchronising Alice's changes to Bob's variant would look like. As the synchronisation of code and feature traces across clones is subject to future work, this example simulates how we envision the synchronisation.
 - [docs/Patterns.png](docs/Patterns.png): Shows how our tool can reproduce the edit patterns described in the paper.
 
-## Interesting Code Locations
+## Documentation
 
+A detailed documentation can be found in [docs/html/index.html](docs/html/index.html).
+
+Some interesting code locations are:
 - `showExamples` function in [`app/Main.hs`](app/Main.hs): Here you can choose which examples to run and in which format the source code should be displayed. Choose from:
     - `userFormat` (default): The perspective of the developer who is editing source code while traces are recorded in the background. This is the format used in the figures in the paper. The tool will show the presence conditions of the snapshots.
     - `userFormatDetailed`: A variation of `userFormat` where traces and presence conditions can be investigated seperately at the same time. Code is coloured in the colour of its feature trace while presence conditions are indicated by coloured lines on the left.

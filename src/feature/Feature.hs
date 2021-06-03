@@ -1,5 +1,9 @@
-﻿{-
-Module for representing features.
+﻿{- |
+Description: Data types for features and feature formulas.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+Data types for features and feature formulas.
 -}
 module Feature where
 

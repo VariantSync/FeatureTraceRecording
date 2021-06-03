@@ -1,26 +1,32 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- | Module for edits to ASTs.</span><span>
-</span><span id="line-2"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Edits</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-3"></span><span>
-</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="UUID.html"><span class="hs-identifier">UUID</span></a></span><span>
-</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Tree.html"><span class="hs-identifier">Tree</span></a></span><span>
-</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="AST.html"><span class="hs-identifier">AST</span></a></span><span>
-</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Grammar.html"><span class="hs-identifier">Grammar</span></a></span><span>
-</span><span id="line-8"></span><span>
-</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Util.html"><span class="hs-identifier">Util</span></a></span><span>
-</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="ListUtil.html"><span class="hs-identifier">ListUtil</span></a></span><span>
-</span><span id="line-11"></span><span>
-</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span>
-</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{- |
+Description: Module for 'Edit's to 'AST's.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+Module for 'Edit's to 'AST's.
+-}</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Edits</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="UUID.html"><span class="hs-identifier">UUID</span></a></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Tree.html"><span class="hs-identifier">Tree</span></a></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="AST.html"><span class="hs-identifier">AST</span></a></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Grammar.html"><span class="hs-identifier">Grammar</span></a></span><span>
 </span><span id="line-14"></span><span>
-</span><span id="line-15"></span><span class="hs-comment">-- | Each edit is associated to a type depending on what it does.</span><span>
-</span><span id="line-16"></span><span class="hs-keyword">data</span><span> </span><span id="EditType"><span class="annot"><a href="Edits.html#EditType"><span class="hs-identifier hs-var">EditType</span></a></span></span><span>
-</span><span id="line-17"></span><span>    </span><span class="hs-glyph">=</span><span> </span><span id="Identity"><span class="annot"><a href="Edits.html#Identity"><span class="hs-identifier hs-var">Identity</span></a></span></span><span>  </span><span class="hs-comment">-- ^ @Identity@ edits do nothing to the AST (they are noops).</span><span>
-</span><span id="line-18"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="TraceOnly"><span class="annot"><a href="Edits.html#TraceOnly"><span class="hs-identifier hs-var">TraceOnly</span></a></span></span><span> </span><span class="hs-comment">-- ^ @TraceOnly@ are edits that do not alter the AST but have a non-empty delta. This delta is used to descibe side-effects that should be applied to all nodes in the delta (e.g., change their feature mapping).</span><span>
-</span><span id="line-19"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Insert"><span class="annot"><a href="Edits.html#Insert"><span class="hs-identifier hs-var">Insert</span></a></span></span><span>    </span><span class="hs-comment">-- ^ @Insert@ edits only add nodes to a tree.</span><span>
-</span><span id="line-20"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Delete"><span class="annot"><a href="Edits.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span></span><span>    </span><span class="hs-comment">-- ^ @Delete@ edits only remove nodes from a tree.</span><span>
-</span><span id="line-21"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Move"><span class="annot"><a href="Edits.html#Move"><span class="hs-identifier hs-var">Move</span></a></span></span><span>      </span><span class="hs-comment">-- ^ @Move@s only relocate nodes within the same tree.</span><span>
-</span><span id="line-22"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Update"><span class="annot"><a href="Edits.html#Update"><span class="hs-identifier hs-var">Update</span></a></span></span><span>    </span><span class="hs-comment">-- ^ @Update@s only change the contents of one or more nodes without altering the tree structure.</span><span>
-</span><span id="line-23"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679094368"><span id="local-6989586621679094370"><span class="annot"><span class="annottext">EditType -&gt; EditType -&gt; Bool
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Util.html"><span class="hs-identifier">Util</span></a></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="ListUtil.html"><span class="hs-identifier">ListUtil</span></a></span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-comment">-- | Each edit is associated to a type depending on what it does.</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">data</span><span> </span><span id="EditType"><span class="annot"><a href="Edits.html#EditType"><span class="hs-identifier hs-var">EditType</span></a></span></span><span>
+</span><span id="line-23"></span><span>    </span><span class="hs-glyph">=</span><span> </span><span id="Identity"><span class="annot"><a href="Edits.html#Identity"><span class="hs-identifier hs-var">Identity</span></a></span></span><span>  </span><span class="hs-comment">-- ^ @Identity@ edits do nothing to the AST (they are noops).</span><span>
+</span><span id="line-24"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="TraceOnly"><span class="annot"><a href="Edits.html#TraceOnly"><span class="hs-identifier hs-var">TraceOnly</span></a></span></span><span> </span><span class="hs-comment">-- ^ @TraceOnly@ are edits that do not alter the AST but have a non-empty delta. This delta is used to descibe side-effects that should be applied to all nodes in the delta (e.g., change their feature mapping).</span><span>
+</span><span id="line-25"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Insert"><span class="annot"><a href="Edits.html#Insert"><span class="hs-identifier hs-var">Insert</span></a></span></span><span>    </span><span class="hs-comment">-- ^ @Insert@ edits only add nodes to a tree.</span><span>
+</span><span id="line-26"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Delete"><span class="annot"><a href="Edits.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span></span><span>    </span><span class="hs-comment">-- ^ @Delete@ edits only remove nodes from a tree.</span><span>
+</span><span id="line-27"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Move"><span class="annot"><a href="Edits.html#Move"><span class="hs-identifier hs-var">Move</span></a></span></span><span>      </span><span class="hs-comment">-- ^ @Move@s only relocate nodes within the same tree.</span><span>
+</span><span id="line-28"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Update"><span class="annot"><a href="Edits.html#Update"><span class="hs-identifier hs-var">Update</span></a></span></span><span>    </span><span class="hs-comment">-- ^ @Update@s only change the contents of one or more nodes without altering the tree structure.</span><span>
+</span><span id="line-29"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679094323"><span id="local-6989586621679094325"><span class="annot"><span class="annottext">EditType -&gt; EditType -&gt; Bool
 (EditType -&gt; EditType -&gt; Bool)
 -&gt; (EditType -&gt; EditType -&gt; Bool) -&gt; Eq EditType
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -28,7 +34,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: EditType -&gt; EditType -&gt; Bool
 == :: EditType -&gt; EditType -&gt; Bool
 $c== :: EditType -&gt; EditType -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679094361"><span id="local-6989586621679094363"><span id="local-6989586621679094365"><span class="annot"><span class="annottext">Int -&gt; EditType -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679094316"><span id="local-6989586621679094318"><span id="local-6989586621679094320"><span class="annot"><span class="annottext">Int -&gt; EditType -&gt; ShowS
 [EditType] -&gt; ShowS
 EditType -&gt; String
 (Int -&gt; EditType -&gt; ShowS)
@@ -42,38 +48,38 @@ $cshow :: EditType -&gt; String
 showsPrec :: Int -&gt; EditType -&gt; ShowS
 $cshowsPrec :: Int -&gt; EditType -&gt; ShowS
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-24"></span><span>
-</span><span id="line-25"></span><span class="hs-comment">-- | An edit to an AST.</span><span>
-</span><span id="line-26"></span><span class="hs-keyword">data</span><span> </span><span id="Edit"><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-var">Edit</span></a></span></span><span> </span><span id="local-6989586621679094427"><span class="annot"><a href="#local-6989586621679094427"><span class="hs-identifier hs-type">g</span></a></span></span><span> </span><span id="local-6989586621679094426"><span class="annot"><a href="#local-6989586621679094426"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Edit"><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-var">Edit</span></a></span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-27"></span><span>    </span><span class="hs-comment">-- | The type of this edit classifying its behaviour.</span><span>
-</span><span id="line-28"></span><span>    </span><span id="edittype"><span class="annot"><span class="annottext">Edit g a -&gt; EditType
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- | An edit to an AST.</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">data</span><span> </span><span id="Edit"><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-var">Edit</span></a></span></span><span> </span><span id="local-6989586621679094382"><span class="annot"><a href="#local-6989586621679094382"><span class="hs-identifier hs-type">g</span></a></span></span><span> </span><span id="local-6989586621679094381"><span class="annot"><a href="#local-6989586621679094381"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Edit"><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-var">Edit</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-33"></span><span>    </span><span class="hs-comment">-- | The type of this edit classifying its behaviour.</span><span>
+</span><span id="line-34"></span><span>    </span><span id="edittype"><span class="annot"><span class="annottext">Edit g a -&gt; EditType
 </span><a href="Edits.html#edittype"><span class="hs-identifier hs-var hs-var">edittype</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Edits.html#EditType"><span class="hs-identifier hs-type">EditType</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-29"></span><span>    </span><span class="hs-comment">-- | The name of this edit. Used for debugging and printing.</span><span>
-</span><span id="line-30"></span><span>    </span><span id="name"><span class="annot"><span class="annottext">Edit g a -&gt; String
+</span><span id="line-35"></span><span>    </span><span class="hs-comment">-- | The name of this edit. Used for debugging and printing.</span><span>
+</span><span id="line-36"></span><span>    </span><span id="name"><span class="annot"><span class="annottext">Edit g a -&gt; String
 </span><a href="Edits.html#name"><span class="hs-identifier hs-var hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">,</span><span>
-</span><span id="line-31"></span><span>    </span><span class="hs-comment">-- | Applies the edit to an AST, yielding the edited AST.</span><span>
-</span><span id="line-32"></span><span>    </span><span id="run"><span class="annot"><span class="annottext">Edit g a -&gt; AST g a -&gt; AST g a
-</span><a href="Edits.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094427"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094426"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094427"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094426"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-33"></span><span>    </span><span class="hs-comment">-- | Computs the set of all nodes that will be altered (inserted, deleted, moved, updated ...) when applying the edit to a given AST.</span><span>
-</span><span id="line-34"></span><span>    </span><span id="delta"><span class="annot"><span class="annottext">Edit g a -&gt; AST g a -&gt; Set (Node g a)
-</span><a href="Edits.html#delta"><span class="hs-identifier hs-var hs-var">delta</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094427"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094426"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="AST.html#Node"><span class="hs-identifier hs-type">Node</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094427"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094426"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-35"></span><span class="hs-special">}</span><span>
-</span><span id="line-36"></span><span>
-</span><span id="line-37"></span><span class="hs-comment">-- | An @EditScript@ is a sequence of edits that should be applied in order to a single AST.</span><span>
-</span><span id="line-38"></span><span class="hs-keyword">type</span><span> </span><span id="EditScript"><span class="annot"><a href="Edits.html#EditScript"><span class="hs-identifier hs-var">EditScript</span></a></span></span><span> </span><span id="local-6989586621679094354"><span class="annot"><a href="#local-6989586621679094354"><span class="hs-identifier hs-type">g</span></a></span></span><span> </span><span id="local-6989586621679094353"><span class="annot"><a href="#local-6989586621679094353"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094354"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094353"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span>
-</span><span id="line-39"></span><span>
-</span><span id="line-40"></span><span id="local-6989586621679094351"><span id="local-6989586621679094352"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679094346"><span id="local-6989586621679094349"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094352"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094351"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-41"></span><span>    </span><span id="local-6989586621679094345"><span class="annot"><span class="annottext">show :: Edit g a -&gt; String
+</span><span id="line-37"></span><span>    </span><span class="hs-comment">-- | Applies the edit to an AST, yielding the edited AST.</span><span>
+</span><span id="line-38"></span><span>    </span><span id="run"><span class="annot"><span class="annottext">Edit g a -&gt; AST g a -&gt; AST g a
+</span><a href="Edits.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094382"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094381"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094382"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094381"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-39"></span><span>    </span><span class="hs-comment">-- | Computs the set of all nodes that will be altered (inserted, deleted, moved, updated ...) when applying the edit to a given AST.</span><span>
+</span><span id="line-40"></span><span>    </span><span id="delta"><span class="annot"><span class="annottext">Edit g a -&gt; AST g a -&gt; Set (Node g a)
+</span><a href="Edits.html#delta"><span class="hs-identifier hs-var hs-var">delta</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094382"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094381"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="AST.html#Node"><span class="hs-identifier hs-type">Node</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094382"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094381"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span class="hs-special">}</span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span class="hs-comment">-- | An @EditScript@ is a sequence of edits that should be applied in order to a single AST.</span><span>
+</span><span id="line-44"></span><span class="hs-keyword">type</span><span> </span><span id="EditScript"><span class="annot"><a href="Edits.html#EditScript"><span class="hs-identifier hs-var">EditScript</span></a></span></span><span> </span><span id="local-6989586621679094309"><span class="annot"><a href="#local-6989586621679094309"><span class="hs-identifier hs-type">g</span></a></span></span><span> </span><span id="local-6989586621679094308"><span class="annot"><a href="#local-6989586621679094308"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094309"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094308"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span id="local-6989586621679094306"><span id="local-6989586621679094307"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679094301"><span id="local-6989586621679094304"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094307"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094306"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-47"></span><span>    </span><span id="local-6989586621679094300"><span class="annot"><span class="annottext">show :: Edit g a -&gt; String
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">show</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit g a -&gt; String
 forall g a. Edit g a -&gt; String
 </span><a href="Edits.html#name"><span class="hs-identifier hs-var hs-var">name</span></a></span></span></span><span>
-</span><span id="line-42"></span><span>
-</span><span id="line-43"></span><span class="hs-comment">-- | Runs an entire edit script on a given AST.</span><span>
-</span><span id="line-44"></span><span class="hs-comment">-- If curried, turns an edit script into one single function that can run that script on any AST.</span><span>
-</span><span id="line-45"></span><span id="local-6989586621679094342"><span id="local-6989586621679094343"><span class="annot"><a href="Edits.html#foldEditScript"><span class="hs-identifier hs-type">foldEditScript</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Edits.html#EditScript"><span class="hs-identifier hs-type">EditScript</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094343"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094342"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094343"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094342"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094343"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094342"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
-</span><span id="line-46"></span><span id="foldEditScript"><span class="annot"><span class="annottext">foldEditScript :: EditScript g a -&gt; AST g a -&gt; AST g a
-</span><a href="Edits.html#foldEditScript"><span class="hs-identifier hs-var hs-var">foldEditScript</span></a></span></span><span> </span><span id="local-6989586621679094340"><span class="annot"><span class="annottext">es :: EditScript g a
-</span><a href="#local-6989586621679094340"><span class="hs-identifier hs-var">es</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((AST g a -&gt; AST g a)
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- | Runs an entire edit script on a given AST.</span><span>
+</span><span id="line-50"></span><span class="hs-comment">-- If curried, turns an edit script into one single function that can run that script on any AST.</span><span>
+</span><span id="line-51"></span><span id="local-6989586621679094297"><span id="local-6989586621679094298"><span class="annot"><a href="Edits.html#foldEditScript"><span class="hs-identifier hs-type">foldEditScript</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Edits.html#EditScript"><span class="hs-identifier hs-type">EditScript</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094298"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094297"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094298"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094297"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094298"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094297"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-52"></span><span id="foldEditScript"><span class="annot"><span class="annottext">foldEditScript :: EditScript g a -&gt; AST g a -&gt; AST g a
+</span><a href="Edits.html#foldEditScript"><span class="hs-identifier hs-var hs-var">foldEditScript</span></a></span></span><span> </span><span id="local-6989586621679094295"><span class="annot"><span class="annottext">es :: EditScript g a
+</span><a href="#local-6989586621679094295"><span class="hs-identifier hs-var">es</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((AST g a -&gt; AST g a)
  -&gt; (AST g a -&gt; AST g a) -&gt; AST g a -&gt; AST g a)
 -&gt; (AST g a -&gt; AST g a)
 -&gt; [AST g a -&gt; AST g a]
@@ -93,12 +99,12 @@ forall g a. Edit g a -&gt; AST g a -&gt; AST g a
 -&gt; EditScript g a -&gt; [AST g a -&gt; AST g a]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">EditScript g a
-</span><a href="#local-6989586621679094340"><span class="hs-identifier hs-var">es</span></a></span><span>
-</span><span id="line-47"></span><span>
-</span><span id="line-48"></span><span class="hs-comment">-- | The identity of edits.</span><span>
-</span><span id="line-49"></span><span class="hs-comment">-- Does nothing and has an empty delta for all trees.</span><span>
-</span><span id="line-50"></span><span id="local-6989586621679094334"><span id="local-6989586621679094335"><span class="annot"><a href="Edits.html#edit_identity"><span class="hs-identifier hs-type">edit_identity</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094335"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094334"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
-</span><span id="line-51"></span><span id="edit_identity"><span class="annot"><span class="annottext">edit_identity :: Edit g a
+</span><a href="#local-6989586621679094295"><span class="hs-identifier hs-var">es</span></a></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-comment">-- | The identity of edits.</span><span>
+</span><span id="line-55"></span><span class="hs-comment">-- Does nothing and has an empty delta for all trees.</span><span>
+</span><span id="line-56"></span><span id="local-6989586621679094289"><span id="local-6989586621679094290"><span class="annot"><a href="Edits.html#edit_identity"><span class="hs-identifier hs-type">edit_identity</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094290"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094289"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-57"></span><span id="edit_identity"><span class="annot"><span class="annottext">edit_identity :: Edit g a
 </span><a href="Edits.html#edit_identity"><span class="hs-identifier hs-var hs-var">edit_identity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
 EditType
 -&gt; String
@@ -106,82 +112,82 @@ EditType
 -&gt; (AST g a -&gt; Set (Node g a))
 -&gt; Edit g a
 </span><a href="Edits.html#Edit"><span class="hs-identifier hs-type hs-type">Edit</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-52"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
+</span><span id="line-58"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
 </span><a href="Edits.html#edittype"><span class="hs-identifier hs-var">edittype</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EditType
 </span><a href="Edits.html#Identity"><span class="hs-identifier hs-var">Identity</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-53"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
+</span><span id="line-59"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
 </span><a href="Edits.html#run"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; AST g a
 forall a. a -&gt; a
 </span><span class="hs-identifier hs-var">id</span></span><span class="hs-special">,</span><span>
-</span><span id="line-54"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
+</span><span id="line-60"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
 </span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
 forall a. Set a
 </span><span class="hs-identifier hs-var">empty</span></span><span class="hs-special">,</span><span>
-</span><span id="line-55"></span><span>    </span><span class="annot"><span class="annottext">name :: String
+</span><span id="line-61"></span><span>    </span><span class="annot"><span class="annottext">name :: String
 </span><a href="Edits.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;identity&quot;</span></span><span class="hs-special">}</span><span>
-</span><span id="line-56"></span><span>
-</span><span id="line-57"></span><span class="hs-comment">{- |
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span class="hs-comment">{- |
 An identity edit that will keep the given set of nodes as delta for the feature trace recording.
 Upon recording, all given nodes will have their feature trace changed to the feature context.
 This function assumes that the given set of nodes is a subset of the nodes in the future edited tree.
 -}</span><span>
-</span><span id="line-62"></span><span id="local-6989586621679094329"><span id="local-6989586621679094330"><span class="annot"><a href="Edits.html#edit_trace_only"><span class="hs-identifier hs-type">edit_trace_only</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="AST.html#Node"><span class="hs-identifier hs-type">Node</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094330"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094329"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094330"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094329"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
-</span><span id="line-63"></span><span id="edit_trace_only"><span class="annot"><span class="annottext">edit_trace_only :: Set (Node g a) -&gt; Edit g a
-</span><a href="Edits.html#edit_trace_only"><span class="hs-identifier hs-var hs-var">edit_trace_only</span></a></span></span><span> </span><span id="local-6989586621679094327"><span class="annot"><span class="annottext">nodes :: Set (Node g a)
-</span><a href="#local-6989586621679094327"><span class="hs-identifier hs-var">nodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
+</span><span id="line-68"></span><span id="local-6989586621679094284"><span id="local-6989586621679094285"><span class="annot"><a href="Edits.html#edit_trace_only"><span class="hs-identifier hs-type">edit_trace_only</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="AST.html#Node"><span class="hs-identifier hs-type">Node</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094285"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094284"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094285"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094284"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-69"></span><span id="edit_trace_only"><span class="annot"><span class="annottext">edit_trace_only :: Set (Node g a) -&gt; Edit g a
+</span><a href="Edits.html#edit_trace_only"><span class="hs-identifier hs-var hs-var">edit_trace_only</span></a></span></span><span> </span><span id="local-6989586621679094282"><span class="annot"><span class="annottext">nodes :: Set (Node g a)
+</span><a href="#local-6989586621679094282"><span class="hs-identifier hs-var">nodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
 EditType
 -&gt; String
 -&gt; (AST g a -&gt; AST g a)
 -&gt; (AST g a -&gt; Set (Node g a))
 -&gt; Edit g a
 </span><a href="Edits.html#Edit"><span class="hs-identifier hs-type hs-type">Edit</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-64"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
+</span><span id="line-70"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
 </span><a href="Edits.html#edittype"><span class="hs-identifier hs-var">edittype</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EditType
 </span><a href="Edits.html#TraceOnly"><span class="hs-identifier hs-var">TraceOnly</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-65"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
+</span><span id="line-71"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
 </span><a href="Edits.html#run"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; AST g a
 forall a. a -&gt; a
 </span><span class="hs-identifier hs-var">id</span></span><span class="hs-special">,</span><span>
-</span><span id="line-66"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
+</span><span id="line-72"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
 </span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
-</span><a href="#local-6989586621679094327"><span class="hs-identifier hs-var">nodes</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-67"></span><span>    </span><span class="annot"><span class="annottext">name :: String
+</span><a href="#local-6989586621679094282"><span class="hs-identifier hs-var">nodes</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-73"></span><span>    </span><span class="annot"><span class="annottext">name :: String
 </span><a href="Edits.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;tracechange&quot;</span></span><span class="hs-special">}</span><span>
-</span><span id="line-68"></span><span>
-</span><span id="line-69"></span><span class="hs-comment">-- | Inserts a subtree into another tree.</span><span>
-</span><span id="line-70"></span><span class="hs-comment">-- The given tree (first argument) will become the @i@-th child of the node with the given UUID.</span><span>
-</span><span id="line-71"></span><span id="local-6989586621679094380"><span id="local-6989586621679094381"><span class="annot"><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-type">edit_ins_tree</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679094381"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094380"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094381"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094380"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094381"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
-</span><span id="line-72"></span><span id="edit_ins_tree"><span class="annot"><span class="annottext">edit_ins_tree :: AST g a -&gt; Int -&gt; Int -&gt; Edit g a
-</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var hs-var">edit_ins_tree</span></a></span></span><span> </span><span id="local-6989586621679094324"><span class="annot"><span class="annottext">stree :: AST g a
-</span><a href="#local-6989586621679094324"><span class="hs-identifier hs-var">stree</span></a></span></span><span> </span><span id="local-6989586621679094323"><span class="annot"><span class="annottext">p :: Int
-</span><a href="#local-6989586621679094323"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679094322"><span class="annot"><span class="annottext">i :: Int
-</span><a href="#local-6989586621679094322"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- | Inserts a subtree into another tree.</span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- The given tree (first argument) will become the @i@-th child of the node with the given UUID.</span><span>
+</span><span id="line-77"></span><span id="local-6989586621679094335"><span id="local-6989586621679094336"><span class="annot"><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-type">edit_ins_tree</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679094336"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="AST.html#AST"><span class="hs-identifier hs-type">AST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094335"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094336"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094335"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094336"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-78"></span><span id="edit_ins_tree"><span class="annot"><span class="annottext">edit_ins_tree :: AST g a -&gt; Int -&gt; Int -&gt; Edit g a
+</span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var hs-var">edit_ins_tree</span></a></span></span><span> </span><span id="local-6989586621679094279"><span class="annot"><span class="annottext">stree :: AST g a
+</span><a href="#local-6989586621679094279"><span class="hs-identifier hs-var">stree</span></a></span></span><span> </span><span id="local-6989586621679094278"><span class="annot"><span class="annottext">p :: Int
+</span><a href="#local-6989586621679094278"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679094277"><span class="annot"><span class="annottext">i :: Int
+</span><a href="#local-6989586621679094277"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
 EditType
 -&gt; String
 -&gt; (AST g a -&gt; AST g a)
 -&gt; (AST g a -&gt; Set (Node g a))
 -&gt; Edit g a
 </span><a href="Edits.html#Edit"><span class="hs-identifier hs-type hs-type">Edit</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-73"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
+</span><span id="line-79"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
 </span><a href="Edits.html#edittype"><span class="hs-identifier hs-var">edittype</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EditType
 </span><a href="Edits.html#Insert"><span class="hs-identifier hs-var">Insert</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-74"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
-</span><a href="Edits.html#run"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094321"><span class="annot"><span class="annottext">t :: AST g a
-</span><a href="#local-6989586621679094321"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">(Node g a -&gt; Bool) -&gt; AST g a -&gt; Bool
+</span><span id="line-80"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
+</span><a href="Edits.html#run"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094276"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094276"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">(Node g a -&gt; Bool) -&gt; AST g a -&gt; Bool
 forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
 </span><span class="hs-identifier hs-var">any</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094323"><span class="hs-identifier hs-var">p</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+</span><a href="#local-6989586621679094278"><span class="hs-identifier hs-var">p</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span class="hs-special">)</span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; (Node g a -&gt; Int) -&gt; Node g a -&gt; Bool
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">Node g a -&gt; Int
 forall g a. Node g a -&gt; Int
 </span><a href="AST.html#uuid"><span class="hs-identifier hs-var hs-var">uuid</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094321"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">(AST g a -&gt; AST g a) -&gt; AST g a -&gt; AST g a
+</span><a href="#local-6989586621679094276"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">(AST g a -&gt; AST g a) -&gt; AST g a -&gt; AST g a
 forall a. (Tree a -&gt; Tree a) -&gt; Tree a -&gt; Tree a
 </span><a href="Tree.html#manipulate"><span class="hs-identifier hs-var">manipulate</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; AST g a
-</span><a href="#local-6989586621679094317"><span class="hs-identifier hs-var">ins</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094321"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">String -&gt; AST g a
+</span><a href="#local-6989586621679094272"><span class="hs-identifier hs-var">ins</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094276"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">String -&gt; AST g a
 forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; AST g a) -&gt; String -&gt; AST g a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -190,28 +196,28 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094323"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><a href="#local-6989586621679094278"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="hs-string">&quot; does not exist!&quot;</span></span><span class="hs-special">,</span><span>
-</span><span id="line-75"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
-</span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094315"><span class="annot"><span class="annottext">t :: AST g a
-</span><a href="#local-6989586621679094315"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">(Node g a -&gt; Bool) -&gt; AST g a -&gt; Bool
+</span><span id="line-81"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
+</span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094270"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094270"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">(Node g a -&gt; Bool) -&gt; AST g a -&gt; Bool
 forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
 </span><span class="hs-identifier hs-var">any</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094323"><span class="hs-identifier hs-var">p</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+</span><a href="#local-6989586621679094278"><span class="hs-identifier hs-var">p</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span class="hs-special">)</span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; (Node g a -&gt; Int) -&gt; Node g a -&gt; Bool
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">Node g a -&gt; Int
 forall g a. Node g a -&gt; Int
 </span><a href="AST.html#uuid"><span class="hs-identifier hs-var hs-var">uuid</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094315"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Set (Node g a)
+</span><a href="#local-6989586621679094270"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Set (Node g a)
 forall a. Ord a =&gt; Tree a -&gt; Set a
 </span><a href="Tree.html#toset"><span class="hs-identifier hs-var">toset</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094324"><span class="hs-identifier hs-var">stree</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
+</span><a href="#local-6989586621679094279"><span class="hs-identifier hs-var">stree</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
 forall a. Set a
 </span><span class="hs-identifier hs-var">empty</span></span><span class="hs-special">,</span><span>
-</span><span id="line-76"></span><span>    </span><span class="annot"><span class="annottext">name :: String
+</span><span id="line-82"></span><span>    </span><span class="annot"><span class="annottext">name :: String
 </span><a href="Edits.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;ins_tree(&quot;</span></span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; String
@@ -225,174 +231,174 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">AST g a -&gt; Int
 forall g a. AST g a -&gt; Int
 </span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094324"><span class="hs-identifier hs-var">stree</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094323"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094322"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><a href="#local-6989586621679094279"><span class="hs-identifier hs-var">stree</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679094278"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679094277"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="hs-string">&quot;)&quot;</span></span><span class="hs-special">}</span><span> </span><span class="hs-comment">-- inverse = del_tree $ uuidOf s</span><span>
-</span><span id="line-77"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679094317"><span class="annot"><span class="annottext">ins :: AST g a -&gt; AST g a
-</span><a href="#local-6989586621679094317"><span class="hs-identifier hs-var hs-var">ins</span></a></span></span><span> </span><span id="local-6989586621679094311"><span class="annot"><span class="annottext">x :: AST g a
-</span><a href="#local-6989586621679094311"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Tree.html#Tree"><span class="hs-identifier hs-type">Tree</span></a></span><span> </span><span id="local-6989586621679094309"><span class="annot"><span class="annottext">n :: Node g a
-</span><a href="#local-6989586621679094309"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679094308"><span class="annot"><span class="annottext">c :: [AST g a]
-</span><a href="#local-6989586621679094308"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Node g a -&gt; Int
+</span><span id="line-83"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679094272"><span class="annot"><span class="annottext">ins :: AST g a -&gt; AST g a
+</span><a href="#local-6989586621679094272"><span class="hs-identifier hs-var hs-var">ins</span></a></span></span><span> </span><span id="local-6989586621679094266"><span class="annot"><span class="annottext">x :: AST g a
+</span><a href="#local-6989586621679094266"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Tree.html#Tree"><span class="hs-identifier hs-type">Tree</span></a></span><span> </span><span id="local-6989586621679094264"><span class="annot"><span class="annottext">n :: Node g a
+</span><a href="#local-6989586621679094264"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679094263"><span class="annot"><span class="annottext">c :: [AST g a]
+</span><a href="#local-6989586621679094263"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Node g a -&gt; Int
 forall g a. Node g a -&gt; Int
 </span><a href="AST.html#uuid"><span class="hs-identifier hs-var hs-var">uuid</span></a></span><span> </span><span class="annot"><span class="annottext">Node g a
-</span><a href="#local-6989586621679094309"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+</span><a href="#local-6989586621679094264"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094323"><span class="hs-identifier hs-var">p</span></a></span><span>
-</span><span id="line-78"></span><span>                             </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Node g a -&gt; [AST g a] -&gt; AST g a
+</span><a href="#local-6989586621679094278"><span class="hs-identifier hs-var">p</span></a></span><span>
+</span><span id="line-84"></span><span>                             </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Node g a -&gt; [AST g a] -&gt; AST g a
 forall a. a -&gt; [Tree a] -&gt; Tree a
 </span><a href="Tree.html#Tree"><span class="hs-identifier hs-var">Tree</span></a></span><span> </span><span class="annot"><span class="annottext">Node g a
-</span><a href="#local-6989586621679094309"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; AST g a -&gt; [AST g a] -&gt; [AST g a]
+</span><a href="#local-6989586621679094264"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; AST g a -&gt; [AST g a] -&gt; [AST g a]
 forall a. Int -&gt; a -&gt; [a] -&gt; [a]
 </span><a href="ListUtil.html#insertAtIndex"><span class="hs-identifier hs-var">ListUtil.insertAtIndex</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094322"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094324"><span class="hs-identifier hs-var">stree</span></a></span><span> </span><span class="annot"><span class="annottext">[AST g a]
-</span><a href="#local-6989586621679094308"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-79"></span><span>                             </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094311"><span class="hs-identifier hs-var">x</span></a></span><span>
-</span><span id="line-80"></span><span>
-</span><span id="line-81"></span><span class="hs-comment">-- | Delete the node with the given UUID v and move its children up (such that they become children of the deleted node's parent).</span><span>
-</span><span id="line-82"></span><span id="local-6989586621679094305"><span id="local-6989586621679094306"><span class="annot"><a href="Edits.html#edit_del_node"><span class="hs-identifier hs-type">edit_del_node</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679094306"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094305"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094306"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
-</span><span id="line-83"></span><span id="edit_del_node"><span class="annot"><span class="annottext">edit_del_node :: Int -&gt; Edit g a
-</span><a href="Edits.html#edit_del_node"><span class="hs-identifier hs-var hs-var">edit_del_node</span></a></span></span><span> </span><span id="local-6989586621679094303"><span class="annot"><span class="annottext">v :: Int
-</span><a href="#local-6989586621679094303"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
+</span><a href="#local-6989586621679094277"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094279"><span class="hs-identifier hs-var">stree</span></a></span><span> </span><span class="annot"><span class="annottext">[AST g a]
+</span><a href="#local-6989586621679094263"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-85"></span><span>                             </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094266"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span class="hs-comment">-- | Delete the node with the given UUID v and move its children up (such that they become children of the deleted node's parent).</span><span>
+</span><span id="line-88"></span><span id="local-6989586621679094260"><span id="local-6989586621679094261"><span class="annot"><a href="Edits.html#edit_del_node"><span class="hs-identifier hs-type">edit_del_node</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679094261"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094260"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094261"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-89"></span><span id="edit_del_node"><span class="annot"><span class="annottext">edit_del_node :: Int -&gt; Edit g a
+</span><a href="Edits.html#edit_del_node"><span class="hs-identifier hs-var hs-var">edit_del_node</span></a></span></span><span> </span><span id="local-6989586621679094258"><span class="annot"><span class="annottext">v :: Int
+</span><a href="#local-6989586621679094258"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
 EditType
 -&gt; String
 -&gt; (AST g a -&gt; AST g a)
 -&gt; (AST g a -&gt; Set (Node g a))
 -&gt; Edit g a
 </span><a href="Edits.html#Edit"><span class="hs-identifier hs-type hs-type">Edit</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-84"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
+</span><span id="line-90"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
 </span><a href="Edits.html#edittype"><span class="hs-identifier hs-var">edittype</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EditType
 </span><a href="Edits.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-85"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
+</span><span id="line-91"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
 </span><a href="Edits.html#run"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(AST g a -&gt; Bool) -&gt; AST g a -&gt; AST g a
 forall a. (Tree a -&gt; Bool) -&gt; Tree a -&gt; Tree a
 </span><a href="Tree.html#filterNodes"><span class="hs-identifier hs-var">filterNodes</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094303"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+</span><a href="#local-6989586621679094258"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">/=</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; (AST g a -&gt; Int) -&gt; AST g a -&gt; Bool
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Int
 forall g a. AST g a -&gt; Int
 </span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-comment">--(fmap $ increaseVersion 1).</span><span>
-</span><span id="line-86"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
-</span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094300"><span class="annot"><span class="annottext">t :: AST g a
-</span><a href="#local-6989586621679094300"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Int -&gt; AST g a -&gt; Maybe (AST g a)
+</span><span id="line-92"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
+</span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094255"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094255"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Int -&gt; AST g a -&gt; Maybe (AST g a)
 forall g a. Int -&gt; AST g a -&gt; Maybe (AST g a)
 </span><a href="AST.html#findById"><span class="hs-identifier hs-var">findById</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094303"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094300"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-87"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
+</span><a href="#local-6989586621679094258"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094255"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-93"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
 forall a. Set a
 </span><span class="hs-identifier hs-var">empty</span></span><span>
-</span><span id="line-88"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679094298"><span class="annot"><span class="annottext">t' :: AST g a
-</span><a href="#local-6989586621679094298"><span class="hs-identifier hs-var">t'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Node g a -&gt; Set (Node g a)
+</span><span id="line-94"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679094253"><span class="annot"><span class="annottext">t' :: AST g a
+</span><a href="#local-6989586621679094253"><span class="hs-identifier hs-var">t'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Node g a -&gt; Set (Node g a)
 forall a. a -&gt; Set a
 </span><span class="hs-identifier hs-var">singleton</span></span><span> </span><span class="annot"><span class="annottext">(Node g a -&gt; Set (Node g a)) -&gt; Node g a -&gt; Set (Node g a)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Node g a
 forall a. Tree a -&gt; a
 </span><a href="Tree.html#element"><span class="hs-identifier hs-var">element</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094298"><span class="hs-identifier hs-var">t'</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-89"></span><span>    </span><span class="annot"><span class="annottext">name :: String
+</span><a href="#local-6989586621679094253"><span class="hs-identifier hs-var">t'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-95"></span><span>    </span><span class="annot"><span class="annottext">name :: String
 </span><a href="Edits.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;del_node(&quot;</span></span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094303"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><a href="#local-6989586621679094258"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="hs-string">&quot;)&quot;</span></span><span class="hs-special">}</span><span>
-</span><span id="line-90"></span><span>
-</span><span id="line-91"></span><span class="hs-comment">-- | Delete the entire subtree whose root has the given id.</span><span>
-</span><span id="line-92"></span><span id="local-6989586621679094382"><span id="local-6989586621679094383"><span class="annot"><a href="Edits.html#edit_del_tree"><span class="hs-identifier hs-type">edit_del_tree</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679094383"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094382"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094383"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
-</span><span id="line-93"></span><span id="edit_del_tree"><span class="annot"><span class="annottext">edit_del_tree :: Int -&gt; Edit g a
-</span><a href="Edits.html#edit_del_tree"><span class="hs-identifier hs-var hs-var">edit_del_tree</span></a></span></span><span> </span><span id="local-6989586621679094294"><span class="annot"><span class="annottext">v :: Int
-</span><a href="#local-6989586621679094294"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span class="hs-comment">-- | Delete the entire subtree whose root has the given id.</span><span>
+</span><span id="line-98"></span><span id="local-6989586621679094337"><span id="local-6989586621679094338"><span class="annot"><a href="Edits.html#edit_del_tree"><span class="hs-identifier hs-type">edit_del_tree</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679094338"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094337"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094338"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-99"></span><span id="edit_del_tree"><span class="annot"><span class="annottext">edit_del_tree :: Int -&gt; Edit g a
+</span><a href="Edits.html#edit_del_tree"><span class="hs-identifier hs-var hs-var">edit_del_tree</span></a></span></span><span> </span><span id="local-6989586621679094249"><span class="annot"><span class="annottext">v :: Int
+</span><a href="#local-6989586621679094249"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
 EditType
 -&gt; String
 -&gt; (AST g a -&gt; AST g a)
 -&gt; (AST g a -&gt; Set (Node g a))
 -&gt; Edit g a
 </span><a href="Edits.html#Edit"><span class="hs-identifier hs-type hs-type">Edit</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-94"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
+</span><span id="line-100"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
 </span><a href="Edits.html#edittype"><span class="hs-identifier hs-var">edittype</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EditType
 </span><a href="Edits.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-95"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
+</span><span id="line-101"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
 </span><a href="Edits.html#run"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(AST g a -&gt; Bool) -&gt; AST g a -&gt; AST g a
 forall a. (Tree a -&gt; Bool) -&gt; Tree a -&gt; Tree a
 </span><a href="Tree.html#filterTrees"><span class="hs-identifier hs-var">filterTrees</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094294"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+</span><a href="#local-6989586621679094249"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">/=</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; (AST g a -&gt; Int) -&gt; AST g a -&gt; Bool
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Int
 forall g a. AST g a -&gt; Int
 </span><a href="AST.html#uuidOf"><span class="hs-identifier hs-var">uuidOf</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-comment">--(fmap $ increaseVersion 1).</span><span>
-</span><span id="line-96"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
-</span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094292"><span class="annot"><span class="annottext">t :: AST g a
-</span><a href="#local-6989586621679094292"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Int -&gt; AST g a -&gt; Maybe (AST g a)
+</span><span id="line-102"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
+</span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094247"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094247"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Int -&gt; AST g a -&gt; Maybe (AST g a)
 forall g a. Int -&gt; AST g a -&gt; Maybe (AST g a)
 </span><a href="AST.html#findById"><span class="hs-identifier hs-var">findById</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094294"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094292"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-97"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
+</span><a href="#local-6989586621679094249"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094247"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-103"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
 forall a. Set a
 </span><span class="hs-identifier hs-var">empty</span></span><span>
-</span><span id="line-98"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679094291"><span class="annot"><span class="annottext">t' :: AST g a
-</span><a href="#local-6989586621679094291"><span class="hs-identifier hs-var">t'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Set (Node g a)
+</span><span id="line-104"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679094246"><span class="annot"><span class="annottext">t' :: AST g a
+</span><a href="#local-6989586621679094246"><span class="hs-identifier hs-var">t'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Set (Node g a)
 forall a. Ord a =&gt; Tree a -&gt; Set a
 </span><a href="Tree.html#toset"><span class="hs-identifier hs-var">toset</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094291"><span class="hs-identifier hs-var">t'</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-99"></span><span>    </span><span class="annot"><span class="annottext">name :: String
+</span><a href="#local-6989586621679094246"><span class="hs-identifier hs-var">t'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-105"></span><span>    </span><span class="annot"><span class="annottext">name :: String
 </span><a href="Edits.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;del_tree(&quot;</span></span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094294"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><a href="#local-6989586621679094249"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="hs-string">&quot;)&quot;</span></span><span class="hs-special">}</span><span>
-</span><span id="line-100"></span><span>
-</span><span id="line-101"></span><span class="hs-comment">-- | Moves the subtree @s@ with the given root (first argument).</span><span>
-</span><span id="line-102"></span><span class="hs-comment">-- @s@ will become the i-th child of the node with the given id (second argument).</span><span>
-</span><span id="line-103"></span><span id="local-6989586621679094289"><span id="local-6989586621679094290"><span class="annot"><a href="Edits.html#edit_move_tree"><span class="hs-identifier hs-type">edit_move_tree</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Grammar.html#Grammar"><span class="hs-identifier hs-type">Grammar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094290"><span class="hs-identifier hs-type">g</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679094289"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679094289"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094290"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094289"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
-</span><span id="line-104"></span><span id="edit_move_tree"><span class="annot"><span class="annottext">edit_move_tree :: Int -&gt; Int -&gt; Int -&gt; Edit g a
-</span><a href="Edits.html#edit_move_tree"><span class="hs-identifier hs-var hs-var">edit_move_tree</span></a></span></span><span> </span><span id="local-6989586621679094286"><span class="annot"><span class="annottext">s :: Int
-</span><a href="#local-6989586621679094286"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621679094285"><span class="annot"><span class="annottext">p :: Int
-</span><a href="#local-6989586621679094285"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679094284"><span class="annot"><span class="annottext">i :: Int
-</span><a href="#local-6989586621679094284"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span class="hs-comment">-- | Moves the subtree @s@ with the given root (first argument).</span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- @s@ will become the i-th child of the node with the given id (second argument).</span><span>
+</span><span id="line-109"></span><span id="local-6989586621679094244"><span id="local-6989586621679094245"><span class="annot"><a href="Edits.html#edit_move_tree"><span class="hs-identifier hs-type">edit_move_tree</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Grammar.html#Grammar"><span class="hs-identifier hs-type">Grammar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094245"><span class="hs-identifier hs-type">g</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679094244"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679094244"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094245"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094244"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-110"></span><span id="edit_move_tree"><span class="annot"><span class="annottext">edit_move_tree :: Int -&gt; Int -&gt; Int -&gt; Edit g a
+</span><a href="Edits.html#edit_move_tree"><span class="hs-identifier hs-var hs-var">edit_move_tree</span></a></span></span><span> </span><span id="local-6989586621679094241"><span class="annot"><span class="annottext">s :: Int
+</span><a href="#local-6989586621679094241"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621679094240"><span class="annot"><span class="annottext">p :: Int
+</span><a href="#local-6989586621679094240"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679094239"><span class="annot"><span class="annottext">i :: Int
+</span><a href="#local-6989586621679094239"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
 EditType
 -&gt; String
 -&gt; (AST g a -&gt; AST g a)
 -&gt; (AST g a -&gt; Set (Node g a))
 -&gt; Edit g a
 </span><a href="Edits.html#Edit"><span class="hs-identifier hs-type hs-type">Edit</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-105"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
+</span><span id="line-111"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
 </span><a href="Edits.html#edittype"><span class="hs-identifier hs-var">edittype</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EditType
 </span><a href="Edits.html#Move"><span class="hs-identifier hs-var">Move</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-106"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
-</span><a href="Edits.html#run"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094283"><span class="annot"><span class="annottext">t :: AST g a
-</span><a href="#local-6989586621679094283"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Maybe (AST g a)
+</span><span id="line-112"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
+</span><a href="Edits.html#run"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094238"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094238"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Maybe (AST g a)
 forall g a. AST g a -&gt; Maybe (AST g a)
-</span><a href="#local-6989586621679094282"><span class="hs-identifier hs-var">streeIn</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094283"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-107"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679094281"><span class="annot"><span class="annottext">stree :: AST g a
-</span><a href="#local-6989586621679094281"><span class="hs-identifier hs-var">stree</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AST g a -&gt; AST g a -&gt; AST g a
+</span><a href="#local-6989586621679094237"><span class="hs-identifier hs-var">streeIn</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094238"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-113"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679094236"><span class="annot"><span class="annottext">stree :: AST g a
+</span><a href="#local-6989586621679094236"><span class="hs-identifier hs-var">stree</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AST g a -&gt; AST g a -&gt; AST g a
 forall a g. Eq a =&gt; AST g a -&gt; AST g a -&gt; AST g a
-</span><a href="#local-6989586621679094280"><span class="hs-identifier hs-var">ins</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094281"><span class="hs-identifier hs-var">stree</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">(AST g a -&gt; AST g a) -&gt; (AST g a -&gt; AST g a) -&gt; AST g a -&gt; AST g a
+</span><a href="#local-6989586621679094235"><span class="hs-identifier hs-var">ins</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094236"><span class="hs-identifier hs-var">stree</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">(AST g a -&gt; AST g a) -&gt; (AST g a -&gt; AST g a) -&gt; AST g a -&gt; AST g a
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">AST g a -&gt; AST g a
 forall g. AST g a -&gt; AST g a
-</span><a href="#local-6989586621679094279"><span class="hs-identifier hs-var">del</span></a></span><span> </span><span class="annot"><span class="annottext">(AST g a -&gt; AST g a) -&gt; AST g a -&gt; AST g a
+</span><a href="#local-6989586621679094234"><span class="hs-identifier hs-var">del</span></a></span><span> </span><span class="annot"><span class="annottext">(AST g a -&gt; AST g a) -&gt; AST g a -&gt; AST g a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094283"><span class="hs-identifier hs-var">t</span></a></span><span>
-</span><span id="line-108"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; AST g a
+</span><a href="#local-6989586621679094238"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-114"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; AST g a
 forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; AST g a) -&gt; String -&gt; AST g a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -401,29 +407,29 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094286"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><a href="#local-6989586621679094241"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="hs-string">&quot; cannot be moved because it does not exist in the given tree \n&quot;</span></span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">AST g a -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094283"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
-</span><span id="line-109"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
-</span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094278"><span class="annot"><span class="annottext">t :: AST g a
-</span><a href="#local-6989586621679094278"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Maybe (AST g a)
+</span><a href="#local-6989586621679094238"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-115"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
+</span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094233"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094233"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Maybe (AST g a)
 forall g a. AST g a -&gt; Maybe (AST g a)
-</span><a href="#local-6989586621679094282"><span class="hs-identifier hs-var">streeIn</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094278"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-110"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679094277"><span class="annot"><span class="annottext">stree :: AST g a
-</span><a href="#local-6989586621679094277"><span class="hs-identifier hs-var">stree</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Set (Node g a)
+</span><a href="#local-6989586621679094237"><span class="hs-identifier hs-var">streeIn</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094233"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-116"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679094232"><span class="annot"><span class="annottext">stree :: AST g a
+</span><a href="#local-6989586621679094232"><span class="hs-identifier hs-var">stree</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Set (Node g a)
 forall a. Ord a =&gt; Tree a -&gt; Set a
 </span><a href="Tree.html#toset"><span class="hs-identifier hs-var">toset</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094277"><span class="hs-identifier hs-var">stree</span></a></span><span>
-</span><span id="line-111"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
+</span><a href="#local-6989586621679094232"><span class="hs-identifier hs-var">stree</span></a></span><span>
+</span><span id="line-117"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
 forall a. Set a
 </span><span class="hs-identifier hs-var">empty</span></span><span class="hs-special">,</span><span>
-</span><span id="line-112"></span><span>    </span><span class="annot"><span class="annottext">name :: String
+</span><span id="line-118"></span><span>    </span><span class="annot"><span class="annottext">name :: String
 </span><a href="Edits.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;move_tree(&quot;</span></span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; String
@@ -435,97 +441,97 @@ forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; String) -&gt; [Int] -&gt; [String]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094286"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094285"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094284"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><a href="#local-6989586621679094241"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679094240"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679094239"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="hs-string">&quot;)&quot;</span></span><span class="hs-special">}</span><span>
-</span><span id="line-113"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679094282"><span class="annot"><span class="annottext">streeIn :: AST g a -&gt; Maybe (AST g a)
-</span><a href="#local-6989586621679094282"><span class="hs-identifier hs-var hs-var">streeIn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; AST g a -&gt; Maybe (AST g a)
+</span><span id="line-119"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679094237"><span class="annot"><span class="annottext">streeIn :: AST g a -&gt; Maybe (AST g a)
+</span><a href="#local-6989586621679094237"><span class="hs-identifier hs-var hs-var">streeIn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; AST g a -&gt; Maybe (AST g a)
 forall g a. Int -&gt; AST g a -&gt; Maybe (AST g a)
 </span><a href="AST.html#findById"><span class="hs-identifier hs-var">findById</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094286"><span class="hs-identifier hs-var">s</span></a></span><span>
-</span><span id="line-114"></span><span>          </span><span id="local-6989586621679094279"><span class="annot"><span class="annottext">del :: AST g a -&gt; AST g a
-</span><a href="#local-6989586621679094279"><span class="hs-identifier hs-var hs-var">del</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit g a -&gt; AST g a -&gt; AST g a
+</span><a href="#local-6989586621679094241"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-120"></span><span>          </span><span id="local-6989586621679094234"><span class="annot"><span class="annottext">del :: AST g a -&gt; AST g a
+</span><a href="#local-6989586621679094234"><span class="hs-identifier hs-var hs-var">del</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit g a -&gt; AST g a -&gt; AST g a
 forall g a. Edit g a -&gt; AST g a -&gt; AST g a
 </span><a href="Edits.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span><span> </span><span class="annot"><span class="annottext">(Edit g a -&gt; AST g a -&gt; AST g a) -&gt; Edit g a -&gt; AST g a -&gt; AST g a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Edit g a
 forall a g. Eq a =&gt; Int -&gt; Edit g a
 </span><a href="Edits.html#edit_del_tree"><span class="hs-identifier hs-var">edit_del_tree</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094286"><span class="hs-identifier hs-var">s</span></a></span><span>
-</span><span id="line-115"></span><span>          </span><span id="local-6989586621679094280"><span class="annot"><span class="annottext">ins :: AST g a -&gt; AST g a -&gt; AST g a
-</span><a href="#local-6989586621679094280"><span class="hs-identifier hs-var hs-var">ins</span></a></span></span><span> </span><span id="local-6989586621679094276"><span class="annot"><span class="annottext">t :: AST g a
-</span><a href="#local-6989586621679094276"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit g a -&gt; AST g a -&gt; AST g a
+</span><a href="#local-6989586621679094241"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-121"></span><span>          </span><span id="local-6989586621679094235"><span class="annot"><span class="annottext">ins :: AST g a -&gt; AST g a -&gt; AST g a
+</span><a href="#local-6989586621679094235"><span class="hs-identifier hs-var hs-var">ins</span></a></span></span><span> </span><span id="local-6989586621679094231"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094231"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit g a -&gt; AST g a -&gt; AST g a
 forall g a. Edit g a -&gt; AST g a -&gt; AST g a
 </span><a href="Edits.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span><span> </span><span class="annot"><span class="annottext">(Edit g a -&gt; AST g a -&gt; AST g a) -&gt; Edit g a -&gt; AST g a -&gt; AST g a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Int -&gt; Int -&gt; Edit g a
 forall a g. Eq a =&gt; AST g a -&gt; Int -&gt; Int -&gt; Edit g a
 </span><a href="Edits.html#edit_ins_tree"><span class="hs-identifier hs-var">edit_ins_tree</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094276"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094285"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094284"><span class="hs-identifier hs-var">i</span></a></span><span>
-</span><span id="line-116"></span><span>
-</span><span id="line-117"></span><span class="hs-comment">-- | Updates the node with the given UUID to have a new grammar type and a new value.</span><span>
-</span><span id="line-118"></span><span class="hs-comment">-- The node will keep its UUID (i.e., not get a new uuid as it is still associated to the same previous node.</span><span>
-</span><span id="line-119"></span><span id="local-6989586621679094274"><span id="local-6989586621679094275"><span class="annot"><a href="Edits.html#edit_update"><span class="hs-identifier hs-type">edit_update</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Grammar.html#Grammar"><span class="hs-identifier hs-type">Grammar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094275"><span class="hs-identifier hs-type">g</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679094274"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679094274"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679094275"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679094274"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094275"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094274"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
-</span><span id="line-120"></span><span id="edit_update"><span class="annot"><span class="annottext">edit_update :: Int -&gt; g -&gt; a -&gt; Edit g a
-</span><a href="Edits.html#edit_update"><span class="hs-identifier hs-var hs-var">edit_update</span></a></span></span><span> </span><span id="local-6989586621679094272"><span class="annot"><span class="annottext">id :: Int
-</span><a href="#local-6989586621679094272"><span class="hs-identifier hs-var">id</span></a></span></span><span> </span><span id="local-6989586621679094271"><span class="annot"><span class="annottext">newGrammarType :: g
-</span><a href="#local-6989586621679094271"><span class="hs-identifier hs-var">newGrammarType</span></a></span></span><span> </span><span id="local-6989586621679094270"><span class="annot"><span class="annottext">newVal :: a
-</span><a href="#local-6989586621679094270"><span class="hs-identifier hs-var">newVal</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
+</span><a href="#local-6989586621679094231"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679094240"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679094239"><span class="hs-identifier hs-var">i</span></a></span><span>
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span class="hs-comment">-- | Updates the node with the given UUID to have a new grammar type and a new value.</span><span>
+</span><span id="line-124"></span><span class="hs-comment">-- The node will keep its UUID (i.e., not get a new uuid as it is still associated to the same previous node.</span><span>
+</span><span id="line-125"></span><span id="local-6989586621679094229"><span id="local-6989586621679094230"><span class="annot"><a href="Edits.html#edit_update"><span class="hs-identifier hs-type">edit_update</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Grammar.html#Grammar"><span class="hs-identifier hs-type">Grammar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094230"><span class="hs-identifier hs-type">g</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679094229"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679094229"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="UUID.html#UUID"><span class="hs-identifier hs-type">UUID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679094230"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679094229"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Edits.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094230"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679094229"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-126"></span><span id="edit_update"><span class="annot"><span class="annottext">edit_update :: Int -&gt; g -&gt; a -&gt; Edit g a
+</span><a href="Edits.html#edit_update"><span class="hs-identifier hs-var hs-var">edit_update</span></a></span></span><span> </span><span id="local-6989586621679094227"><span class="annot"><span class="annottext">id :: Int
+</span><a href="#local-6989586621679094227"><span class="hs-identifier hs-var">id</span></a></span></span><span> </span><span id="local-6989586621679094226"><span class="annot"><span class="annottext">newGrammarType :: g
+</span><a href="#local-6989586621679094226"><span class="hs-identifier hs-var">newGrammarType</span></a></span></span><span> </span><span id="local-6989586621679094225"><span class="annot"><span class="annottext">newVal :: a
+</span><a href="#local-6989586621679094225"><span class="hs-identifier hs-var">newVal</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Edit :: forall g a.
 EditType
 -&gt; String
 -&gt; (AST g a -&gt; AST g a)
 -&gt; (AST g a -&gt; Set (Node g a))
 -&gt; Edit g a
 </span><a href="Edits.html#Edit"><span class="hs-identifier hs-type hs-type">Edit</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-121"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
+</span><span id="line-127"></span><span>    </span><span class="annot"><span class="annottext">edittype :: EditType
 </span><a href="Edits.html#edittype"><span class="hs-identifier hs-var">edittype</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EditType
 </span><a href="Edits.html#Update"><span class="hs-identifier hs-var">Update</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-122"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
-</span><a href="Edits.html#run"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094269"><span class="annot"><span class="annottext">t :: AST g a
-</span><a href="#local-6989586621679094269"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679094268"><span class="annot"><span class="annottext">n :: Node g a
-</span><a href="#local-6989586621679094268"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-123"></span><span>        </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Node g a -&gt; Int
+</span><span id="line-128"></span><span>    </span><span class="annot"><span class="annottext">run :: AST g a -&gt; AST g a
+</span><a href="Edits.html#run"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094224"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094224"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679094223"><span class="annot"><span class="annottext">n :: Node g a
+</span><a href="#local-6989586621679094223"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-129"></span><span>        </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Node g a -&gt; Int
 forall g a. Node g a -&gt; Int
 </span><a href="AST.html#uuid"><span class="hs-identifier hs-var hs-var">uuid</span></a></span><span> </span><span class="annot"><span class="annottext">Node g a
-</span><a href="#local-6989586621679094268"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+</span><a href="#local-6989586621679094223"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094272"><span class="hs-identifier hs-var">id</span></a></span><span>
-</span><span id="line-124"></span><span>        </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Node :: forall g a. a -&gt; g -&gt; Int -&gt; Node g a
+</span><a href="#local-6989586621679094227"><span class="hs-identifier hs-var">id</span></a></span><span>
+</span><span id="line-130"></span><span>        </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Node :: forall g a. a -&gt; g -&gt; Int -&gt; Node g a
 </span><a href="AST.html#Node"><span class="hs-identifier hs-type hs-type">Node</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">value :: a
 </span><a href="AST.html#value"><span class="hs-identifier hs-var">value</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679094270"><span class="hs-identifier hs-var">newVal</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">grammartype :: g
+</span><a href="#local-6989586621679094225"><span class="hs-identifier hs-var">newVal</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">grammartype :: g
 </span><a href="AST.html#grammartype"><span class="hs-identifier hs-var">grammartype</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">g
-</span><a href="#local-6989586621679094271"><span class="hs-identifier hs-var">newGrammarType</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">uuid :: Int
+</span><a href="#local-6989586621679094226"><span class="hs-identifier hs-var">newGrammarType</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">uuid :: Int
 </span><a href="AST.html#uuid"><span class="hs-identifier hs-var">uuid</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Node g a -&gt; Int
 forall g a. Node g a -&gt; Int
 </span><a href="AST.html#uuid"><span class="hs-identifier hs-var hs-var">uuid</span></a></span><span> </span><span class="annot"><span class="annottext">Node g a
-</span><a href="#local-6989586621679094268"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">}</span><span>
-</span><span id="line-125"></span><span>        </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Node g a
-</span><a href="#local-6989586621679094268"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Node g a -&gt; Node g a) -&gt; AST g a -&gt; AST g a
+</span><a href="#local-6989586621679094223"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-131"></span><span>        </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Node g a
+</span><a href="#local-6989586621679094223"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Node g a -&gt; Node g a) -&gt; AST g a -&gt; AST g a
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094269"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-126"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
-</span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094263"><span class="annot"><span class="annottext">t :: AST g a
-</span><a href="#local-6989586621679094263"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Int -&gt; AST g a -&gt; Maybe (AST g a)
+</span><a href="#local-6989586621679094224"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-132"></span><span>    </span><span class="annot"><span class="annottext">delta :: AST g a -&gt; Set (Node g a)
+</span><a href="Edits.html#delta"><span class="hs-identifier hs-var">delta</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679094218"><span class="annot"><span class="annottext">t :: AST g a
+</span><a href="#local-6989586621679094218"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Int -&gt; AST g a -&gt; Maybe (AST g a)
 forall g a. Int -&gt; AST g a -&gt; Maybe (AST g a)
 </span><a href="AST.html#findById"><span class="hs-identifier hs-var">findById</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094272"><span class="hs-identifier hs-var">id</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094263"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-127"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
+</span><a href="#local-6989586621679094227"><span class="hs-identifier hs-var">id</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
+</span><a href="#local-6989586621679094218"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-133"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Set (Node g a)
 forall a. Set a
 </span><span class="hs-identifier hs-var">empty</span></span><span>
-</span><span id="line-128"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679094262"><span class="annot"><span class="annottext">x :: AST g a
-</span><a href="#local-6989586621679094262"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Set (Node g a)
+</span><span id="line-134"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679094217"><span class="annot"><span class="annottext">x :: AST g a
+</span><a href="#local-6989586621679094217"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">AST g a -&gt; Set (Node g a)
 forall a. Ord a =&gt; Tree a -&gt; Set a
 </span><a href="Tree.html#toset"><span class="hs-identifier hs-var">toset</span></a></span><span> </span><span class="annot"><span class="annottext">AST g a
-</span><a href="#local-6989586621679094262"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-129"></span><span>    </span><span class="annot"><span class="annottext">name :: String
+</span><a href="#local-6989586621679094217"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-135"></span><span>    </span><span class="annot"><span class="annottext">name :: String
 </span><a href="Edits.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;update(&quot;</span></span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; String
@@ -535,14 +541,14 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679094272"><span class="hs-identifier hs-var">id</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">g -&gt; String
+</span><a href="#local-6989586621679094227"><span class="hs-identifier hs-var">id</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">g -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">g
-</span><a href="#local-6989586621679094271"><span class="hs-identifier hs-var">newGrammarType</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+</span><a href="#local-6989586621679094226"><span class="hs-identifier hs-var">newGrammarType</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679094270"><span class="hs-identifier hs-var">newVal</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><a href="#local-6989586621679094225"><span class="hs-identifier hs-var">newVal</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="hs-string">&quot;)&quot;</span></span><span>
-</span><span id="line-130"></span><span class="hs-special">}</span><span>
-</span><span id="line-131"></span></pre></body></html>
+</span><span id="line-136"></span><span class="hs-special">}</span><span>
+</span><span id="line-137"></span></pre></body></html>

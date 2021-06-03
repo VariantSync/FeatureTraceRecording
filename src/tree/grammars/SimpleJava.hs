@@ -1,6 +1,12 @@
-﻿-- | Example implementation of a context free grammar.
--- This example represents a simplified subset of the Java programming language.
--- It contains the 'Grammar' implementation as well as functions to construct an AST in this sub-language.
+﻿{- |
+Description: Example implementation of a simplified version of the Java grammar.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+Example implementation of a context free grammar.
+This example represents a simplified subset of the Java programming language.
+It contains the 'Grammar' implementation as well as functions to construct an 'AST' in this sub-language.
+-}
 module SimpleJava where
 
 import Tree
@@ -32,14 +38,14 @@ data SimpleJavaGrammar =
   | SJava_File  -- ^ Rule that represents an entire file. Usually the root of the AST.
   deriving (Eq, Show)
 
--- | An AST build from the SimpleJavaGrammar.
+-- | An 'AST' build from the SimpleJavaGrammar.
 type SJavaAST a = AST SimpleJavaGrammar a
--- | An AST build from the SimpleJavaGrammar containing Strings as values.
+-- | An 'AST' build from the SimpleJavaGrammar containing Strings as values.
 type SSJavaAST = SJavaAST String
--- | A 'SSJavaAST' whose nodes are not yet assigned their UUIDs (they are still states waiting for evaluation).
+-- | A 'SSJavaAST' whose nodes are not yet assigned their 'UUID's (they are still states waiting for evaluation).
 type SJavaState = Tree (State UUID (Node SimpleJavaGrammar String))
 
-{- Grammar rules to build the AST -}
+{- Grammar rules to build the 'AST' -}
 
 -- | Construct a method definition with given (1) return type, (2) name, (3) parameters (pairs of type and name), and (4) the given content (list of statements).
 sjava_methoddef :: String -> String -> [(String, String)] -> [SJavaState] -> SJavaState
@@ -157,7 +163,7 @@ instance Grammar SimpleJavaGrammar where
     nodetypeof SJava_Assignment = Mandatory
 
 instance ASTPrettyPrinter SimpleJavaGrammar where
-    -- | Prints AST as source code
+    -- | Prints 'AST' as source code
     prettyPrint i indentGenerator prtStrWithContext prtNode (Tree n children) =
         mconcat $
         let indentLen = 2

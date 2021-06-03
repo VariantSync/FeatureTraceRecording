@@ -5,7 +5,8 @@
 
 
 -- | Module for type class <a>Defunctor</a> and some instances for Prelude
---   types.
+--   types. <a>Defunctor</a>s can de-lift functions from embellished types
+--   to plain types.
 module Defunctor
 
 -- | A <a>Defunctor</a> is a type that allows de-lifting functions from
@@ -22,7 +23,7 @@ instance Defunctor.Defunctor GHC.Maybe.Maybe
 instance Defunctor.Defunctor []
 
 
--- | Module for representing context-free grammars.
+-- | Type class for context-free grammars.
 module Grammar
 
 -- | Classification of nodes for feature traces and presence condition.
@@ -73,7 +74,13 @@ removeRange :: Int -> Int -> [a] -> [a]
 --   discarded.
 removeDuplicates :: Eq a => [a] -> [a]
 
+
+-- | Type class for reasoning on <a>Logic</a>s.
 module Logic
+
+-- | Type class to reason on logics. We use this type class to reason on
+--   propositional logic and the ternary logic by Sobocinski we use for
+--   feature trace recording.
 class Logic l
 
 -- | The atomic value representing <i>true</i> in this logic.
@@ -103,9 +110,13 @@ limplies :: Logic l => l -> l -> l
 -- | Equivalence between two logical formulas.
 lequals :: Logic l => l -> l -> l
 
--- | Evaluates a logical formula. Arguments are (1) a function assigning
---   variables to values (2) a formula to evaluate This function should
---   return an element of <a>lvalues</a>.
+-- | Evaluates a logical formula. Arguments are
+--   
+--   <ol>
+--   <li>a function assigning variables to values</li>
+--   <li>a formula to evaluate This function should return an element of
+--   <a>lvalues</a>.</li>
+--   </ol>
 leval :: Logic l => (l -> l) -> l -> l
 
 
@@ -176,18 +187,23 @@ cartesianOr :: [PropositionalFormula a] -> [PropositionalFormula a] -> [Proposit
 simplify :: PropositionalFormula a -> PropositionalFormula a
 
 -- | Transforms a <a>PropositionalFormula</a> in CNF to a list of its
---   clauses. Assumes that the given formula is in CNF. * The first
---   argument is a functions resolving negation, i.e. it should take an
---   <tt>a</tt> and give its negated version. * The second argument is a
---   function creating the value of type <tt>a</tt> that should be
---   associated with <i>false</i> (<a>PFalse</a>). For example, <tt>0</tt>
---   could represent <i>false</i> in propositional formulas over numerals.
---   (Note, if no such value exists, the <i>false</i> function is free to
---   produce an error.) * The third argument is the function in CNF that
---   should be clausified. If still confused, try the following call and
---   look at the result: <tt> show $ clausifyCNF (x -&gt; "not "++x)
---   "false" (toCNF p)</tt> where <tt>p</tt> is a propositional formula
---   over strings.
+--   clauses. Assumes that the given formula is in CNF.
+--   
+--   <ul>
+--   <li>The first argument is a functions resolving negation, i.e. it
+--   should take an <tt>a</tt> and give its negated version.</li>
+--   <li>The second argument is a function creating the value of type
+--   <tt>a</tt> that should be associated with <i>false</i>
+--   (<a>PFalse</a>). For example, <tt>0</tt> could represent <i>false</i>
+--   in propositional formulas over numerals. (Note, if no such value
+--   exists, the <i>false</i> function is free to produce an error.)</li>
+--   <li>The third argument is the function in CNF that should be
+--   clausified.</li>
+--   </ul>
+--   
+--   If still confused, try the following call and look at the result: <tt>
+--   show $ clausifyCNF (x -&gt; "not "++x) "false" (toCNF p) </tt> where
+--   <tt>p</tt> is a propositional formula over strings.
 clausifyCNF :: Show a => (a -> a) -> (() -> a) -> PropositionalFormula a -> [[a]]
 instance GHC.Classes.Eq a => GHC.Classes.Eq (Propositions.PropositionalFormula a)
 instance Logic.Logic (Propositions.PropositionalFormula a)
@@ -222,6 +238,8 @@ nullable_simplify :: NullableFormula a -> NullableFormula a
 prettyPrint :: Show a => Maybe a -> String
 instance Logic.Logic a => Logic.Logic (GHC.Maybe.Maybe a)
 
+
+-- | Data types for features and feature formulas.
 module Feature
 
 -- | Features are represented by a unique name.
@@ -298,23 +316,19 @@ prettybinarytable :: (Logic a, Show a) => [a] -> (a -> a -> a) -> String -> Stri
 generatetruthtablesfor :: (Logic a, Show a) => [a] -> String
 
 
--- | Module representing universable unique identifiers (UUID). We use
---   these to identify nodes in abstract syntax trees (<tt>AST</tt>) and
---   track them across versions.
+-- | Module representing universable unique identifiers (<a>UUID</a>). We
+--   use these to identify nodes in abstract syntax trees (<tt>AST</tt>)
+--   and track them across versions.
 module UUID
 
 -- | A universable unique identifiers (UUID) realised as an integer.
 type UUID = Int
 
--- | Computes the successor UUID of the current UUID.
+-- | Computes the successor <a>UUID</a> of the current <a>UUID</a>.
 next :: State UUID ()
 
--- | Converts a UUID to an int.
+-- | Converts a <a>UUID</a> to an <a>Int</a>.
 toInt :: UUID -> Int
-
--- | An invalid value for UUID that can be used to represent invalid
---   states.
-epsilon :: UUID
 
 
 -- | A module containing various utility functions.
@@ -356,7 +370,7 @@ removeQuotes :: String -> String
 
 
 -- | Implementation of a rose tree (i.e., a tree whose nodes can have an
---   arbitrary amount of children, including 0).
+--   arbitrary amount of children, including 0) we use for <tt>AST</tt>s .
 module Tree
 
 -- | Rose tree of elements of type a where children of nodes are given as
@@ -432,11 +446,11 @@ instance Data.Foldable.Foldable Tree.Tree
 instance GHC.Base.Applicative Tree.Tree
 
 
--- | Module for Abstract Syntax Trees (ASTs) that are <a>Tree</a>s with a
---   fixed node type.
+-- | Data types and operations for Abstract Syntax Trees (ASTs).
+--   <a>AST</a>s are that <a>Tree</a>s with a fixed <a>Node</a> type.
 module AST
 
--- | Node type of ASTs.
+-- | Node type of <a>AST</a>s.
 data Node g a
 Node :: a -> g -> UUID -> Node g a
 
@@ -448,12 +462,13 @@ Node :: a -> g -> UUID -> Node g a
 --   instance of <a>Grammar</a>.
 [grammartype] :: Node g a -> g
 
--- | A unique identifier to trace nodes across several versions of ASTs.
+-- | A unique identifier to trace nodes across several versions of
+--   <a>AST</a>s.
 [uuid] :: Node g a -> UUID
 
--- | Type for abstract syntax trees (ASTs) representing source code. It is
---   a tree in which each node represents a source code entity by a value,
---   a grammar type and a <a>UUID</a>.
+-- | Type for abstract syntax trees (<a>AST</a>s) representing source code.
+--   It is a tree in which each node represents a source code entity by a
+--   value, a grammar type and a <a>UUID</a>.
 type AST g a = Tree (Node g a)
 
 -- | Returns the node type of a nodes grammar type.
@@ -487,6 +502,9 @@ instance GHC.Classes.Eq a => GHC.Classes.Ord (AST.Node g a)
 instance GHC.Base.Functor (AST.Node g)
 instance (Grammar.Grammar g, GHC.Show.Show a) => GHC.Show.Show (AST.Node g a)
 
+
+-- | Module for sat solving on <a>PropositionalFormula</a>s. Uses the
+--   picosat library.
 module SAT
 
 -- | Returns <i>true</i> iff the given propositional formula is
@@ -521,26 +539,30 @@ contradicts :: (Show a, Ord a) => PropositionalFormula a -> Bool
 toIntCNF :: Ord a => PropositionalFormula a -> ([[Int]], Bimap a Int)
 
 
--- | Functions for simplification of propositional formulas.
+-- | Functions for simplification of <a>PropositionalFormula</a>s.
 module Simplify
 
 -- | This is a naive implementation for presence condition simplification
---   as described in <tt> A. von Rhein, A. Grebhahn, S. Apel, N. Siegmund,
---   D. Beyer, and T. Berger. Presence-Condition Simplification in Highly
---   Configurable Systems. In Proceedings of the IEEE/ACM International
---   Conference on Software Engineering (ICSE), pages 178–188. IEEE
---   Computer Society, May 2015. </tt> This function simplifies a
---   propositional formula (second argument) within the context of another
---   propositional formula (first argument). Assuming, that the first given
---   formula is always satisfied (i.e., it is an axiom) this function
---   simplifies the second formula. For example, in pseudo-code
---   <tt>removeRedundancy (A) (A and B) == B</tt> as <tt>A</tt> is
---   redundant in the second formula if its already satisfied in the first
---   formula.
+--   as described in
+--   
+--   <pre>
+--   A. von Rhein, A. Grebhahn, S. Apel, N. Siegmund, D. Beyer, and T. Berger.
+--   Presence-Condition Simplification in Highly Configurable Systems.
+--   In Proceedings of the IEEE/ACM International Conference on Software Engineering (ICSE), pages 178–188.
+--   IEEE Computer Society, May 2015.
+--   </pre>
+--   
+--   This function simplifies a propositional formula (second argument)
+--   within the context of another propositional formula (first argument).
+--   Assuming, that the first given formula is always satisfied (i.e., it
+--   is an axiom) this function simplifies the second formula. For example,
+--   in pseudo-code <tt>removeRedundancy (A) (A and B) == B</tt> as
+--   <tt>A</tt> is redundant in the second formula if its already satisfied
+--   in the first formula.
 removeRedundancy :: (Ord a, Show a) => PropositionalFormula a -> PropositionalFormula a -> PropositionalFormula a
 
 
--- | Module for feature traces and presence conditions.
+-- | Data types and functions for feature traces and presence conditions.
 module FeatureTrace
 
 -- | A feature trace (or feature mapping) assigns a nullable propositional
@@ -583,7 +605,7 @@ pc_parentpart :: (Grammar g, Show a, Eq a) => AST g a -> FeatureTrace g a -> Nod
 prettyPrint :: (Grammar g, Show a) => FeatureTrace g a -> AST g a -> String
 
 
--- | Module for edits to ASTs.
+-- | Module for <a>Edit</a>s to <a>AST</a>s.
 module Edits
 
 -- | Each edit is associated to a type depending on what it does.
@@ -672,7 +694,12 @@ instance GHC.Classes.Eq Edits.EditType
 instance GHC.Show.Show (Edits.Edit g a)
 
 
--- | Data types and interfaces for feature trace recording.
+-- | Data types and framework for feature trace recording. This module
+--   provides functions to run feature trace recording as well as the
+--   datatypes required to implement custom feature trace recording
+--   algorithms (i.e., variations of Algorithm 1 in the paper) and
+--   functions (i.e., supporting new edit types or adapting/replacing the
+--   default recording functions for different use cases).
 module FeatureTraceRecording
 
 -- | The feature context is a nullable propositional formula over features
@@ -703,7 +730,7 @@ type RecordingFunction g a = RecordedEdit g a -> Version g a -> FeatureTrace g a
 -- | Abstraction over Algorithm 1 in the paper. For different use cases and
 --   to prevent future errors, feature trace recording is configurable. In
 --   a framework-like manner, it gives us an implementation for a recording
---   function identified by edit typs.
+--   function identified by edit types.
 type FeatureTraceRecording g a = EditType -> RecordingFunction g a
 
 -- | Runs the given <a>FeatureTraceRecording</a> implementation starting at
@@ -827,7 +854,7 @@ runExampleWithDefaultFTR :: (Grammar g, Show a, Eq a) => Example m g a -> [Versi
 finalizeExample :: State UUID (Example m g a) -> Example m g a
 
 
--- | Module for pretty printing of ASTs.
+-- | Type class for pretty printing <a>AST</a>s.
 module ASTPrettyPrinter
 
 -- | An ASTPrettyPrinter can pretty print ASTs of a certain grammar.
@@ -853,7 +880,7 @@ showCodeAs :: (Monoid b, ASTPrettyPrinter g) => b -> (Node g a -> Int -> b) -> (
 -- | Example implementation of a context free grammar. This example
 --   represents a simplified subset of the Java programming language. It
 --   contains the <a>Grammar</a> implementation as well as functions to
---   construct an AST in this sub-language.
+--   construct an <a>AST</a> in this sub-language.
 module SimpleJava
 
 -- | Simplified subset of the Java grammar.
@@ -913,14 +940,15 @@ SJava_Type :: SimpleJavaGrammar
 -- | Rule that represents an entire file. Usually the root of the AST.
 SJava_File :: SimpleJavaGrammar
 
--- | An AST build from the SimpleJavaGrammar.
+-- | An <a>AST</a> build from the SimpleJavaGrammar.
 type SJavaAST a = AST SimpleJavaGrammar a
 
--- | An AST build from the SimpleJavaGrammar containing Strings as values.
+-- | An <a>AST</a> build from the SimpleJavaGrammar containing Strings as
+--   values.
 type SSJavaAST = SJavaAST String
 
--- | A <a>SSJavaAST</a> whose nodes are not yet assigned their UUIDs (they
---   are still states waiting for evaluation).
+-- | A <a>SSJavaAST</a> whose nodes are not yet assigned their <a>UUID</a>s
+--   (they are still states waiting for evaluation).
 type SJavaState = Tree (State UUID (Node SimpleJavaGrammar String))
 
 -- | Construct a method definition with given (1) return type, (2) name,
@@ -1180,6 +1208,9 @@ remNormalCode_notnull :: MonadColorPrinter m => State UUID (Example m SimpleJava
 --   the same as <a>remNormalCode_notnull</a>.
 remIfdef :: MonadColorPrinter m => State UUID (Example m SimpleJavaGrammar String)
 
+
+-- | Module of the <tt>main</tt> function to run demos and print
+--   meta-information.
 module Main
 
 -- | Style defining how to print <a>AST</a>s.

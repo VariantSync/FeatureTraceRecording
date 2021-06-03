@@ -1,4 +1,10 @@
-﻿-- | Module for pretty printing of ASTs.
+﻿{- |
+Description: Type class for pretty printing 'AST's.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
+Type class for pretty printing 'AST's.
+-}
 module ASTPrettyPrinter where
 
 import AST

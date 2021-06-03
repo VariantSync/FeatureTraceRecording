@@ -1,4 +1,8 @@
 ﻿{- |
+Description: Generation of truth tables for 'Logic's.
+License: GNU LGPLv3
+Maintainer: paul.bittner@uni-ulm.de
+
 Generation of truth tables for 'Logic's.
 -}
 module Truthtable where
