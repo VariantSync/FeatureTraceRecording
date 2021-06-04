@@ -2,7 +2,7 @@
 
 [![Language](https://img.shields.io/badge/Language-Haskell-purple)](https://www.haskell.org/)
 [![Documentation](https://img.shields.io/badge/Documentation-Read-purple)][documentation]
-[![Build Status](https://travis-ci.com/pmbittner/FeatureTraceRecording.svg?branch=esecfse21)](https://travis-ci.com/pmbittner/FeatureTraceRecording)
+[![Build Status](https://travis-ci.com/pmbittner/FeatureTraceRecording.svg?branch=master)](https://travis-ci.com/pmbittner/FeatureTraceRecording)
 [![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](LICENSE.LGPL3)
 [![Install](https://img.shields.io/badge/Install-Instructions-blue)](INSTALL.md)
 [![Status](https://img.shields.io/badge/ESEC%2FFSE'21-Badge%20Application-blue)](STATUS.md)
