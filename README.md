@@ -5,6 +5,7 @@
 [![Build Status](https://travis-ci.com/pmbittner/FeatureTraceRecording.svg?branch=esecfse21)](https://travis-ci.com/pmbittner/FeatureTraceRecording)
 [![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](LICENSE.LGPL3)
 [![Install](https://img.shields.io/badge/Install-Instructions-blue)](INSTALL.md)
+[![DOI](https://zenodo.org/badge/286511539.svg)](https://zenodo.org/badge/latestdoi/286511539)
 [![Status](https://img.shields.io/badge/ESEC%2FFSE'21-Badge%20Application-blue)](STATUS.md)
 
 Artifact repository for the paper _Feature Trace Recording_, accepted at _ESEC/FSE 2021_.
