@@ -1,6 +1,10 @@
-﻿## Installing Stack
+﻿## Installation Instructions
 
 As explained in the [REQUIREMENTS.md](REQUIREMENTS.md), the [_Stack_][stack] build system is our only installation requirement.
+You can install it yourself or use the [Dockerfile](Dockerfile).
+
+### Option 1: Manual Setup
+First, please install Stack.
 Detailed installation instructions for many operating systems are given on the respective [installation webpage][stackinstall].
 
 - Linux: You can install stack via `curl -sSL https://get.haskellstack.org/ | sh` or `wget -qO- https://get.haskellstack.org/ | sh` (Alternatively, if you are using an Ubuntu-based distro, you can get it with apt `sudo apt-get install haskell-stack`, or `sudo pacman -S stack` if you are using an Arch-based distro).
@@ -8,9 +12,7 @@ Further instructions for installing stack including specific linux distributions
 - Windows 64-bit: Go to the [stack installation page][stackinstall]. Download and run the _Windows 64-bit Installer_.
 - MacOS: Please follow the instructions on the [installation webpage][stackinstall].
 
-## Running the Demo
-
-After you installed stack, please open a terminal and navigate to the repository's directory (the directory containing this `INSTALL.md`).
+Second, please open a terminal and navigate to the repository's directory (the directory containing this `INSTALL.md`).
 ```shell
 cd <path/to/this/repository>
 ```
@@ -24,6 +26,27 @@ We tested it within the Windows Terminal, Windows Powershell, Windows Subsystem 
 You can then build the library and run the demo as follows:
 ```shell
 stack run
+```
+
+### Option 2: Setup via Dockerfile
+
+First, install [Docker](https://www.docker.com/).
+Second, open a terminal and navigate to the repository's directory (the directory containing this `INSTALL.md`).
+```shell
+cd <path/to/this/repository>
+```
+Third, create the docker image:
+```shell
+docker build -t ftr .
+```
+You can verify that the image was created successfully by running
+```shell
+docker images
+```
+and checking that an image called `ftr` is listed.
+Fourth, you can run the image and thus the demo:
+```shell
+docker run -t ftr
 ```
 
 ## What Is There to See
@@ -48,7 +71,7 @@ By default, the following examples are executed in this order:
     - Bob's part of the motivating example shown in Figure 3 in the paper. As the synchronisation of code and feature traces across clones is subject to future work, this example simulates how we envision the synchronisation.
 2. Examples of edit patterns from the evaluation (Section 5): For each pattern we show how to reproduce it in the general case and when an outer scope (eg., a method) is already assigned the target mapping. We omitted AddIfdef* as it is just a repitition of AddIfdef with arbitrary contexts and code fragments. As AddIfdefElse has to be reproduced using two variants, we need two different examples here, one for the if-branch and one for the else-branch.
 
-If you see the following output after `stack run`, the build process and execution of the demo were successful.
+If you see the following output after `stack run` (or when running the Dockerfile), the build process and execution of the demo were successful.
 The colours in your terminal might deviate from the following screenshots.
 The following screenshots also display the entire default output of the demo in case you were not able to install the stack or get the demo running.
 
