@@ -14,9 +14,10 @@ After you installed stack, please open a terminal and navigate to the repository
 ```shell
 cd <path/to/this/repository>
 ```
-Before running the demo you should update stack as you might get errors otherwise:
+Before running the demo you should update and upgrade stack as you might get errors otherwise:
 ```shell
 stack update
+stack upgrade
 ```
 Our demo prints coloured text to the terminal, so it might not be compatible with every terminal.
 We tested it within the Windows Terminal, Windows Powershell, Windows Subsystem for Linux (WSL), and the default terminal on Manjaro.
