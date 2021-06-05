@@ -13,13 +13,14 @@ Implementing feature trace recording in a pure functional way, also allows us to
 - **Giving Examples for Evaluation**: Our demo complements our evaluation with concrete examples for the inspected edit patterns (Section 5.2) to show that our library is able to reproduce the results of our evaluation.
 Therefore, our demo runs feature trace recording on an instance of each pattern (i.e., a concrete edit matching this pattern).
 
-We claim the _Artifacts Available_ badge as we made our artefacts publicly available on [Github][ftrgithub] and [Zenodo][ftrzenodo]. (For now, the Zenodo link points to a reserved doi under which we will publish the artifacts once completed until the deadline at June 4.)
+We claim the _Artifacts Available_ badge as we made our artefacts publicly available on Github (Repository and readme file: [here][ftrgithub], Submission Release: [here][ftrrelease]), and [Zenodo][ftrzenodo].
 
 We claim the _Artifacts Evaluated Reusable_ badge as we implemented feature trace recording as a reusable library (see above).
 Furthermore, our library serves as a reference implementation if researchers or practitioners want to reimplement feature trace recording in another programming language.
 
-*: One may want to compare the formal model presented in Section 4.2 with [src/feature/recording/DefaultFeatureTraceRecording.hs](src/feature/recording/DefaultFeatureTraceRecording.hs).
+*: One may want to compare the formal model presented in Section 4.2 with [src/feature/recording/DefaultFeatureTraceRecording.hs](https://github.com/pmbittner/FeatureTraceRecording/blob/esecfse21/src/feature/recording/DefaultFeatureTraceRecording.hs).
 
 [ftrgithub]: https://github.com/pmbittner/FeatureTraceRecording/tree/esecfse21
-[ftrzenodo]: https://doi.org/10.5281/zenodo.4818461
+[ftrrelease]: https://github.com/pmbittner/FeatureTraceRecording/releases/tag/ArtefactSubmission
+[ftrzenodo]: https://doi.org/10.5281/zenodo.4900683 
 [documentation]: https://pmbittner.github.io/FeatureTraceRecording/
