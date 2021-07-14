@@ -50,6 +50,36 @@ The implementation is based on our implementation for propositional logic in [`s
 You can inspect the truth tables for the ternary logic by uncommenting the respective line (`showTruthtables`) in the `main` function in [`app/Main.hs`](app/Main.hs) and running the project again.
 
 
+## Please cite as
+```tex
+@inproceedings{BST+:ESECFSE21,
+	author = {Paul Maximilian Bittner and Alexander Schulthei\ss{} and Thomas Th{\"{u}}m and Timo Kehrer and Jeffrey M. Young and Lukas Linsbauer},
+	title = {{Feature Trace Recording}},
+	booktitle = {Proc.\ Europ.\ Software Engineering Conf./Foundations of Software Engineering (ESEC/FSE)},
+	location = {Athens, Greece},
+	publisher = {ACM},
+	address = {New York, NY, USA},
+	year = 2021,
+	month = AUG,
+	note = {To appear}
+}
+```
+
+
+## Limitations
+
+So far, this library contains no implementation for parsing and diffing source code.
+Instead, users of this library have to provide [Abstract Syntax Trees (ASTs)](https://pmbittner.github.io/FeatureTraceRecording/AST.html) and [edits to them](https://pmbittner.github.io/FeatureTraceRecording/Edits.html) as input for feature trace recording (see `runFTR` and `runFTRWithIntermediateSteps` in [FeatureTraceRecording.hs](https://pmbittner.github.io/FeatureTraceRecording/FeatureTraceRecording.html)).
+Examples for creating edits and ASTs can be found in the demos for Alice ([docs](https://pmbittner.github.io/FeatureTraceRecording/StackPopAlice.html), [src](app/examples/StackPopAlice.hs)), Bob ([docs](https://pmbittner.github.io/FeatureTraceRecording/StackPopBob.html), [src](app/examples/StackPopBob.hs)), and edit patterns ([docs](https://pmbittner.github.io/FeatureTraceRecording/EditPatterns.html), [src](app/examples/EditPatterns.hs)).
+
+Currently, the library also does not provide (de-)serialisation of feature traces.
+
+
+## Contact
+
+Don't hesitate to open issues or pull-request or to contact us directly (paul.bittner@uni-ulm.de). We are thankful for any help, constructive criticism, or interest. :)
+
+
 [paul]: https://www.uni-ulm.de/in/sp/team/paul-maximilian-bittner/
 [alexander]: https://www.informatik.hu-berlin.de/de/forschung/gebiete/mse/mitarb/alexander-schultheiss.html
 [thomas]: https://www.uni-ulm.de/in/sp/team/thuem/
