@@ -1,12 +1,22 @@
 # Feature Trace Recording
 
+<div style="float:left;">
+    <a href="https://doi.org/10.1145/3468264.3468531">
+        <img src="https://www.acm.org/binaries/content/gallery/acm/publications/artifact-review-v1_1-badges/artifacts_evaluated_reusable_v1_1.png" alt="ACM Artifacts Evaluated Reusable" width="114" height="113" />
+    </a>
+</div>
+
 [![Language](https://img.shields.io/badge/Language-Haskell-purple)](https://www.haskell.org/)
 [![Documentation](https://img.shields.io/badge/Documentation-Read-purple)][documentation]
+[![Preprint](https://img.shields.io/badge/Preprint-Read-purple)][preprint]
 [![Build Status](https://travis-ci.com/pmbittner/FeatureTraceRecording.svg?branch=esecfse21)](https://travis-ci.com/pmbittner/FeatureTraceRecording)
 [![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](LICENSE.LGPL3)
 [![Install](https://img.shields.io/badge/Install-Instructions-blue)](INSTALL.md)
 [![DOI](https://zenodo.org/badge/286511539.svg)](https://zenodo.org/badge/latestdoi/286511539)
-[![Status](https://img.shields.io/badge/ESEC%2FFSE'21-Badge%20Application-blue)](STATUS.md)
+<!-- [![Status](https://img.shields.io/badge/ESEC%2FFSE'21-Badge%20Application-blue)](STATUS.md) -->
+
+
+<!-- [<img src="https://www.acm.org/binaries/content/gallery/acm/publications/artifact-review-v1_1-badges/artifacts_evaluated_reusable_v1_1.png" alt="ACM Artifacts Evaluated Reusable" width="114" height="113" />][paper] -->
 
 Artifact repository for the paper _Feature Trace Recording_, accepted at _ESEC/FSE 2021_.
 Authors are [Paul Maximilian Bittner][paul], [Alexander Schultheiß][alexander], [Thomas Thüm][thomas], [Timo Kehrer][timo], [Jeffrey M. Young][jeffrey], and [Lukas Linsbauer][lukas].
@@ -55,3 +65,5 @@ You can inspect the truth tables for the ternary logic by uncommenting the respe
 [lukas]: https://www.tu-braunschweig.de/isf/team/lukas-linsbauer
 
 [documentation]: https://pmbittner.github.io/FeatureTraceRecording/
+[preprint]: https://github.com/SoftVarE-Group/Papers/raw/master/2021/2021-ESECFSE-Bittner.pdf
+[paper]: https://doi.org/10.1145/3468264.3468531
