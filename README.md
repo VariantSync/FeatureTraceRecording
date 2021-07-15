@@ -18,6 +18,36 @@ The artefact mainly consists of a library written in the Haskell language that i
 The library is accompanied with a demo application that uses the library to reproduce our motivating example (Alice and Bob using feature trace recording in Section 2 in our paper) as well as examples of the edit patterns we used to evaluate feature trace recording (Section 5).
 
 
+## What is Feature Trace Recording?
+
+Feature trace recording is a semi-automated method for recording feature-to-code mappings during software development.
+It unlocks evolution as a new source of information for feature location.
+
+![Feature Trace Recording Example](meta/FeatureTraceRecording.png)
+
+Consider a developer Alice editing the `pop` method of a `Stack` class in Java as depicted in the image above.
+Feature-to-code mappings are indicated by corresponding colours.
+By labeling her edits with the feature she edits, we derive feature mappings for edited source code.
+We refer to such a label as [_feature context_](https://pmbittner.github.io/FeatureTraceRecording/FeatureTraceRecording.html#t:FeatureContext).
+It can be left empty when developers do not know the feature they edit.
+In our example, Alice does not know the feature of the moved line in her second edit and omits the feature context (i.e., sets it to null).
+
+From feature contexts we can compute feature mappings for the current code base but also for other variants.
+Assume there is a second developer, Bob, working on another variant (e.g., branch or fork) of the software.
+Bob’s variant might implement other features than Alice’s.
+Assume Bob’s variant implements the blue feature <span style="color:#00BEEB">SafeStack</span> but not the orange feature <span style="color:#D95F02">ImmutableStack</span>.
+Although Alice made many edits to <span style="color:#D95F02">ImmutableStack</span>, we can still derive feature mappings for Bob’s code.
+When Alice deletes code from <span style="color:#D95F02">ImmutableStack</span>, we can infer that this code does not belong to <span style="color:#D95F02">ImmutableStack</span> anymore.
+We thus introduce the new feature mapping <span style="color:#7570B3">¬ImmutableStack</span> for the deleted code that is still present in Bob’s variant (highlighted in purple):
+
+<img src="meta/BobsVariant.png" alt="Bob's Recorded Feature Traces" width="250" />
+
+A detailed explanation of this example can be found in our [paper][paper] and [preprint][preprint].
+
+Feature trace recording is the first step towards our vision for bridging the gap between clone-and-own and software product lines in our project [VariantSync][variantsync].
+You may read about it in our [ICSE NIER paper](https://tinyurl.com/variantsync) or watch our talk on [YouTube](https://www.youtube.com/watch?v=oJf8W4cE25A) :blush:.
+
+
 ## How to Run the Demo
 Our library is written in Haskell and uses the _Stack_ build system (see [REQUIREMENTS.md](REQUIREMENTS.md)).
 Instructions for installing Stack, building our library and running the demo are given in the [INSTALL.md](INSTALL.md).
@@ -77,7 +107,7 @@ Currently, the library also does not provide (de-)serialisation of feature trace
 
 ## Contact
 
-Don't hesitate to open issues or pull-request or to contact us directly (paul.bittner@uni-ulm.de). We are thankful for questions, constructive criticism, or interest. :blush:
+Don't hesitate to open issues or pull-request or to contact us directly (paul.bittner@uni-ulm.de). We are thankful for any questions, constructive criticism, or interest. :blush:
 
 
 [paul]: https://www.uni-ulm.de/in/sp/team/paul-maximilian-bittner/
@@ -90,3 +120,4 @@ Don't hesitate to open issues or pull-request or to contact us directly (paul.bi
 [documentation]: https://pmbittner.github.io/FeatureTraceRecording/
 [preprint]: https://github.com/SoftVarE-Group/Papers/raw/master/2021/2021-ESECFSE-Bittner.pdf
 [paper]: https://doi.org/10.1145/3468264.3468531
+[variantsync]: https://www.uni-ulm.de/en/in/sp/research/projects/variantsync/
