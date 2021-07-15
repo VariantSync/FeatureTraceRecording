@@ -53,16 +53,18 @@ Our library is written in Haskell and uses the _Stack_ build system (see [REQUIR
 Instructions for installing Stack, building our library and running the demo are given in the [INSTALL.md](INSTALL.md).
 
 
-## Documentation
+## [Documentation][documentation]
 
 A detailed documentation can be found in `docs/index.html` and can be browsed on the [Github page][documentation].
 
 Some interesting code locations are:
-- `showExamples` function in [`app/Main.hs`](app/Main.hs): Here you can choose which examples to run and in which format the source code should be displayed. Choose from:
-    - `userFormat` (default): The perspective of the developer who is editing source code while traces are recorded in the background. This is the format used in the figures in the paper. The tool will show the presence conditions of the snapshots.
-    - `userFormatDetailed`: A variation of `userFormat` where traces and presence conditions can be investigated seperately at the same time. Code is coloured in the colour of its feature trace while presence conditions are indicated by coloured lines on the left.
-    - `astFormat`: Shows the abstract syntax tree of the source code with feature traces as formulas.
-    - `tikzFormat`: Tikz export of abstract syntax trees with traces. Used for figures in the paper.
+- [`main`](https://pmbittner.github.io/FeatureTraceRecording/Main.html#v:main) function in [`app/Main.hs`](app/Main.hs): Here you can choose in which format source code should be displayed. Choose from:
+    - [`userFormat`](https://pmbittner.github.io/FeatureTraceRecording/Main.html#v:userFormat) (default): The perspective of the developer who is editing source code while traces are recorded in the background. This is the format used in the figures in the paper. The tool will show the presence conditions of the snapshots.
+    - [`userFormatDetailed`](https://pmbittner.github.io/FeatureTraceRecording/Main.html#v:userFormatDetailed): A variation of `userFormat` where traces and presence conditions can be investigated seperately at the same time. Code is coloured in the colour of its feature trace while presence conditions are indicated by coloured lines on the left.
+    - [`astFormat`](https://pmbittner.github.io/FeatureTraceRecording/Main.html#v:astFormat): Shows the abstract syntax tree of the source code with feature traces as formulas.
+    - [`tikzFormat`](https://pmbittner.github.io/FeatureTraceRecording/Main.html#v:tikzFormat): Tikz export of abstract syntax trees with traces. Used for figures in the paper.
+
+- [`showExamples`](https://pmbittner.github.io/FeatureTraceRecording/Main.html#v:showExamples) function in [`app/Main.hs`](app/Main.hs): Here you can choose which examples to run.
 
 - [`src/feature/recording/FeatureTraceRecording.hs`](src/feature/recording/FeatureTraceRecording.hs): This file includes type definitions and interfaces for feature trace recording to make it configurable (e.g., plug in custom recording functions).
 
@@ -77,7 +79,7 @@ Some interesting code locations are:
 - [`src/propositions/NullPropositions.hs`](src/propositions/NullPropositions.hs): Operators for the ternary logic with `null`.
 We provide truthtables for the logic in [meta/Truthtable.md](meta/Truthtable.md).
 The implementation is based on our implementation for propositional logic in [`src/propositions/Propositions.hs`](src/propositions/Propositions.hs).
-You can inspect the truth tables for the ternary logic by uncommenting the respective line (`showTruthtables`) in the `main` function in [`app/Main.hs`](app/Main.hs) and running the project again.
+You can inspect the truth tables for the ternary logic by uncommenting the respective line (`showTruthtables`) in the `main` function in [`app/Main.hs`](app/Main.hs) and running the demo again.
 
 
 ## Please cite as
