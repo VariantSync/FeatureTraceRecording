@@ -110,7 +110,7 @@ Currently, the library also does not provide (de-)serialisation of feature trace
 
 ## Contact
 
-Don't hesitate to open issues or pull-request or to contact us directly (paul.bittner@uni-ulm.de). We are thankful for any questions, constructive criticism, or interest. :blush:
+Don't hesitate to open issues or pull-request, or to contact us directly (paul.bittner@uni-ulm.de). We are thankful for any questions, constructive criticism, or interest. :blush:
 
 
 [paul]: https://www.uni-ulm.de/in/sp/team/paul-maximilian-bittner/
