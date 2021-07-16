@@ -5,7 +5,7 @@
 [![Language](https://img.shields.io/badge/Language-Haskell-purple)](https://www.haskell.org/)
 [![Preprint](https://img.shields.io/badge/Preprint-Read-purple)][preprint]
 [![Documentation](https://img.shields.io/badge/Documentation-Read-purple)][documentation]
-[![Build Status](https://travis-ci.com/pmbittner/FeatureTraceRecording.svg?branch=esecfse21)](https://travis-ci.com/pmbittner/FeatureTraceRecording)
+[![Build Status](https://travis-ci.com/pmbittner/FeatureTraceRecording.svg?branch=master)](https://travis-ci.com/pmbittner/FeatureTraceRecording)
 [![Install](https://img.shields.io/badge/Install-Instructions-blue)](INSTALL.md)
 [![GitHubPages](https://img.shields.io/badge/GitHub%20Pages-online-blue.svg?style=flat)][website]
 [![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](LICENSE.LGPL3)
