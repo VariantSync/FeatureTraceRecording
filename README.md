@@ -24,7 +24,8 @@ The library is accompanied with a demo application that uses the library to repr
 Feature trace recording is a semi-automated method for recording feature-to-code mappings during software development.
 It unlocks evolution as a new source of information for feature location.
 
-![Feature Trace Recording Example](meta/FeatureTraceRecording.png)
+<img src="meta/FeatureTraceRecording.png" alt="Feature Trace Recording Example" image-rendering="crisp-edges" image-rendering="pixelated" />
+<!-- ![Feature Trace Recording Example](meta/FeatureTraceRecording.png) -->
 
 Consider a developer Alice editing the `pop` method of a `Stack` class in Java as depicted in the image above.
 Feature-to-code mappings are indicated by corresponding colours.
