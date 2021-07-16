@@ -9,7 +9,7 @@
 [![Install](https://img.shields.io/badge/Install-Instructions-blue)](INSTALL.md)
 [![GitHubPages](https://img.shields.io/badge/GitHub%20Pages-online-blue.svg?style=flat)][website]
 [![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](LICENSE.LGPL3)
-[![DOI](https://zenodo.org/badge/286511539.svg)](https://zenodo.org/badge/latestdoi/286511539)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4900682.svg)](https://doi.org/10.5281/zenodo.4900682)
 <!-- [![Status](https://img.shields.io/badge/ESEC%2FFSE'21-Badge%20Application-blue)](STATUS.md) -->
 
 Artifact repository for the paper _Feature Trace Recording_, accepted at _ESEC/FSE 2021_.
