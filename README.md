@@ -96,7 +96,7 @@ You can inspect the truth tables for the ternary logic by uncommenting the respe
 	year = 2021,
 	month = AUG,
 	doi = {10.1145/3468264.3468531},
-	note = {To appear}
+	keywords = {feature traceability, feature location, disciplined annotations, clone-and-own, software product lines}
 }
 ```
 
