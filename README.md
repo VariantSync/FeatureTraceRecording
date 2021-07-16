@@ -3,11 +3,12 @@
 [<img align="right" src="https://www.acm.org/binaries/content/gallery/acm/publications/artifact-review-v1_1-badges/artifacts_evaluated_reusable_v1_1.png" alt="ACM Artifacts Evaluated Reusable" width="114" height="113" />][paper]
 
 [![Language](https://img.shields.io/badge/Language-Haskell-purple)](https://www.haskell.org/)
-[![Documentation](https://img.shields.io/badge/Documentation-Read-purple)][documentation]
 [![Preprint](https://img.shields.io/badge/Preprint-Read-purple)][preprint]
+[![Documentation](https://img.shields.io/badge/Documentation-Read-purple)][documentation]
 [![Build Status](https://travis-ci.com/pmbittner/FeatureTraceRecording.svg?branch=esecfse21)](https://travis-ci.com/pmbittner/FeatureTraceRecording)
-[![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](LICENSE.LGPL3)
 [![Install](https://img.shields.io/badge/Install-Instructions-blue)](INSTALL.md)
+[![GitHubPages](https://img.shields.io/badge/GitHub%20Pages-online-blue.svg?style=flat)][website]
+[![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](LICENSE.LGPL3)
 [![DOI](https://zenodo.org/badge/286511539.svg)](https://zenodo.org/badge/latestdoi/286511539)
 <!-- [![Status](https://img.shields.io/badge/ESEC%2FFSE'21-Badge%20Application-blue)](STATUS.md) -->
 
@@ -119,7 +120,8 @@ Don't hesitate to open issues or pull-request or to contact us directly (paul.bi
 [jeffrey]: https://www.uni-ulm.de/in/sp/team/former-employees-and-doctorands/jeffrey-young/
 [lukas]: https://www.tu-braunschweig.de/isf/team/lukas-linsbauer
 
-[documentation]: https://pmbittner.github.io/FeatureTraceRecording/
+[website]: https://pmbittner.github.io/FeatureTraceRecording/
+[documentation]: https://pmbittner.github.io/FeatureTraceRecording/docs
 [preprint]: https://github.com/SoftVarE-Group/Papers/raw/master/2021/2021-ESECFSE-Bittner.pdf
 [paper]: https://doi.org/10.1145/3468264.3468531
 [variantsync]: https://www.uni-ulm.de/en/in/sp/research/projects/variantsync/
