@@ -59,7 +59,7 @@ Instructions for installing Stack, building our library and running the demo are
 A detailed documentation can be found in `docs/index.html` and can be browsed on the [Github page][documentation].
 
 Some interesting code locations are:
-- [`main`](https://pmbittner.github.io/FeatureTraceRecording/docs/Main.html#v:main) function in [`app/Main.hs`](app/Main.hs): Here you can choose in which format source code should be displayed. Choose from:
+- [`main`](https://pmbittner.github.io/FeatureTraceRecording/docs/Main.html#v:main) function in [`app/Main.hs`](app/Main.hs): Here you can choose in which format source code should be displayed in the terminal. Choose from:
     - [`userFormat`](https://pmbittner.github.io/FeatureTraceRecording/docs/Main.html#v:userFormat) (default): The perspective of the developer who is editing source code while traces are recorded in the background. This is the format used in the figures in the paper. The tool will show the presence conditions of the snapshots.
     - [`userFormatDetailed`](https://pmbittner.github.io/FeatureTraceRecording/docs/Main.html#v:userFormatDetailed): A variation of `userFormat` where traces and presence conditions can be investigated seperately at the same time. Code is coloured in the colour of its feature trace while presence conditions are indicated by coloured lines on the left.
     - [`astFormat`](https://pmbittner.github.io/FeatureTraceRecording/docs/Main.html#v:astFormat): Shows the abstract syntax tree of the source code with feature traces as formulas.
@@ -94,6 +94,7 @@ You can inspect the truth tables for the ternary logic by uncommenting the respe
 	address = {New York, NY, USA},
 	year = 2021,
 	month = AUG,
+	doi = {10.1145/3468264.3468531},
 	note = {To appear}
 }
 ```
