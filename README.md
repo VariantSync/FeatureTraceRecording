@@ -29,7 +29,7 @@ It unlocks evolution as a new source of information for feature location.
 Consider a developer Alice editing the `pop` method of a `Stack` class in Java as depicted in the image above.
 Feature-to-code mappings are indicated by corresponding colours.
 By labeling her edits with the feature she edits, we derive feature mappings for edited source code.
-We refer to such a label as [_feature context_](https://pmbittner.github.io/FeatureTraceRecording/FeatureTraceRecording.html#t:FeatureContext).
+We refer to such a label as [_feature context_](https://pmbittner.github.io/FeatureTraceRecording/docs/FeatureTraceRecording.html#t:FeatureContext).
 It can be left empty when developers do not know the feature they edit.
 In our example, Alice does not know the feature of the moved line in her second edit and omits the feature context (i.e., sets it to null).
 
