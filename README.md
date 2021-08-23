@@ -85,7 +85,7 @@ You can inspect the truth tables for the ternary logic by uncommenting the respe
 
 
 ## Please cite as
-```tex
+```BibTeX
 @inproceedings{BST+:ESECFSE21,
 	author = {Paul Maximilian Bittner and Alexander Schulthei\ss{} and Thomas Th{\"{u}}m and Timo Kehrer and Jeffrey M. Young and Lukas Linsbauer},
 	title = {{Feature Trace Recording}},
