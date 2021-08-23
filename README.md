@@ -95,8 +95,12 @@ You can inspect the truth tables for the ternary logic by uncommenting the respe
 	address = {New York, NY, USA},
 	year = 2021,
 	month = AUG,
+	pages = {1007--1020},
+	numpages = {14},
+	isbn = {9781450385626},
 	doi = {10.1145/3468264.3468531},
-	keywords = {feature traceability, feature location, disciplined annotations, clone-and-own, software product lines}
+	url = {https://doi.org/10.1145/3468264.3468531},
+	keywords = {feature traceability, disciplined annotations, clone-and-own, feature location, software product lines}
 }
 ```
 
