@@ -5,6 +5,7 @@
 [![Language](https://img.shields.io/badge/Language-Haskell-purple)](https://www.haskell.org/)
 [![Preprint](https://img.shields.io/badge/Preprint-Read-purple)][preprint]
 [![Documentation](https://img.shields.io/badge/Documentation-Read-purple)][documentation]
+[![Talk](https://img.shields.io/badge/Talk-Watch-purple)][talk]
 [![Build Status](https://travis-ci.com/pmbittner/FeatureTraceRecording.svg?branch=master)](https://travis-ci.com/pmbittner/FeatureTraceRecording)
 [![Install](https://img.shields.io/badge/Install-Instructions-blue)](INSTALL.md)
 [![GitHubPages](https://img.shields.io/badge/GitHub%20Pages-online-blue.svg?style=flat)][website]
@@ -131,3 +132,4 @@ Don't hesitate to open issues or pull-request, or to contact us directly (paul.b
 [preprint]: https://github.com/SoftVarE-Group/Papers/raw/master/2021/2021-ESECFSE-Bittner.pdf
 [paper]: https://doi.org/10.1145/3468264.3468531
 [variantsync]: https://www.uni-ulm.de/en/in/sp/research/projects/variantsync/
+[talk]: https://www.youtube.com/watch?v=Mk5S0XcoVVo
