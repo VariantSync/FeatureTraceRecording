@@ -1,6 +1,7 @@
 # Feature Trace Recording
 
-[<img align="right" src="https://www.acm.org/binaries/content/gallery/acm/publications/artifact-review-v1_1-badges/artifacts_evaluated_reusable_v1_1.png" alt="ACM Artifacts Evaluated Reusable" width="114" height="113" />][paper]
+<img padding="10" align="right" src="meta/best_artifact-ftr.png" height="200" />
+[<img padding="10" align="right" src="https://www.acm.org/binaries/content/gallery/acm/publications/artifact-review-v1_1-badges/artifacts_evaluated_reusable_v1_1.png" alt="ACM Artifacts Evaluated Reusable" width="114" height="113"/>][paper]
 
 [![Language](https://img.shields.io/badge/Language-Haskell-purple)](https://www.haskell.org/)
 [![Preprint](https://img.shields.io/badge/Preprint-Read-purple)][preprint]
