@@ -1,6 +1,6 @@
 # Feature Trace Recording
 
-<img padding="10" align="right" src="meta/best_artifact-ftr.png" height="200" />
+[<img padding="10" align="right" src="meta/best_artifact-ftr.png" height="200" />](https://2021.esec-fse.org/info/awards)
 
 [<img padding="10" align="right" src="https://www.acm.org/binaries/content/gallery/acm/publications/artifact-review-v1_1-badges/artifacts_evaluated_reusable_v1_1.png" alt="ACM Artifacts Evaluated Reusable" width="114" height="113"/>][paper]
 
