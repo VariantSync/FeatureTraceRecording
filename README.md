@@ -130,7 +130,7 @@ Don't hesitate to open issues or pull-request, or to contact us directly (paul.b
 [lukas]: https://www.tu-braunschweig.de/isf/team/lukas-linsbauer
 
 [website]: https://variantsync.github.io/FeatureTraceRecording/
-[documentation]: https://pmbittner.github.io/FeatureTraceRecording/docs
+[documentation]: https://variantsync.github.io/FeatureTraceRecording/docs
 [preprint]: https://github.com/SoftVarE-Group/Papers/raw/master/2021/2021-ESECFSE-Bittner.pdf
 [paper]: https://doi.org/10.1145/3468264.3468531
 [variantsync]: https://www.uni-ulm.de/en/in/sp/research/projects/variantsync/
