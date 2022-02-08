@@ -8,11 +8,11 @@
 [![Preprint](https://img.shields.io/badge/Preprint-Read-purple)][preprint]
 [![Documentation](https://img.shields.io/badge/Documentation-Read-purple)][documentation]
 [![Talk](https://img.shields.io/badge/Talk-Watch-purple)][talk]
-<!-- [![Build Status](https://travis-ci.com/pmbittner/FeatureTraceRecording.svg?branch=master)](https://travis-ci.com/pmbittner/FeatureTraceRecording) -->
 [![Install](https://img.shields.io/badge/Install-Instructions-blue)](INSTALL.md)
 [![GitHubPages](https://img.shields.io/badge/GitHub%20Pages-online-blue.svg?style=flat)][website]
 [![License](https://img.shields.io/badge/License-GNU%20LGPLv3-blue)](LICENSE.LGPL3)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4900682.svg)](https://doi.org/10.5281/zenodo.4900682)
+<!-- [![Build Status](https://travis-ci.com/pmbittner/FeatureTraceRecording.svg?branch=master)](https://travis-ci.com/pmbittner/FeatureTraceRecording) -->
 <!-- [![Status](https://img.shields.io/badge/ESEC%2FFSE'21-Badge%20Application-blue)](STATUS.md) -->
 
 Artifact repository for the paper _Feature Trace Recording_, accepted at _ESEC/FSE 2021_.
@@ -111,7 +111,7 @@ You can inspect the truth tables for the ternary logic by uncommenting the respe
 ## Limitations
 
 So far, this library contains no implementation for parsing and diffing source code.
-Instead, users of this library have to provide [Abstract Syntax Trees (ASTs)](https://variantsync.github.io/FeatureTraceRecording/docs/AST.html) and [edits to them](https://variantsync.github.io/FeatureTraceRecording/docs/Edits.html) as input for feature trace recording (see `runFTR` and `runFTRWithIntermediateSteps` in [FeatureTraceRecording.hs](https://variantsync.github.io/FeatureTraceRecording/FeatureTraceRecording.html)).
+Instead, users of this library have to provide [Abstract Syntax Trees (ASTs)](https://variantsync.github.io/FeatureTraceRecording/docs/AST.html) and [edits to them](https://variantsync.github.io/FeatureTraceRecording/docs/Edits.html) as input for feature trace recording (see `runFTR` and `runFTRWithIntermediateSteps` in [FeatureTraceRecording.hs](https://variantsync.github.io/FeatureTraceRecording/docs/FeatureTraceRecording.html)).
 Examples for creating edits and ASTs can be found in the demos for Alice ([docs](https://variantsync.github.io/FeatureTraceRecording/docs/StackPopAlice.html), [src](app/examples/StackPopAlice.hs)), Bob ([docs](https://variantsync.github.io/FeatureTraceRecording/docs/StackPopBob.html), [src](app/examples/StackPopBob.hs)), and edit patterns ([docs](https://variantsync.github.io/FeatureTraceRecording/docs/EditPatterns.html), [src](app/examples/EditPatterns.hs)).
 
 Currently, the library also does not provide (de-)serialisation of feature traces.
