@@ -33,7 +33,7 @@ It unlocks evolution as a new source of information for feature location.
 Consider a developer Alice editing the `pop` method of a `Stack` class in Java as depicted in the image above.
 Feature-to-code mappings are indicated by corresponding colours.
 By labeling her edits with the feature she edits, we derive feature mappings for edited source code.
-We refer to such a label as [_feature context_](https://pmbittner.github.io/FeatureTraceRecording/docs/FeatureTraceRecording.html#t:FeatureContext).
+We refer to such a label as [_feature context_](https://variantsync.github.io/FeatureTraceRecording/docs/FeatureTraceRecording.html#t:FeatureContext).
 It can be left empty when developers do not know the feature they edit.
 In our example, Alice does not know the feature of the moved line in her second edit and omits the feature context (i.e., sets it to null).
 
@@ -63,13 +63,13 @@ Instructions for installing Stack, building our library and running the demo are
 A detailed documentation can be found in `docs/index.html` and can be browsed on the [Github page][documentation].
 
 Some interesting code locations are:
-- [`main`](https://pmbittner.github.io/FeatureTraceRecording/docs/Main.html#v:main) function in [`app/Main.hs`](app/Main.hs): Here you can choose in which format source code should be displayed in the terminal. Choose from:
-    - [`userFormat`](https://pmbittner.github.io/FeatureTraceRecording/docs/Main.html#v:userFormat) (default): The perspective of the developer who is editing source code while traces are recorded in the background. This is the format used in the figures in the paper. The tool will show the presence conditions of the snapshots.
-    - [`userFormatDetailed`](https://pmbittner.github.io/FeatureTraceRecording/docs/Main.html#v:userFormatDetailed): A variation of `userFormat` where traces and presence conditions can be investigated seperately at the same time. Code is coloured in the colour of its feature trace while presence conditions are indicated by coloured lines on the left.
-    - [`astFormat`](https://pmbittner.github.io/FeatureTraceRecording/docs/Main.html#v:astFormat): Shows the abstract syntax tree of the source code with feature traces as formulas.
-    - [`tikzFormat`](https://pmbittner.github.io/FeatureTraceRecording/docs/Main.html#v:tikzFormat): Tikz export of abstract syntax trees with traces. Used for figures in the paper.
+- [`main`](https://variantsync.github.io/FeatureTraceRecording/docs/Main.html#v:main) function in [`app/Main.hs`](app/Main.hs): Here you can choose in which format source code should be displayed in the terminal. Choose from:
+    - [`userFormat`](https://variantsync.github.io/FeatureTraceRecording/docs/Main.html#v:userFormat) (default): The perspective of the developer who is editing source code while traces are recorded in the background. This is the format used in the figures in the paper. The tool will show the presence conditions of the snapshots.
+    - [`userFormatDetailed`](https://variantsync.github.io/FeatureTraceRecording/docs/Main.html#v:userFormatDetailed): A variation of `userFormat` where traces and presence conditions can be investigated seperately at the same time. Code is coloured in the colour of its feature trace while presence conditions are indicated by coloured lines on the left.
+    - [`astFormat`](https://variantsync.github.io/FeatureTraceRecording/docs/Main.html#v:astFormat): Shows the abstract syntax tree of the source code with feature traces as formulas.
+    - [`tikzFormat`](https://variantsync.github.io/FeatureTraceRecording/docs/Main.html#v:tikzFormat): Tikz export of abstract syntax trees with traces. Used for figures in the paper.
 
-- [`showExamples`](https://pmbittner.github.io/FeatureTraceRecording/docs/Main.html#v:showExamples) function in [`app/Main.hs`](app/Main.hs): Here you can choose which examples to run.
+- [`showExamples`](https://variantsync.github.io/FeatureTraceRecording/docs/Main.html#v:showExamples) function in [`app/Main.hs`](app/Main.hs): Here you can choose which examples to run.
 
 - [`src/feature/recording/FeatureTraceRecording.hs`](src/feature/recording/FeatureTraceRecording.hs): This file includes type definitions and interfaces for feature trace recording to make it configurable (e.g., plug in custom recording functions).
 
@@ -111,8 +111,8 @@ You can inspect the truth tables for the ternary logic by uncommenting the respe
 ## Limitations
 
 So far, this library contains no implementation for parsing and diffing source code.
-Instead, users of this library have to provide [Abstract Syntax Trees (ASTs)](https://pmbittner.github.io/FeatureTraceRecording/docs/AST.html) and [edits to them](https://pmbittner.github.io/FeatureTraceRecording/docs/Edits.html) as input for feature trace recording (see `runFTR` and `runFTRWithIntermediateSteps` in [FeatureTraceRecording.hs](https://pmbittner.github.io/FeatureTraceRecording/FeatureTraceRecording.html)).
-Examples for creating edits and ASTs can be found in the demos for Alice ([docs](https://pmbittner.github.io/FeatureTraceRecording/docs/StackPopAlice.html), [src](app/examples/StackPopAlice.hs)), Bob ([docs](https://pmbittner.github.io/FeatureTraceRecording/docs/StackPopBob.html), [src](app/examples/StackPopBob.hs)), and edit patterns ([docs](https://pmbittner.github.io/FeatureTraceRecording/docs/EditPatterns.html), [src](app/examples/EditPatterns.hs)).
+Instead, users of this library have to provide [Abstract Syntax Trees (ASTs)](https://variantsync.github.io/FeatureTraceRecording/docs/AST.html) and [edits to them](https://variantsync.github.io/FeatureTraceRecording/docs/Edits.html) as input for feature trace recording (see `runFTR` and `runFTRWithIntermediateSteps` in [FeatureTraceRecording.hs](https://variantsync.github.io/FeatureTraceRecording/FeatureTraceRecording.html)).
+Examples for creating edits and ASTs can be found in the demos for Alice ([docs](https://variantsync.github.io/FeatureTraceRecording/docs/StackPopAlice.html), [src](app/examples/StackPopAlice.hs)), Bob ([docs](https://variantsync.github.io/FeatureTraceRecording/docs/StackPopBob.html), [src](app/examples/StackPopBob.hs)), and edit patterns ([docs](https://variantsync.github.io/FeatureTraceRecording/docs/EditPatterns.html), [src](app/examples/EditPatterns.hs)).
 
 Currently, the library also does not provide (de-)serialisation of feature traces.
 
