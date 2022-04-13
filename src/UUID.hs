@@ -14,11 +14,10 @@ import Control.Monad.State
 type UUID = Int
 
 -- | Computes the successor 'UUID' of the current 'UUID'.
-next :: State UUID ()
+next :: State UUID UUID
 next = do
-    num <- get
-    put (num + 1)
-    return ()
+    modify (+ 1)
+    get
 
 -- | Converts a 'UUID' to an 'Int'.
 toInt :: UUID -> Int

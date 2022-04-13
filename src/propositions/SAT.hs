@@ -67,7 +67,7 @@ For example, the literal @-3@ translates to @PNot x@, where @x@ is the variable 
 The mapping from integers to variables is returned as a bimap in the second argument.
 -}
 toIntCNF :: (Ord a) => PropositionalFormula a -> ([[Int]], Bimap a Int)
-toIntCNF p = fst $ flip runState 1 $ do
+toIntCNF p = flip evalState 1 $ do
     (m, p') <- intifyFormula empty $ simplify p
     return (clausifyCNF (\x -> -x) (\_ -> error "Cannot construct false.") $ lazyToCNF p', m)
 
@@ -87,8 +87,7 @@ intifyFormula m (PVariable v) =
     if member v m
     then return (m, PVariable (m ! v))
     else do
-        next
-        uuidForV <- get
+        uuidForV <- next
         let intval = toInt uuidForV in
             return (insert v intval m, PVariable intval)
 intifyFormula m (PNot p) = do
@@ -127,7 +126,6 @@ Creates a list of the two literals 'x' and 'not x' where x is a new generated va
 -}
 createConflictingLiterals :: (Ord a) => Bimap a Int -> State UUID (Bimap a Int, [PropositionalFormula Int])
 createConflictingLiterals m = do
-    next
-    z <- get
+    z <- next
     let intval = toInt z in
         return (m, [PVariable intval, PNot $ PVariable intval])

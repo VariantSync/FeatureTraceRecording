@@ -46,8 +46,7 @@ optionaltype = nodetypeof.grammartype
 -- | Creates a new node from a value and a type by generating a new 'UUID' for it.
 node :: Grammar g => a -> g -> State UUID (Node g a)
 node v vt = do
-  next
-  id <- get
+  id <- next
   return Node {value = v, grammartype = vt, uuid = id}
 
 -- | Returns the 'UUID' of an 'AST's root.
