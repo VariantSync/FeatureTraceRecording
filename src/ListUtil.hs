@@ -7,6 +7,8 @@ A collection of functions that modify lists.
 -}
 module ListUtil where
 
+import Data.List (nub)
+
 -- | Returns the head of the given list as Just or Nothing, iff the list is empty.
 safehead :: [a] -> Maybe a
 safehead [] = Nothing
@@ -50,6 +52,4 @@ removeRange i j (head:tail)
 -- | Removes all duplicates from the given list.
 -- If two elements are equal (w.r.t. to @Eq@), the first one will be kept and the second one discarded.
 removeDuplicates :: (Eq a) => [a] -> [a]
-removeDuplicates [] = []
-removeDuplicates [x] = [x]
-removeDuplicates (x:xs) = x : [ k  | k <- removeDuplicates xs, k /=x ]
+removeDuplicates = nub

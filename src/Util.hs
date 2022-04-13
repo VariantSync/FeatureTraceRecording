@@ -11,12 +11,6 @@ module Util where
 genIndent :: Int -> String
 genIndent i = concat $ replicate i " "
 
--- | Returns @x@ iff the given Maybe is @Just x@.
--- Otherwise, returns the value produced by the given generator function.
-safeFromJust :: Maybe a -> (() -> a) -> a
-safeFromJust Nothing gen = gen ()
-safeFromJust (Just x) _ = x
-
 -- | Folds the given list after reversing it.
 reversefoldr :: (a -> b -> b) -> b -> [a] -> b
 reversefoldr f zero container = foldr f zero $ reverse container
