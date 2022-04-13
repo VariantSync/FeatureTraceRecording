@@ -9,7 +9,7 @@ module Util where
 
 -- | Generates a string of /i/ spaces where /i/ is the given indent.
 genIndent :: Int -> String
-genIndent i = concat $ replicate i " "
+genIndent i = replicate i ' '
 
 -- | Folds the given list after reversing it.
 reversefoldr :: (a -> b -> b) -> b -> [a] -> b
