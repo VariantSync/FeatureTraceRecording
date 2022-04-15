@@ -24,8 +24,6 @@ import Data.Bimap
 import Data.List (find)
 import Data.Maybe (isJust)
 
-import System.IO.Unsafe (unsafePerformIO)
-
 -- | Returns /true/ iff the given propositional formula is satisfiable.
 sat :: (Show a, Ord a) => PropositionalFormula a -> Bool
 sat = isJust.satAssignment
@@ -36,15 +34,13 @@ sat = isJust.satAssignment
 satAssignment :: (Show a, Ord a) => PropositionalFormula a -> Maybe (Assignment a)
 satAssignment p = 
     let (cnf, m) = toIntCNF p in
-        unsafePerformIO $ do -- TODO: Remove this hack
-            res <- solve cnf
-            case res of
-                Solution s -> return $ Just
-                    (\x -> case find (\i -> abs i == m ! x) s of
-                        Nothing -> error $ (show x)++" is not a variable in this configuration!"
-                        Just i -> i >= 0)
-                Unsatisfiable -> return Nothing
-                Unknown -> return Nothing
+        case unsafeSolve cnf of
+            Solution s -> Just
+                (\x -> case find (\i -> abs i == m ! x) s of
+                    Nothing -> error $ (show x)++" is not a variable in this configuration!"
+                    Just i -> i >= 0)
+            Unsatisfiable -> Nothing
+            Unknown -> Nothing
 
 -- | Returns /true/ iff the given propositional formula is a tautology.
 taut :: (Show a, Ord a) => PropositionalFormula a -> Bool
