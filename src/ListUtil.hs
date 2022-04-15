@@ -16,8 +16,7 @@ safehead (x:_) = Just x
 
 -- | Returns a continuous sublist within the given range [i, j].
 getRange :: Int -> Int -> [a] -> [a]
-getRange _ _ [] = []
-getRange i j l = (l!!) <$> [i..j]
+getRange i j = take (j - i + 1) . drop i
 
 -- | Inserts the given element into the given list at the given index.
 -- Subsequent elements will be pushed by one.
