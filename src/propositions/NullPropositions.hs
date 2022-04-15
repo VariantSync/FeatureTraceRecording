@@ -54,4 +54,4 @@ instance Logic a => Logic (Maybe a) where
         [p] -> Just p
         justs -> Just $ land justs
 
-    leval config m = m >>= Just . leval (demap config)
+    leval config m = leval (demap config) <$> m

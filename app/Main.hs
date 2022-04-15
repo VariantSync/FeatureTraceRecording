@@ -189,12 +189,14 @@ runStepwise format ex =
 -- the given 'FeatureFormulaColourPalette' will be used to assign colours to feature formulas.
 printASTWithTrace :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) =>
     OutputFormat -> FeatureFormulaColourPalette m -> AST g a -> FeatureTrace g a -> Doc (Attribute m)
-printASTWithTrace format featureColourPalette tree trace = 
+printASTWithTrace OutputFormat
+    { codeStyle = codestyle
+    , traceStyle = tracestyle
+    , traceDisplay = tracedisplay
+    , withTraceLines = withtracelines
+    }
+    featureColourPalette tree trace =
     let 
-        codestyle = codeStyle format
-        tracestyle = traceStyle format
-        tracedisplay = traceDisplay format
-        withtracelines = withTraceLines format
         nodePrint trace n = case tracestyle of
                         None -> pretty.removeQuotes.show $ value n
                         Colour -> paint (trace n) $ removeQuotes.show $ value n

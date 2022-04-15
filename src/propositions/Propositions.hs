@@ -79,7 +79,7 @@ isPFalse _ = False
 isLiteral :: PropositionalFormula a -> Bool
 isLiteral PTrue = True
 isLiteral PFalse = True
-isLiteral (PVariable x) = True
+isLiteral (PVariable _) = True
 isLiteral (PNot f) = isLiteral f
 isLiteral _ = False
 

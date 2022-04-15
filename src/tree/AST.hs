@@ -30,7 +30,7 @@ instance (Eq a) => Ord (Node g a) where
   v <= w = (uuid v) <= (uuid w)
 
 instance Functor (Node g) where
-  fmap f n = Node {value = f $ value n, grammartype = grammartype n, uuid = uuid n}
+  fmap f n = n {value = f $ value n}
 
 instance (Grammar g, Show a) => Show (Node g a) where
   show n = "("++(show $ uuid n)++", "++(show $ grammartype n)++", "++(show $ value n)++", "++(show $ optionaltype n)++")"
