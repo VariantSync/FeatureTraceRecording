@@ -197,14 +197,14 @@ printASTWithTrace OutputFormat
     }
     featureColourPalette tree trace =
     let 
-        nodePrint trace n = case tracestyle of
+        nodePrint n = case tracestyle of
                         None -> pretty.removeQuotes.show $ value n
                         Colour -> paint (trace n) $ removeQuotes.show $ value n
                         Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ trace n, ">", removeQuotes.show $ value n]
-        stringPrint trace n s = case tracestyle of
+        stringPrint n s = case tracestyle of
                         Colour -> paint (trace n) s
                         _ -> pretty s
-        indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && optionaltype n == Optional
+        indentGenerator n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && optionaltype n == Optional
                         then mappend (paint (trace n) "|") (pretty $ genIndent (i-1))
                         else pretty $ genIndent i
         paint formula = (annotate (foreground $ featureColourPalette formula)).pretty
@@ -215,7 +215,7 @@ printASTWithTrace OutputFormat
                 Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace n) $ show n)
                 Text -> pretty.(FeatureTrace.prettyPrint trace)) tree
             ShowTikz -> pretty $ astToTikzWithTraceDefault (trace, tree)
-            ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
+            ShowCode -> showCodeAs mempty indentGenerator stringPrint nodePrint tree
 
 -- | Prints the given list of versions that were produced from the given example.
 printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) =>
