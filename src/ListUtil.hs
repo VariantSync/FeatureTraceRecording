@@ -22,10 +22,7 @@ getRange i j l = (l!!) <$> [i..j]
 -- | Inserts the given element into the given list at the given index.
 -- Subsequent elements will be pushed by one.
 insertAtIndex :: Int -> a -> [a] -> [a]
-insertAtIndex i x [] = [x]
-insertAtIndex i x l@(head:tail)
-    | i <= 0 = x:l 
-    | otherwise = head:(insertAtIndex (i-1) x tail)
+insertAtIndex i x = insertListAtIndex i [x]
 
 -- | Inserts all elements from the first list into the second list at the given index.
 -- Similar to 'insertAtIndex' but inserts all elements of a list rather than just a single element.
