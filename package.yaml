@@ -33,6 +33,10 @@ dependencies:
 # - bytestring
 # - utf8-string
 
+ghc-options:
+  - -Wall
+  - -Wno-name-shadowing
+
 library:
   source-dirs:
     - src
