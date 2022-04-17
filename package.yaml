@@ -1,7 +1,7 @@
 name:                ftr
 version:             0.1.0.0
 github:              "git@github.com:pmbittner/FeatureTraceRecording.git"
-license:             GPL3
+license:             LGPL-3
 author:              "Paul Bittner"
 maintainer:          "paul.bittner@uni-ulm.de"
 copyright:           "2020 Paul Bittner"
