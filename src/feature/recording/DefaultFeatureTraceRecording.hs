@@ -15,7 +15,6 @@ import FeatureTraceRecording
 import Logic
 import NullPropositions
 import Data.Set
-import ListUtil
 
 {- |
 This is the default implementation of feature trace recording as proposed in our paper.

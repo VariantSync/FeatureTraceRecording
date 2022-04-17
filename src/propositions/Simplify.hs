@@ -14,7 +14,6 @@ import Propositions
     ( simplify,
       PropositionalFormula(..) )
 import SAT ( contradicts, taut )
-import Data.List
 
 {- |
 This is a naive implementation for presence condition simplification as described in

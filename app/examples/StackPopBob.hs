@@ -17,7 +17,6 @@ import Edits ( Edit(delta), foldEditScript, edit_trace_only )
 import Propositions ( PropositionalFormula(..) )
 import SimpleJava ( SimpleJavaGrammar )
 import FeatureColour
-import FeatureTrace
 
 import System.Terminal
 import Control.Monad.State ( State ) 

@@ -16,7 +16,6 @@ module SAT (
 
 import UUID
 import Propositions
-import Util
 
 import Picosat
 import Control.Monad.State

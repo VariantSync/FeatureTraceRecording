@@ -10,7 +10,6 @@ module StackPopAlice where
 
 import Control.Monad.State ( State )
 import UUID ( UUID )
-import Tree
 import AST
 import Edits
 import Propositions

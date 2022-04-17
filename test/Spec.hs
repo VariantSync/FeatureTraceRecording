@@ -1,6 +1,4 @@
 import Propositions
-import SAT
-import Util
 import Simplify
 
 

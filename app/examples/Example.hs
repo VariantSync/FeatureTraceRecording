@@ -7,11 +7,7 @@ Module for creating demos of feature trace recording.
 -}
 module Example where
 
-import AST ( AST )
-import Edits ( EditScript )
 import Grammar
-import Feature
-import FeatureTrace
 import FeatureTraceRecording
 import DefaultFeatureTraceRecording
 import FeatureColour (FeatureFormulaColourPalette)
