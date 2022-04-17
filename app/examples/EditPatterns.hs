@@ -117,7 +117,7 @@ addIfdefWithPC = do
     return $ plainAddIfdef{
         Example.name = "AddIfdef"++(buildPCName (value fileNode) ultraFormula),
         startVersion = (\v -> if v == fileNode then ultraFormula else (startTrace v), startAST),
-        history = (\(edit, fc) -> (edit, Nothing)) <$> history plainAddIfdef
+        history = (\(edit, _) -> (edit, Nothing)) <$> history plainAddIfdef
     }
 
 {- |

@@ -55,7 +55,7 @@ type Assignment a = a -> Bool -- Maybe this should better be implemented as a ma
 eval :: Assignment a -> PropositionalFormula a -> Bool
 eval _ PTrue = True
 eval _ PFalse = False
-eval config v@(PVariable x) = config x
+eval config (PVariable x) = config x
 eval config (PNot x) = not $ eval config x
 eval config (PAnd cs) = and $ fmap (eval config) cs
 eval config (POr cs) = or $ fmap (eval config) cs
@@ -94,12 +94,12 @@ toCNF :: PropositionalFormula a -> PropositionalFormula a
 toCNF n@(PNot a) = case a of
     PTrue -> PFalse
     PFalse -> PTrue
-    (PVariable x) -> n
+    (PVariable _) -> n
     (PNot x) -> toCNF x
     (PAnd cs) -> toCNF $ POr $ fmap lnot cs
     (POr cs) -> toCNF $ PAnd $ fmap lnot cs
-toCNF a@(PAnd cs) = simplify $ PAnd $ fmap toCNF cs
-toCNF o@(POr cs) = simplify $ PAnd $ foldr cartesianOr [PFalse] $ fmap toCNFClauseList $ fmap toCNF cs -- TODO
+toCNF (PAnd cs) = simplify $ PAnd $ fmap toCNF cs
+toCNF (POr cs) = simplify $ PAnd $ foldr cartesianOr [PFalse] $ fmap toCNFClauseList $ fmap toCNF cs -- TODO
 toCNF p = p
 
 -- | Converts the given propositional formula to conjunctive normal form if it is not already in that form.

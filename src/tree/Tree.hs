@@ -98,7 +98,7 @@ Children of removed nodes are moved up and become children of the parent of the 
 The root remains untouched.
 -}
 filterNodes :: (Tree a -> Bool) -> Tree a -> Tree a
-filterNodes p = manipulate (\tree@(Tree node children) ->
+filterNodes p = manipulate (\(Tree node children) ->
     Tree node (concat $ fmap (\c@(Tree _ cc) -> if p c then [c] else cc) children))
 
 

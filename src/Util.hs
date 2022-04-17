@@ -40,7 +40,7 @@ nothingIf p a
 -- | Removes the first and the last element of a list.
 removeFirstAndLast :: [a] -> [a]
 removeFirstAndLast [] = []
-removeFirstAndLast [x] = []
+removeFirstAndLast [_] = []
 removeFirstAndLast xs = tail $ init xs
 
 -- | If the given string starts and ends with quotes @"@ (i.e., it is of the form @"\"something\""@), those parenthesis will be removed (i.e., turned to just @"something"@).

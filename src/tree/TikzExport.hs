@@ -52,7 +52,7 @@ astToTikz :: (AST g a -> String) -> (AST g a -> String) -> AST g a -> String
 astToTikz val cls t = "\\"++(astToTikzRecursive 0 val cls t)++";"
 
 astToTikzRecursive :: Int -> (AST g a -> String) -> (AST g a -> String) -> AST g a -> String
-astToTikzRecursive i val cls t@(Tree n cs) = intercalate " " $
+astToTikzRecursive i val cls t@(Tree _ cs) = intercalate " " $
     ["node", "[", cls t, "] {", val t, "}"]++
     (mconcat $ fmap (\c -> ["\n", ind, "child", "{", astToTikzRecursive (i+1) val cls c, "\n", ind, "}"]) cs)
     where ind = genIndent $ 2*i

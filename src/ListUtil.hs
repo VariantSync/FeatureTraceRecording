@@ -26,7 +26,7 @@ insertAtIndex i x = insertListAtIndex i [x]
 -- | Inserts all elements from the first list into the second list at the given index.
 -- Similar to 'insertAtIndex' but inserts all elements of a list rather than just a single element.
 insertListAtIndex :: Int -> [a] -> [a] -> [a]
-insertListAtIndex i l [] = l
+insertListAtIndex _ l [] = l
 insertListAtIndex i arg l@(head:tail)
     | i > 0 = head:insertListAtIndex (i-1) arg tail
     | otherwise = arg++l
@@ -37,7 +37,7 @@ removeIndex i = removeRange i i
 
 -- | Removes all elements within the given range [i, j] from the given list.
 removeRange :: Int -> Int -> [a] -> [a]
-removeRange i j [] = []
+removeRange _ _ [] = []
 removeRange i j (head:tail)
     | i < 0 = error "i < 0 in removeRange"
     | i > j = error "i > j in removeRange"
