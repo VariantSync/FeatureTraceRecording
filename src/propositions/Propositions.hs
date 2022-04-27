@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeFamilies #-}
+
 {- |
 Description: Definition and operations of propositional logic.
 License: GNU LGPLv3
@@ -22,6 +24,10 @@ data PropositionalFormula a =
 
 -- | 'PropositionalFormula's form a 'Logic'.
 instance Logic (PropositionalFormula a) where
+    type Value (PropositionalFormula a) = Bool
+    type Variable (PropositionalFormula a) = a
+    type VariableValue (PropositionalFormula a) = Bool
+
     ltrue = PTrue
     lfalse = PFalse
 
@@ -35,10 +41,12 @@ instance Logic (PropositionalFormula a) where
     lor [] = PFalse
     lor l = POr l
     
-    leval config (PNot x) = lnot $ leval config x -- This should evaluate as config should only map to lvalues and lnot directly inverts PTrue and PFalse.
-    leval config (PAnd cs) = liftBool.not $ any isPFalse $ fmap (leval config) cs
-    leval config (POr cs) = liftBool $ any isPTrue $ fmap (leval config) cs
-    leval config p = config p
+    leval config (PNot x) = not $ leval config x -- This should evaluate as config should only map to lvalues and lnot directly inverts PTrue and PFalse.
+    leval config (PAnd cs) = all (leval config) cs
+    leval config (POr cs) = any (leval config) cs
+    leval config (PVariable v) = config v
+    leval _ (PTrue) = True
+    leval _ (PFalse) = False
 
 instance Functor PropositionalFormula where
     fmap _ PTrue = PTrue

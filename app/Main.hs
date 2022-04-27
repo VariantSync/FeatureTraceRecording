@@ -17,6 +17,7 @@ import Grammar
 import ASTPrettyPrinter
 import Edits ( edit_identity )
 import Logic
+import Data.Void
 import Propositions
 import NullPropositions 
 import FeatureTrace 
@@ -255,22 +256,12 @@ printTraces format example tracesAndTrees =
 alsoShowInitialStateInHistory :: History g a -> History g a
 alsoShowInitialStateInHistory h = (edit_identity, Nothing):h
 
--- | Helper function to help with type inference.
--- Returns all atomic values of a 'PropositionalFormula' (over strings).
-propositional_values :: [PropositionalFormula String]
-propositional_values = lvalues
-
--- | Helper function to help with type inference.
--- Returns all atomic values of a 'NullableFormula' (over strings).
-nullableFormula_values :: [NullableFormula String]
-nullableFormula_values = lvalues
-
 -- | Prints truthtables for common operators in 'PropositionalFormula's and 'NullableFormula's (not, and, or, implies, equiv)
 showTruthtables :: IO()
 showTruthtables = withTerminal $ runTerminalT $
     do
         headline "Propositional Logic"
-        putDoc.pretty $ generatetruthtablesfor propositional_values
+        putDoc.pretty $ generatetruthtablesfor (lvalues :: [PropositionalFormula Void])
         putDoc $ hardline <+> hardline
         headline "Ternary Logic With Null"
-        putDoc.pretty $ generatetruthtablesfor nullableFormula_values
+        putDoc.pretty $ generatetruthtablesfor (lvalues :: [NullableFormula Void])

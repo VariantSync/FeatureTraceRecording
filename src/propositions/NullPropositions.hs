@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeFamilies #-}
+
 {- |
 Description: Definition and operations on the ternary logic with /null/.
 License: GNU LGPLv3
@@ -11,7 +13,6 @@ module NullPropositions where
 
 import Logic
 import Propositions
-import Defunctor ( Defunctor(demap) )
 import Data.Maybe (catMaybes, fromJust, isNothing)
 
 -- | Data type for the ternary logic by Sobocinski.
@@ -44,6 +45,10 @@ prettyPrint (Just p) = show p
 -- This adds a new value 'Nothing' to the values of the given logic.
 -- In particular, 'NullableFormula' is thus a 'Logic'.
 instance Logic a => Logic (Maybe a) where
+    type Value (Maybe a) = Maybe (Value a)
+    type Variable (Maybe a) = Variable a
+    type VariableValue (Maybe a) = VariableValue a
+
     ltrue = Just ltrue
     lfalse = Just lfalse
     lvalues = Nothing:(Just <$> lvalues)
@@ -54,4 +59,4 @@ instance Logic a => Logic (Maybe a) where
         [p] -> Just p
         justs -> Just $ land justs
 
-    leval config m = leval (demap config) <$> m
+    leval config m = leval config <$> m

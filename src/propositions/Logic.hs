@@ -1,4 +1,7 @@
-﻿{- |
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleContexts #-}
+
+{- |
 Description: Type class for reasoning on 'Logic's.
 License: GNU LGPLv3
 Maintainer: paul.bittner@uni-ulm.de
@@ -12,6 +15,10 @@ Type class to reason on logics.
 We use this type class to reason on propositional logic and the ternary logic by Sobocinski we use for feature trace recording.
 -}
 class Logic l where
+    type Value l
+    type Variable l
+    type VariableValue l
+
     -- | The atomic value representing /true/ in this logic.
     ltrue :: l
     -- | The atomic value representing /false/ in this logic.
@@ -46,4 +53,4 @@ class Logic l where
     (2) a formula to evaluate
     This function should return an element of 'lvalues'.
     -}
-    leval :: (l -> l) -> l -> l
+    leval :: (Variable l -> VariableValue l) -> l -> Value l
