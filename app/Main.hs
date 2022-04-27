@@ -11,24 +11,24 @@ import Control.Monad.State ( State )
 
 import UUID ( UUID )
 import Util (removeQuotes,  genIndent )
-import Tree ( prettyPrint )
-import AST
-import Grammar
-import ASTPrettyPrinter
-import Edits ( edit_identity )
-import Logic
+import Tree.Tree as Tree ( prettyPrint )
+import Tree.AST
+import Tree.Grammar
+import Tree.ASTPrettyPrinter
+import Tree.Edits ( edit_identity )
+import Propositions.Logic
 import Data.Void
-import Propositions
-import NullPropositions 
-import FeatureTrace 
-import FeatureTraceRecording
-import FeatureColour (FeatureFormulaColourPalette)
-import Example
-import TikzExport ( astToTikzWithTraceDefault )
+import Propositions.Propositions
+import Propositions.NullPropositions as NullPropositions
+import Feature.FeatureTrace as FeatureTrace
+import Feature.Recording.FeatureTraceRecording
+import Feature.FeatureColour (FeatureFormulaColourPalette)
+import Examples.Example as Example
+import Tree.TikzExport ( astToTikzWithTraceDefault )
 
-import StackPopAlice (example)
-import StackPopBob (example)
-import EditPatterns
+import Examples.StackPopAlice as StackPopAlice (example)
+import Examples.StackPopBob as StackPopBob (example)
+import Examples.EditPatterns as EditPatterns
 
 import Data.List (intercalate)
 
@@ -36,7 +36,7 @@ import Data.List (intercalate)
 import Data.Text.Prettyprint.Doc
     ( Doc, (<+>), annotate, hardline, Pretty(pretty) )
 import System.Terminal
-import Truthtable (generatetruthtablesfor)
+import Propositions.Truthtable (generatetruthtablesfor)
 
 -- | Style defining how to print 'AST's.
 data CodePrintStyle

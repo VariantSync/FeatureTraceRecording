@@ -9,10 +9,10 @@ Definition and operations on the ternary logic with /null/.
 In the paper, we call formulas of this logic /nullable propositional formulas/.
 Reuses 'PropositionalFormula's.
 -}
-module NullPropositions where
+module Propositions.NullPropositions where
 
-import Logic
-import Propositions
+import Propositions.Logic
+import Propositions.Propositions
 import Data.Maybe (catMaybes, fromJust, isNothing)
 
 -- | Data type for the ternary logic by Sobocinski.
@@ -32,9 +32,9 @@ notnull = not.isnull
 assure :: NullableFormula a -> PropositionalFormula a
 assure = fromJust
 
--- | Simplifies the given formula. Uses 'Propositions.simplify'.
+-- | Simplifies the given formula. Uses 'Propositions.Propositions.simplify'.
 nullable_simplify :: NullableFormula a -> NullableFormula a
-nullable_simplify = fmap Propositions.simplify
+nullable_simplify = fmap simplify
 
 -- | Pretty Printing for nullable objects such as the nullable propositional logic.
 prettyPrint :: (Show a) => Maybe a -> String

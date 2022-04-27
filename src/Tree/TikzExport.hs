@@ -6,15 +6,15 @@ Maintainer: paul.bittner@uni-ulm.de
 Facilities for exporting 'AST's to Tikz code as a String.
 We use this export to generate the 'AST' figure in the paper (Figure 5).
 -}
-module TikzExport where
+module Tree.TikzExport where
 
-import Tree (element,  Tree(Tree) )
-import AST
-import Grammar
-import Propositions
-import Feature
-import FeatureTrace
-import FeatureTraceRecording
+import Tree.Tree (element,  Tree(Tree) )
+import Tree.AST
+import Tree.Grammar
+import Propositions.Propositions
+import Feature.Feature
+import Feature.FeatureTrace
+import Feature.Recording.FeatureTraceRecording
 import Util
 import Data.List ( intercalate )
 

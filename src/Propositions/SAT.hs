@@ -6,7 +6,7 @@ Maintainer: paul.bittner@uni-ulm.de
 Module for sat solving on 'PropositionalFormula's.
 Uses the picosat library.
 -}
-module SAT (
+module Propositions.SAT (
     sat,
     satAssignment,
     tautCounterExample,
@@ -15,7 +15,7 @@ module SAT (
     toIntCNF) where
 
 import UUID
-import Propositions
+import Propositions.Propositions
 
 import Picosat
 import Control.Monad.State

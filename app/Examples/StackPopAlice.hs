@@ -6,22 +6,22 @@ Maintainer: paul.bittner@uni-ulm.de
 Module for reproducing our motivating 'example' where Alice edits the @pop@ method of a class @Stack@ in Java.
 The example is described in detail in Section 2.1 of the paper and shown in Figure 1.
 -}
-module StackPopAlice where
+module Examples.StackPopAlice where
 
 import Control.Monad.State ( State )
 import UUID ( UUID )
-import AST
-import Edits
-import Propositions
-import Feature
-import FeatureTrace
-import FeatureColour
-import SimpleJava
+import Tree.AST
+import Tree.Edits
+import Propositions.Propositions
+import Feature.Feature
+import Feature.FeatureTrace
+import Feature.FeatureColour
+import Tree.Grammars.SimpleJava
 import System.Terminal
     ( MonadColorPrinter(..) )
 import Data.Maybe ( fromJust )
 
-import Example
+import Examples.Example as Example
 
 -- | Feature @SafeStack@ from the paper.
 feature_SafeStack :: Feature
@@ -87,11 +87,11 @@ Alice works on the @pop@ method of a Java class @Stack@.
 example :: (MonadColorPrinter m) => State UUID (Example m SimpleJavaGrammar String)
 example =
     do
-        tree_start <- StackPopAlice.startTree
-        tree_cond <- StackPopAlice.condTree
-        tree_clonedef <- StackPopAlice.cloneDef
-        tree_clonestorage <- StackPopAlice.cloneStorage
-        tree_cloneretstatement <- StackPopAlice.cloneRetStatement
+        tree_start <- Examples.StackPopAlice.startTree
+        tree_cond <- Examples.StackPopAlice.condTree
+        tree_clonedef <- Examples.StackPopAlice.cloneDef
+        tree_clonestorage <- Examples.StackPopAlice.cloneStorage
+        tree_cloneretstatement <- Examples.StackPopAlice.cloneRetStatement
         let
             id_tree_start_body = uuidOf . fromJust $ findByGrammarType SJava_Statements tree_start
             id_tree_start_storage = uuidOf . fromJust $ findByGrammarType SJava_ExprStatement tree_start

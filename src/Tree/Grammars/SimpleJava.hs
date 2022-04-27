@@ -7,14 +7,14 @@ Example implementation of a context free grammar.
 This example represents a simplified subset of the Java programming language.
 It contains the 'Grammar' implementation as well as functions to construct an 'AST' in this sub-language.
 -}
-module SimpleJava where
+module Tree.Grammars.SimpleJava where
 
-import Tree
+import Tree.Tree
 import Control.Monad.State ( State )
 import UUID ( UUID )
-import AST
-import Grammar
-import ASTPrettyPrinter
+import Tree.AST
+import Tree.Grammar
+import Tree.ASTPrettyPrinter
 import Data.List ( intersperse )
 
 -- | Simplified subset of the Java grammar.

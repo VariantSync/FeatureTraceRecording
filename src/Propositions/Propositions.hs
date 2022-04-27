@@ -7,9 +7,9 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Definition and operations of propositional logic.
 -}
-module Propositions where
+module Propositions.Propositions where
 
-import Logic
+import Propositions.Logic
 import Data.List ( intercalate )
 
 -- | Sum type similar to a grammar for building propositional formulas.

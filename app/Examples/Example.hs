@@ -5,12 +5,12 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Module for creating demos of feature trace recording.
 -}
-module Example where
+module Examples.Example where
 
-import Grammar
-import FeatureTraceRecording
-import DefaultFeatureTraceRecording
-import FeatureColour (FeatureFormulaColourPalette)
+import Tree.Grammar
+import Feature.Recording.FeatureTraceRecording
+import Feature.Recording.DefaultFeatureTraceRecording
+import Feature.FeatureColour (FeatureFormulaColourPalette)
 import Control.Monad.State ( State, evalState )
 import UUID
 

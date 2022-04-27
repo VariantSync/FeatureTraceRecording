@@ -6,11 +6,11 @@ Maintainer: paul.bittner@uni-ulm.de
 Data types and operations for Abstract Syntax Trees (ASTs).
 'AST's are that 'Tree's with a fixed 'Node' type.
 -}
-module AST where
+module Tree.AST where
 
 import UUID
-import Tree
-import Grammar
+import Tree.Tree
+import Tree.Grammar
 import Control.Monad.State
 
 -- | Node type of 'AST's.
@@ -55,7 +55,7 @@ uuidOf = uuid . element
 
 -- | Finds a subtree in the given 'AST' whose root has the given 'UUID'. Returns @Nothing@ iff no such subtree exists.
 findById :: UUID -> AST g a -> Maybe (AST g a)
-findById i = Tree.find ((i==).uuidOf)
+findById i = find ((i==).uuidOf)
 
 -- | Finds a subtree in the given 'AST' whose root has the given value. Returns @Nothing@ iff no such subtree exists.
 findByValue :: (Eq a) => a -> AST g a -> Maybe (AST g a)

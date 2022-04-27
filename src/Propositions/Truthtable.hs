@@ -8,9 +8,9 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Generation of truth tables for 'Logic's.
 -}
-module Truthtable where
+module Propositions.Truthtable where
 
-import Logic
+import Propositions.Logic
 import Data.Void
 
 -- | For a unary operator and a set of values, produces all results when applying that operator to that set of values.

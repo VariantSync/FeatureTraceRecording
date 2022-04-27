@@ -5,15 +5,15 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Implementation of feature trace recording as proposed in the paper (Section 4.2).
 -}
-module DefaultFeatureTraceRecording where
+module Feature.Recording.DefaultFeatureTraceRecording where
 
-import Grammar
-import Edits
-import AST
-import FeatureTrace
-import FeatureTraceRecording
-import Logic
-import NullPropositions
+import Tree.Grammar
+import Tree.Edits
+import Tree.AST
+import Feature.FeatureTrace
+import Feature.Recording.FeatureTraceRecording
+import Propositions.Logic
+import Propositions.NullPropositions
 import Data.Set
 
 {- |
@@ -53,7 +53,7 @@ removeTheRedundanciesWeIntroduced wrappee = \redit@(edit, _) version@(_, t_old) 
     let f_new = wrappee redit version
         t_new = run edit t_old
         d = delta edit t_old in
-        FeatureTrace.simplifyFeatureTraceOfNodes f_new t_new d
+        simplifyFeatureTraceOfNodes f_new t_new d
 
 {- |
 Feature trace recording for identity edit:

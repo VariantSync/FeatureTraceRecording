@@ -6,17 +6,17 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Data types and functions for feature traces and presence conditions.
 -}
-module FeatureTrace where
+module Feature.FeatureTrace where
 
-import Feature
-import Tree
-import AST
-import Grammar
-import Logic
-import Propositions
-import NullPropositions
+import Feature.Feature
+import Tree.Tree as Tree
+import Tree.AST
+import Tree.Grammar
+import Propositions.Logic
+import Propositions.Propositions as Propositions
+import Propositions.NullPropositions as NullPropositions
 import Data.Set
-import Simplify ( removeRedundancy )
+import Propositions.Simplify ( removeRedundancy )
 import Util ( nothingIf )
 
 -- | A feature trace (or feature mapping) assigns a nullable propositional formula over features to each node in an 'AST'.

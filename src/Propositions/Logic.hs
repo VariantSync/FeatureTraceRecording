@@ -8,7 +8,7 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Type class for reasoning on 'Logic's.
 -}
-module Logic where
+module Propositions.Logic where
 
 {- |
 Type class to reason on logics.
