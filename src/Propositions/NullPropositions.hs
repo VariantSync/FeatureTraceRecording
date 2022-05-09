@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeFamilies #-}
+
 {- |
 Description: Definition and operations on the ternary logic with /null/.
 License: GNU LGPLv3
@@ -7,11 +9,10 @@ Definition and operations on the ternary logic with /null/.
 In the paper, we call formulas of this logic /nullable propositional formulas/.
 Reuses 'PropositionalFormula's.
 -}
-module NullPropositions where
+module Propositions.NullPropositions where
 
-import Logic
-import Propositions
-import Defunctor ( Defunctor(demap) )
+import Propositions.Logic
+import Propositions.Propositions
 import Data.Maybe (catMaybes, fromJust, isNothing)
 
 -- | Data type for the ternary logic by Sobocinski.
@@ -31,9 +32,9 @@ notnull = not.isnull
 assure :: NullableFormula a -> PropositionalFormula a
 assure = fromJust
 
--- | Simplifies the given formula. Uses 'Propositions.simplify'.
+-- | Simplifies the given formula. Uses 'Propositions.Propositions.simplify'.
 nullable_simplify :: NullableFormula a -> NullableFormula a
-nullable_simplify = fmap Propositions.simplify
+nullable_simplify = fmap simplify
 
 -- | Pretty Printing for nullable objects such as the nullable propositional logic.
 prettyPrint :: (Show a) => Maybe a -> String
@@ -44,6 +45,10 @@ prettyPrint (Just p) = show p
 -- This adds a new value 'Nothing' to the values of the given logic.
 -- In particular, 'NullableFormula' is thus a 'Logic'.
 instance Logic a => Logic (Maybe a) where
+    type Value (Maybe a) = Maybe (Value a)
+    type Variable (Maybe a) = Variable a
+    type VariableValue (Maybe a) = VariableValue a
+
     ltrue = Just ltrue
     lfalse = Just lfalse
     lvalues = Nothing:(Just <$> lvalues)
@@ -54,4 +59,4 @@ instance Logic a => Logic (Maybe a) where
         [p] -> Just p
         justs -> Just $ land justs
 
-    leval config m = m >>= Just . leval (demap config)
+    leval config m = leval config <$> m

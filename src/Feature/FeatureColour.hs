@@ -1,4 +1,4 @@
-﻿{- |
+{- |
 Description: Module for colouring features and feature formulas.
 License: GNU LGPLv3
 Maintainer: paul.bittner@uni-ulm.de
@@ -6,15 +6,15 @@ Maintainer: paul.bittner@uni-ulm.de
 Module for colouring features and feature formulas.
 We use this colouring for visualizing features when printing to terminal.
 -}
-module FeatureColour (
+module Feature.FeatureColour (
     ColourPalette,
     FeatureColourPalette,
     FeatureFormulaColourPalette,
     defaultFeatureFormulaColouring
 ) where
 
-import Feature
-import Propositions
+import Feature.Feature
+import Propositions.Propositions
 import System.Terminal
 
 -- | A 'ColourPalette' assigns values of type @a@ to 'Color's.
@@ -46,7 +46,7 @@ defaultFeatureFormulaColouring palette (Just p) = defaultNonNullFeatureFormulaCo
 -- | Given a colour palette over features ('FeatureColourPalette'), returns the colour a propositional formula over these features should have.
 defaultNonNullFeatureFormulaColouring :: (MonadColorPrinter m) => FeatureColourPalette m -> NonNullFeatureFormula -> Color m
 defaultNonNullFeatureFormulaColouring palette (PVariable f) = palette f
-defaultNonNullFeatureFormulaColouring palette (PNot p) = FeatureColour.negate $ defaultNonNullFeatureFormulaColouring palette p
+defaultNonNullFeatureFormulaColouring palette (PNot p) = Feature.FeatureColour.negate $ defaultNonNullFeatureFormulaColouring palette p
 defaultNonNullFeatureFormulaColouring _ (PAnd []) = defaultColour
 defaultNonNullFeatureFormulaColouring _ (POr  []) = defaultColour
 defaultNonNullFeatureFormulaColouring palette (PAnd cs) = foldl1 mix $ defaultNonNullFeatureFormulaColouring palette <$> cs

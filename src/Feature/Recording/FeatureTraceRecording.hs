@@ -9,12 +9,12 @@ implement custom feature trace recording algorithms (i.e., variations of Algorit
 and functions (i.e., supporting new edit types or adapting/replacing the default recording functions
 for different use cases).
 -}
-module FeatureTraceRecording where
+module Feature.Recording.FeatureTraceRecording where
 
-import Edits
-import AST
-import Feature
-import FeatureTrace
+import Tree.Edits
+import Tree.AST
+import Feature.Feature
+import Feature.FeatureTrace
 
 -- | The feature context is a nullable propositional formula over features to tag edits to source code with the feature that was edited.
 type FeatureContext = FeatureFormula

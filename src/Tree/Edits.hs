@@ -5,12 +5,12 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Module for 'Edit's to 'AST's.
 -}
-module Edits where
+module Tree.Edits where
 
 import UUID
-import Tree
-import AST
-import Grammar
+import Tree.Tree
+import Tree.AST
+import Tree.Grammar
 
 import Util
 import ListUtil

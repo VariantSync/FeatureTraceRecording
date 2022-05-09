@@ -9,13 +9,7 @@ module Util where
 
 -- | Generates a string of /i/ spaces where /i/ is the given indent.
 genIndent :: Int -> String
-genIndent i = concat $ replicate i " "
-
--- | Returns @x@ iff the given Maybe is @Just x@.
--- Otherwise, returns the value produced by the given generator function.
-safeFromJust :: Maybe a -> (() -> a) -> a
-safeFromJust Nothing gen = gen ()
-safeFromJust (Just x) _ = x
+genIndent i = replicate i ' '
 
 -- | Folds the given list after reversing it.
 reversefoldr :: (a -> b -> b) -> b -> [a] -> b
@@ -46,7 +40,7 @@ nothingIf p a
 -- | Removes the first and the last element of a list.
 removeFirstAndLast :: [a] -> [a]
 removeFirstAndLast [] = []
-removeFirstAndLast [x] = []
+removeFirstAndLast [_] = []
 removeFirstAndLast xs = tail $ init xs
 
 -- | If the given string starts and ends with quotes @"@ (i.e., it is of the form @"\"something\""@), those parenthesis will be removed (i.e., turned to just @"something"@).

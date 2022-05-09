@@ -5,10 +5,10 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Data types for features and feature formulas.
 -}
-module Feature where
+module Feature.Feature where
 
-import Propositions
-import NullPropositions
+import Propositions.Propositions
+import Propositions.NullPropositions
 
 -- | Features are represented by a unique name.
 type Feature = String

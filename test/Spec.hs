@@ -1,7 +1,5 @@
-import Propositions
-import SAT
-import Util
-import Simplify
+import Propositions.Propositions
+import Propositions.Simplify
 
 
 {-Test CNF conversion-}

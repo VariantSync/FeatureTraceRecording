@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeFamilies #-}
+
 {- |
 Description: Definition and operations of propositional logic.
 License: GNU LGPLv3
@@ -5,9 +7,9 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Definition and operations of propositional logic.
 -}
-module Propositions where
+module Propositions.Propositions where
 
-import Logic
+import Propositions.Logic
 import Data.List ( intercalate )
 
 -- | Sum type similar to a grammar for building propositional formulas.
@@ -22,6 +24,10 @@ data PropositionalFormula a =
 
 -- | 'PropositionalFormula's form a 'Logic'.
 instance Logic (PropositionalFormula a) where
+    type Value (PropositionalFormula a) = Bool
+    type Variable (PropositionalFormula a) = a
+    type VariableValue (PropositionalFormula a) = Bool
+
     ltrue = PTrue
     lfalse = PFalse
 
@@ -35,10 +41,12 @@ instance Logic (PropositionalFormula a) where
     lor [] = PFalse
     lor l = POr l
     
-    leval config (PNot x) = lnot $ leval config x -- This should evaluate as config should only map to lvalues and lnot directly inverts PTrue and PFalse.
-    leval config (PAnd cs) = liftBool.not $ any isPFalse $ fmap (leval config) cs
-    leval config (POr cs) = liftBool $ any isPTrue $ fmap (leval config) cs
-    leval config p = config p
+    leval config (PNot x) = not $ leval config x -- This should evaluate as config should only map to lvalues and lnot directly inverts PTrue and PFalse.
+    leval config (PAnd cs) = all (leval config) cs
+    leval config (POr cs) = any (leval config) cs
+    leval config (PVariable v) = config v
+    leval _ (PTrue) = True
+    leval _ (PFalse) = False
 
 instance Functor PropositionalFormula where
     fmap _ PTrue = PTrue
@@ -55,7 +63,7 @@ type Assignment a = a -> Bool -- Maybe this should better be implemented as a ma
 eval :: Assignment a -> PropositionalFormula a -> Bool
 eval _ PTrue = True
 eval _ PFalse = False
-eval config v@(PVariable x) = config x
+eval config (PVariable x) = config x
 eval config (PNot x) = not $ eval config x
 eval config (PAnd cs) = and $ fmap (eval config) cs
 eval config (POr cs) = or $ fmap (eval config) cs
@@ -79,7 +87,7 @@ isPFalse _ = False
 isLiteral :: PropositionalFormula a -> Bool
 isLiteral PTrue = True
 isLiteral PFalse = True
-isLiteral (PVariable x) = True
+isLiteral (PVariable _) = True
 isLiteral (PNot f) = isLiteral f
 isLiteral _ = False
 
@@ -94,12 +102,12 @@ toCNF :: PropositionalFormula a -> PropositionalFormula a
 toCNF n@(PNot a) = case a of
     PTrue -> PFalse
     PFalse -> PTrue
-    (PVariable x) -> n
+    (PVariable _) -> n
     (PNot x) -> toCNF x
     (PAnd cs) -> toCNF $ POr $ fmap lnot cs
     (POr cs) -> toCNF $ PAnd $ fmap lnot cs
-toCNF a@(PAnd cs) = simplify $ PAnd $ fmap toCNF cs
-toCNF o@(POr cs) = simplify $ PAnd $ foldr cartesianOr [PFalse] $ fmap toCNFClauseList $ fmap toCNF cs -- TODO
+toCNF (PAnd cs) = simplify $ PAnd $ fmap toCNF cs
+toCNF (POr cs) = simplify $ PAnd $ foldr cartesianOr [PFalse] $ fmap toCNFClauseList $ fmap toCNF cs -- TODO
 toCNF p = p
 
 -- | Converts the given propositional formula to conjunctive normal form if it is not already in that form.

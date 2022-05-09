@@ -6,7 +6,7 @@ Maintainer: paul.bittner@uni-ulm.de
 Module for sat solving on 'PropositionalFormula's.
 Uses the picosat library.
 -}
-module SAT (
+module Propositions.SAT (
     sat,
     satAssignment,
     tautCounterExample,
@@ -15,16 +15,13 @@ module SAT (
     toIntCNF) where
 
 import UUID
-import Propositions
-import Util
+import Propositions.Propositions
 
 import Picosat
 import Control.Monad.State
 import Data.Bimap
 import Data.List (find)
 import Data.Maybe (isJust)
-
-import System.IO.Unsafe (unsafePerformIO)
 
 -- | Returns /true/ iff the given propositional formula is satisfiable.
 sat :: (Show a, Ord a) => PropositionalFormula a -> Bool
@@ -36,15 +33,13 @@ sat = isJust.satAssignment
 satAssignment :: (Show a, Ord a) => PropositionalFormula a -> Maybe (Assignment a)
 satAssignment p = 
     let (cnf, m) = toIntCNF p in
-        unsafePerformIO $ do -- TODO: Remove this hack
-            res <- solve cnf
-            case res of
-                Solution s -> return $ Just
-                    (\x -> case find (\i -> abs i == m ! x) s of
-                        Nothing -> error $ (show x)++" is not a variable in this configuration!"
-                        Just i -> i >= 0)
-                Unsatisfiable -> return Nothing
-                Unknown -> return Nothing
+        case unsafeSolve cnf of
+            Solution s -> Just
+                (\x -> case find (\i -> abs i == m ! x) s of
+                    Nothing -> error $ (show x)++" is not a variable in this configuration!"
+                    Just i -> i >= 0)
+            Unsatisfiable -> Nothing
+            Unknown -> Nothing
 
 -- | Returns /true/ iff the given propositional formula is a tautology.
 taut :: (Show a, Ord a) => PropositionalFormula a -> Bool
@@ -71,7 +66,7 @@ For example, the literal @-3@ translates to @PNot x@, where @x@ is the variable 
 The mapping from integers to variables is returned as a bimap in the second argument.
 -}
 toIntCNF :: (Ord a) => PropositionalFormula a -> ([[Int]], Bimap a Int)
-toIntCNF p = fst $ flip runState 1 $ do
+toIntCNF p = flip evalState 1 $ do
     (m, p') <- intifyFormula empty $ simplify p
     return (clausifyCNF (\x -> -x) (\_ -> error "Cannot construct false.") $ lazyToCNF p', m)
 
@@ -91,8 +86,7 @@ intifyFormula m (PVariable v) =
     if member v m
     then return (m, PVariable (m ! v))
     else do
-        next
-        uuidForV <- get
+        uuidForV <- next
         let intval = toInt uuidForV in
             return (insert v intval m, PVariable intval)
 intifyFormula m (PNot p) = do
@@ -131,7 +125,6 @@ Creates a list of the two literals 'x' and 'not x' where x is a new generated va
 -}
 createConflictingLiterals :: (Ord a) => Bimap a Int -> State UUID (Bimap a Int, [PropositionalFormula Int])
 createConflictingLiterals m = do
-    next
-    z <- get
+    z <- next
     let intval = toInt z in
         return (m, [PVariable intval, PNot $ PVariable intval])

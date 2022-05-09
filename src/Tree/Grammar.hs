@@ -5,7 +5,7 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Type class for context-free grammars.
 -}
-module Grammar where
+module Tree.Grammar where
 
 -- | Classification of nodes for feature traces and presence condition.
 -- (See Section 3.1 in the paper.)

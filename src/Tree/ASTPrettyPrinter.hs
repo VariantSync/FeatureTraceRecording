@@ -5,10 +5,10 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Type class for pretty printing 'AST's.
 -}
-module ASTPrettyPrinter where
+module Tree.ASTPrettyPrinter where
 
-import AST
-import Grammar
+import Tree.AST
+import Tree.Grammar
 import Util
 
 -- | An ASTPrettyPrinter can pretty print ASTs of a certain grammar.

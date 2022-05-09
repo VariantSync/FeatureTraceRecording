@@ -11,22 +11,22 @@ For some patterns, we thus /have to/ show multiple examples as described in the 
 Most notably, distinguishing between the case when no feature traces are present (/in general/ case)
 and the case when an optional outer scope of the edit code fragment is already mapped to the target feature mapping.
 -}
-module EditPatterns where
+module Examples.EditPatterns where
 
-import Example
-import SimpleJava
+import Examples.Example as Example
+import Tree.Grammars.SimpleJava
 import UUID ( UUID )
 import Control.Monad.State ( State )
 import System.Terminal
-import Feature
-import FeatureTrace
-import NullPropositions
-import FeatureTraceRecording
-import FeatureColour
-import Edits
-import AST
-import Propositions
-import Tree
+import Feature.Feature
+import Feature.FeatureTrace
+import Propositions.NullPropositions as NullPropositions
+import Feature.Recording.FeatureTraceRecording
+import Feature.FeatureColour
+import Tree.Edits
+import Tree.AST
+import Propositions.Propositions
+import Tree.Tree
 import Data.Maybe (fromJust)
 
 -- | A dummy feature that is edited in each example.
@@ -117,7 +117,7 @@ addIfdefWithPC = do
     return $ plainAddIfdef{
         Example.name = "AddIfdef"++(buildPCName (value fileNode) ultraFormula),
         startVersion = (\v -> if v == fileNode then ultraFormula else (startTrace v), startAST),
-        history = (\(edit, fc) -> (edit, Nothing)) <$> history plainAddIfdef
+        history = (\(edit, _) -> (edit, Nothing)) <$> history plainAddIfdef
     }
 
 {- |

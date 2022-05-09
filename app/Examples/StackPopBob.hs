@@ -7,17 +7,16 @@ Module for reproducing Bob's part of our motivating 'example'.
 Bob propagates applicable edits by Alice to his variant.
 The example is described in detail in Section 2.2 of the paper and shown in Figure 3.
 -}
-module StackPopBob where
+module Examples.StackPopBob where
 
-import StackPopAlice ( feature_ImmutableStack, example )
+import Examples.StackPopAlice as StackPopAlice ( feature_ImmutableStack, example )
 
 import UUID ( UUID )
-import Example ( Example(..) )
-import Edits ( Edit(delta), foldEditScript, edit_trace_only )
-import Propositions ( PropositionalFormula(..) )
-import SimpleJava ( SimpleJavaGrammar )
-import FeatureColour
-import FeatureTrace
+import Examples.Example as Example ( Example(..) )
+import Tree.Edits ( Edit(delta), foldEditScript, edit_trace_only )
+import Propositions.Propositions ( PropositionalFormula(..) )
+import Tree.Grammars.SimpleJava ( SimpleJavaGrammar )
+import Feature.FeatureColour
 
 import System.Terminal
 import Control.Monad.State ( State ) 
@@ -43,14 +42,14 @@ example =
     >>= \alice ->
         let numEditsToSynchronise = 2
             deleteThatUpdatesBobsTrace = 2
-            startVersion@(startTrace, startTree) = Example.startVersion alice
+            startVersion@(_, startTree) = Example.startVersion alice
             alicesEdits = history alice
             alicesEditsToSyncDirectly = take numEditsToSynchronise alicesEdits
             popVersion3 = foldEditScript (fst <$> alicesEditsToSyncDirectly) startTree
             in
         return Example {
             Example.name = "Motivating Example: Simulating propagation of Alice's edits on Stack.pop to Bob's clone",
-            Example.colours = StackPopBob.featureColourPalette $ colours alice,
+            Example.colours = featureColourPalette $ colours alice,
             Example.startVersion = startVersion,
             Example.history = 
                 alicesEditsToSyncDirectly++

@@ -11,23 +11,24 @@ import Control.Monad.State ( State )
 
 import UUID ( UUID )
 import Util (removeQuotes,  genIndent )
-import Tree ( prettyPrint )
-import AST
-import Grammar
-import ASTPrettyPrinter
-import Edits ( edit_identity )
-import Logic
-import Propositions
-import NullPropositions 
-import FeatureTrace 
-import FeatureTraceRecording
-import FeatureColour (FeatureFormulaColourPalette)
-import Example
-import TikzExport ( astToTikzWithTraceDefault )
+import Tree.Tree as Tree ( prettyPrint )
+import Tree.AST
+import Tree.Grammar
+import Tree.ASTPrettyPrinter
+import Tree.Edits ( edit_identity )
+import Propositions.Logic
+import Data.Void
+import Propositions.Propositions
+import Propositions.NullPropositions as NullPropositions
+import Feature.FeatureTrace as FeatureTrace
+import Feature.Recording.FeatureTraceRecording
+import Feature.FeatureColour (FeatureFormulaColourPalette)
+import Examples.Example as Example
+import Tree.TikzExport ( astToTikzWithTraceDefault )
 
-import StackPopAlice (example)
-import StackPopBob (example)
-import EditPatterns
+import Examples.StackPopAlice as StackPopAlice (example)
+import Examples.StackPopBob as StackPopBob (example)
+import Examples.EditPatterns as EditPatterns
 
 import Data.List (intercalate)
 
@@ -35,7 +36,7 @@ import Data.List (intercalate)
 import Data.Text.Prettyprint.Doc
     ( Doc, (<+>), annotate, hardline, Pretty(pretty) )
 import System.Terminal
-import Truthtable (generatetruthtablesfor)
+import Propositions.Truthtable (generatetruthtablesfor)
 
 -- | Style defining how to print 'AST's.
 data CodePrintStyle
@@ -189,20 +190,22 @@ runStepwise format ex =
 -- the given 'FeatureFormulaColourPalette' will be used to assign colours to feature formulas.
 printASTWithTrace :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) =>
     OutputFormat -> FeatureFormulaColourPalette m -> AST g a -> FeatureTrace g a -> Doc (Attribute m)
-printASTWithTrace format featureColourPalette tree trace = 
+printASTWithTrace OutputFormat
+    { codeStyle = codestyle
+    , traceStyle = tracestyle
+    , traceDisplay = tracedisplay
+    , withTraceLines = withtracelines
+    }
+    featureColourPalette tree trace =
     let 
-        codestyle = codeStyle format
-        tracestyle = traceStyle format
-        tracedisplay = traceDisplay format
-        withtracelines = withTraceLines format
-        nodePrint trace n = case tracestyle of
+        nodePrint n = case tracestyle of
                         None -> pretty.removeQuotes.show $ value n
                         Colour -> paint (trace n) $ removeQuotes.show $ value n
                         Text -> pretty $ concat ["<", NullPropositions.prettyPrint $ trace n, ">", removeQuotes.show $ value n]
-        stringPrint trace n s = case tracestyle of
+        stringPrint n s = case tracestyle of
                         Colour -> paint (trace n) s
                         _ -> pretty s
-        indentGenerator trace n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && optionaltype n == Optional
+        indentGenerator n i = if tracestyle == Colour && tracedisplay == Trace && withtracelines && optionaltype n == Optional
                         then mappend (paint (trace n) "|") (pretty $ genIndent (i-1))
                         else pretty $ genIndent i
         paint formula = (annotate (foreground $ featureColourPalette formula)).pretty
@@ -213,7 +216,7 @@ printASTWithTrace format featureColourPalette tree trace =
                 Colour -> Tree.prettyPrint 0 pretty (\n -> paint (trace n) $ show n)
                 Text -> pretty.(FeatureTrace.prettyPrint trace)) tree
             ShowTikz -> pretty $ astToTikzWithTraceDefault (trace, tree)
-            ShowCode -> showCodeAs mempty (indentGenerator trace) (stringPrint trace) (nodePrint trace) tree
+            ShowCode -> showCodeAs mempty indentGenerator stringPrint nodePrint tree
 
 -- | Prints the given list of versions that were produced from the given example.
 printTraces :: (MonadColorPrinter m, Grammar g, ASTPrettyPrinter g, Show a, Eq a) =>
@@ -253,22 +256,12 @@ printTraces format example tracesAndTrees =
 alsoShowInitialStateInHistory :: History g a -> History g a
 alsoShowInitialStateInHistory h = (edit_identity, Nothing):h
 
--- | Helper function to help with type inference.
--- Returns all atomic values of a 'PropositionalFormula' (over strings).
-propositional_values :: [PropositionalFormula String]
-propositional_values = lvalues
-
--- | Helper function to help with type inference.
--- Returns all atomic values of a 'NullableFormula' (over strings).
-nullableFormula_values :: [NullableFormula String]
-nullableFormula_values = lvalues
-
 -- | Prints truthtables for common operators in 'PropositionalFormula's and 'NullableFormula's (not, and, or, implies, equiv)
 showTruthtables :: IO()
 showTruthtables = withTerminal $ runTerminalT $
     do
         headline "Propositional Logic"
-        putDoc.pretty $ generatetruthtablesfor propositional_values
+        putDoc.pretty $ generatetruthtablesfor (lvalues :: [PropositionalFormula Void])
         putDoc $ hardline <+> hardline
         headline "Ternary Logic With Null"
-        putDoc.pretty $ generatetruthtablesfor nullableFormula_values
+        putDoc.pretty $ generatetruthtablesfor (lvalues :: [NullableFormula Void])

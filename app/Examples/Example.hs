@@ -5,17 +5,13 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Module for creating demos of feature trace recording.
 -}
-module Example where
+module Examples.Example where
 
-import AST ( AST )
-import Edits ( EditScript )
-import Grammar
-import Feature
-import FeatureTrace
-import FeatureTraceRecording
-import DefaultFeatureTraceRecording
-import FeatureColour (FeatureFormulaColourPalette)
-import Control.Monad.State ( State, runState )
+import Tree.Grammar
+import Feature.Recording.FeatureTraceRecording
+import Feature.Recording.DefaultFeatureTraceRecording
+import Feature.FeatureColour (FeatureFormulaColourPalette)
+import Control.Monad.State ( State, evalState )
 import UUID
 
 {- | An 'Example' represents a single demo showcase of feature trace recording.
@@ -48,4 +44,4 @@ runExampleWithDefaultFTR = runExample defaultFeatureTraceRecording
 -- | Evaluates all 'UUID's in the example, starting with @0@.
 -- Use this after building an 'AST' whose 'Node's yet have to be assigned 'UUID's.
 finalizeExample :: State UUID (Example m g a) -> Example m g a
-finalizeExample ex = fst $ runState ex 0
+finalizeExample ex = evalState ex 0

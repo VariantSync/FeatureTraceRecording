@@ -6,15 +6,15 @@ Maintainer: paul.bittner@uni-ulm.de
 Facilities for exporting 'AST's to Tikz code as a String.
 We use this export to generate the 'AST' figure in the paper (Figure 5).
 -}
-module TikzExport where
+module Tree.TikzExport where
 
-import Tree (element,  Tree(Tree) )
-import AST
-import Grammar
-import Propositions
-import Feature
-import FeatureTrace
-import FeatureTraceRecording
+import Tree.Tree (element,  Tree(Tree) )
+import Tree.AST
+import Tree.Grammar
+import Propositions.Propositions
+import Feature.Feature
+import Feature.FeatureTrace
+import Feature.Recording.FeatureTraceRecording
 import Util
 import Data.List ( intercalate )
 
@@ -52,7 +52,7 @@ astToTikz :: (AST g a -> String) -> (AST g a -> String) -> AST g a -> String
 astToTikz val cls t = "\\"++(astToTikzRecursive 0 val cls t)++";"
 
 astToTikzRecursive :: Int -> (AST g a -> String) -> (AST g a -> String) -> AST g a -> String
-astToTikzRecursive i val cls t@(Tree n cs) = intercalate " " $
+astToTikzRecursive i val cls t@(Tree _ cs) = intercalate " " $
     ["node", "[", cls t, "] {", val t, "}"]++
     (mconcat $ fmap (\c -> ["\n", ind, "child", "{", astToTikzRecursive (i+1) val cls c, "\n", ind, "}"]) cs)
     where ind = genIndent $ 2*i

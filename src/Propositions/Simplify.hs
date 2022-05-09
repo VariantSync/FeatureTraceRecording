@@ -5,16 +5,15 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Functions for simplification of 'PropositionalFormula's.
 -}
-module Simplify (
+module Propositions.Simplify (
     removeRedundancy
 ) where
 
-import Logic
-import Propositions
+import Propositions.Logic
+import Propositions.Propositions
     ( simplify,
       PropositionalFormula(..) )
-import SAT ( contradicts, taut )
-import Data.List
+import Propositions.SAT ( contradicts, taut )
 
 {- |
 This is a naive implementation for presence condition simplification as described in

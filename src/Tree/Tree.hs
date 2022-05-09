@@ -7,9 +7,9 @@ Maintainer: paul.bittner@uni-ulm.de
 
 Implementation of a rose tree (i.e., a tree whose nodes can have an arbitrary amount of children, including 0) we use for 'AST's .
 -}
-module Tree where
+module Tree.Tree where
 
-import Data.List
+import Data.List hiding (find)
 import Data.Maybe
 import Data.Set
 
@@ -49,7 +49,7 @@ tree t x = case safetree t x of
 
 -- | Same as 'tree' but returns @Nothing@ in the error case (i.e., when no subtree contains the given value).
 safetree :: Eq a => Tree a -> a -> Maybe(Tree a)
-safetree t x = Tree.find (\(Tree y _) -> x == y) t
+safetree t x = find (\(Tree y _) -> x == y) t
 
 -- | Transforms a tree into a set.
 -- The returned set contains exactly the values previously held in the tree.
@@ -60,17 +60,17 @@ toset = fromList.(foldMap pure)
 find :: (Tree a -> Bool) -> Tree a -> Maybe(Tree a)
 find predicate x@(Tree _ children) = case predicate x of
   True -> Just x
-  False -> safehead $ catMaybes $ fmap (\t -> Tree.find predicate t) children
+  False -> safehead $ catMaybes $ fmap (\t -> find predicate t) children
 
 -- | Same as 'find' but takes a predicate over elements instead of a predicate over trees to identify the subtree of interest.
 findByNode :: (a -> Bool) -> Tree a -> Maybe(Tree a)
-findByNode p = Tree.find (\(Tree n _) -> p n)
+findByNode p = find (\(Tree n _) -> p n)
 
 -- | Returns the parent of the given node (second argument) in the given tree (first argument).
 -- The returned parent is a subtree of the first given tree and has the second given tree as child.
 -- Throws an error iff no parent exists.
 parent :: Eq a => Tree a -> Tree a -> Maybe(Tree a)
-parent root t = Tree.find (\(Tree _ children) -> elem t children) root
+parent root t = find (\(Tree _ children) -> elem t children) root
 
 {- |
 Retrieves all nodes that are above the given node (second argument) in the given tree (first argument)
@@ -98,7 +98,7 @@ Children of removed nodes are moved up and become children of the parent of the 
 The root remains untouched.
 -}
 filterNodes :: (Tree a -> Bool) -> Tree a -> Tree a
-filterNodes p = manipulate (\tree@(Tree node children) ->
+filterNodes p = manipulate (\(Tree node children) ->
     Tree node (concat $ fmap (\c@(Tree _ cc) -> if p c then [c] else cc) children))
 
 

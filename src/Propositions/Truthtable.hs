@@ -1,25 +1,29 @@
-﻿{- |
+﻿{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleContexts #-}
+
+{- |
 Description: Generation of truth tables for 'Logic's.
 License: GNU LGPLv3
 Maintainer: paul.bittner@uni-ulm.de
 
 Generation of truth tables for 'Logic's.
 -}
-module Truthtable where
+module Propositions.Truthtable where
 
-import Logic
+import Propositions.Logic
+import Data.Void
 
 -- | For a unary operator and a set of values, produces all results when applying that operator to that set of values.
-unarytable :: Logic a => (a -> a) -> [a] -> [a]
-unarytable op values = leval id . op <$> values
+unarytable :: (Logic a, Variable a ~ Void) => (a -> a) -> [a] -> [Value a]
+unarytable op values = leval absurd . op <$> values
 
 -- | Builds the cartesions product of two lists.
 cartesian :: [a] -> [b] -> [(a, b)]
 cartesian x y = (,) <$> x <*> y
 
 -- | For a binary operator and a set of values, produces all results when applying that operator to all combinations of values.
-binarytable :: Logic a => (a -> a -> a) -> [a] -> [a]
-binarytable op values = leval id . uncurry op <$> cartesian values values
+binarytable :: (Logic a, Variable a ~ Void) => (a -> a -> a) -> [a] -> [Value a]
+binarytable op values = leval absurd . uncurry op <$> cartesian values values
 
 -- | Creates a function of two arguments by reusing a function on lists.
 binarify :: ([a] -> b) -> (a -> a -> b)
@@ -41,16 +45,16 @@ defaulthfillto :: String -> String
 defaulthfillto = hfillto defaultlinewidth
 
 -- | For a list of values and a unary operator, generates a truth table with the given name.
-prettyunarytable :: (Logic a, Show a) => [a] -> (a -> a) -> String -> String
+prettyunarytable :: (Logic a, Variable a ~ Void, Show a, Show (Value a)) => [a] -> (a -> a) -> String -> String
 prettyunarytable values op name = ((name++"\n"++(replicate (2*defaultlinewidth+3) '_')++"\n")++) $ mconcat $ (\(val, res) -> unwords [defaulthfillto $ show val, "|", defaulthfillto $ show res, "\n"]) <$> zip values (unarytable op values)
 
 -- | For a list of values and a binary operator, generates a truth table with the given name.
-prettybinarytable :: (Logic a, Show a) => [a] -> (a -> a -> a) -> String -> String
+prettybinarytable :: (Logic a, Variable a ~ Void, Show a, Show (Value a)) => [a] -> (a -> a -> a) -> String -> String
 prettybinarytable values op name = ((name++"\n"++(replicate (3*defaultlinewidth+4) '_')++"\n")++) $ mconcat $ (\((a, b), res) -> unwords [defaulthfillto $ show a, defaulthfillto $ show b, "|", defaulthfillto $ show res, "\n"]) <$> zip pairs (binarytable op values)
     where pairs = cartesian values values
 
 -- | Generates a truthtable for all common operators of a logic (not, and, or, implies, equals) for the given set of values.
-generatetruthtablesfor :: (Logic a, Show a) => [a] -> String
+generatetruthtablesfor :: (Logic a, Variable a ~ Void, Show a, Show (Value a)) => [a] -> String
 generatetruthtablesfor values =
     let
         notname = "¬"

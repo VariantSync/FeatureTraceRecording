@@ -6,11 +6,11 @@ Maintainer: paul.bittner@uni-ulm.de
 Data types and operations for Abstract Syntax Trees (ASTs).
 'AST's are that 'Tree's with a fixed 'Node' type.
 -}
-module AST where
+module Tree.AST where
 
 import UUID
-import Tree
-import Grammar
+import Tree.Tree
+import Tree.Grammar
 import Control.Monad.State
 
 -- | Node type of 'AST's.
@@ -30,7 +30,7 @@ instance (Eq a) => Ord (Node g a) where
   v <= w = (uuid v) <= (uuid w)
 
 instance Functor (Node g) where
-  fmap f n = Node {value = f $ value n, grammartype = grammartype n, uuid = uuid n}
+  fmap f n = n {value = f $ value n}
 
 instance (Grammar g, Show a) => Show (Node g a) where
   show n = "("++(show $ uuid n)++", "++(show $ grammartype n)++", "++(show $ value n)++", "++(show $ optionaltype n)++")"
@@ -46,8 +46,7 @@ optionaltype = nodetypeof.grammartype
 -- | Creates a new node from a value and a type by generating a new 'UUID' for it.
 node :: Grammar g => a -> g -> State UUID (Node g a)
 node v vt = do
-  next
-  id <- get
+  id <- next
   return Node {value = v, grammartype = vt, uuid = id}
 
 -- | Returns the 'UUID' of an 'AST's root.
@@ -56,7 +55,7 @@ uuidOf = uuid . element
 
 -- | Finds a subtree in the given 'AST' whose root has the given 'UUID'. Returns @Nothing@ iff no such subtree exists.
 findById :: UUID -> AST g a -> Maybe (AST g a)
-findById i = Tree.find ((i==).uuidOf)
+findById i = find ((i==).uuidOf)
 
 -- | Finds a subtree in the given 'AST' whose root has the given value. Returns @Nothing@ iff no such subtree exists.
 findByValue :: (Eq a) => a -> AST g a -> Maybe (AST g a)
