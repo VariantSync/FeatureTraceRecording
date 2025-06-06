@@ -122,16 +122,16 @@ Currently, the library also does not provide (de-)serialisation of feature trace
 Don't hesitate to open issues or pull-request, or to contact us directly (paul.bittner@uni-ulm.de). We are thankful for any questions, constructive criticism, or interest. :blush:
 
 
-[paul]: https://www.uni-ulm.de/in/sp/team/paul-maximilian-bittner/
-[alexander]: https://www.informatik.hu-berlin.de/de/forschung/gebiete/mse/mitarb/alexander-schultheiss.html
-[thomas]: https://www.uni-ulm.de/in/sp/team/thuem/
-[timo]: https://www.informatik.hu-berlin.de/de/forschung/gebiete/mse/mitarb/kehrerti.html
-[jeffrey]: https://www.uni-ulm.de/in/sp/team/former-employees-and-doctorands/jeffrey-young/
-[lukas]: https://www.tu-braunschweig.de/isf/team/lukas-linsbauer
+[paul]: https://pmbittner.github.io/
+[alexander]: https://github.com/AlexanderSchultheiss
+[thomas]: https://thomas.thüm.de
+[timo]: https://seg.inf.unibe.ch/team/timo-kehrer/
+[jeffrey]: https://github.com/doyougnu
+[lukas]: https://github.com/llinsbauer
 
 [website]: https://variantsync.github.io/FeatureTraceRecording/
 [documentation]: https://variantsync.github.io/FeatureTraceRecording/docs
-[preprint]: https://github.com/SoftVarE-Group/Papers/raw/master/2021/2021-ESECFSE-Bittner.pdf
+[preprint]: https://github.com/SoftVarE-Group/Papers/raw/main/2021/2021-ESECFSE-Bittner.pdf
 [paper]: https://doi.org/10.1145/3468264.3468531
 [variantsync]: https://www.uni-ulm.de/en/in/sp/research/projects/variantsync/
 [talk]: https://www.youtube.com/watch?v=Mk5S0XcoVVo
